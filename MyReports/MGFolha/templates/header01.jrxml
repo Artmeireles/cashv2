@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="header01" pageWidth="555" pageHeight="83" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="c81d4a6a-ca01-45a7-a0bb-eeced5c7bdd8">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mgfolha_vps1"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://162.214.145.146:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/MGFolha/templates/header01_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MGFolha/templates/header01"/>
+	<parameter name="titulo" class="java.lang.String">
+		<defaultValueExpression><![CDATA["Título do relatório"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="descricao" class="java.lang.String">
+		<defaultValueExpression><![CDATA["Descrição do relatório"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dominio" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ativos"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dbSchema" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{DB_PREFIX} + "_" + $P{CLIENTE} + "_" + $P{DOMINIO}]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DOMINIO" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ativos"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="CLIENTE" class="java.lang.String">
+		<defaultValueExpression><![CDATA["major"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DB_PREFIX" class="java.lang.String">
+		<defaultValueExpression><![CDATA["wwmgca"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select  orgao.orgao, orgao.orgao_cliente, orgao.dominio, orgao.url_logo  from $P!{dbSchema}.orgao where orgao.dominio = $P{dominio}]]>
+	</queryString>
+	<field name="orgao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="orgao"/>
+		<property name="com.jaspersoft.studio.field.label" value="orgao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="orgao"/>
+		<fieldDescription><![CDATA[Nome do cliente]]></fieldDescription>
+	</field>
+	<field name="orgao_cliente" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="orgao_cliente"/>
+		<property name="com.jaspersoft.studio.field.label" value="orgao_cliente"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="orgao"/>
+		<fieldDescription><![CDATA[Nome orgão snake_case]]></fieldDescription>
+	</field>
+	<field name="dominio" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="dominio"/>
+		<property name="com.jaspersoft.studio.field.label" value="dominio"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="orgao"/>
+		<fieldDescription><![CDATA[Domínio do cliente]]></fieldDescription>
+	</field>
+	<field name="url_logo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="url_logo"/>
+		<property name="com.jaspersoft.studio.field.label" value="url_logo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="orgao"/>
+		<fieldDescription><![CDATA[Url da logo do cliente]]></fieldDescription>
+	</field>
+	<variable name="dataAtual" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[DateFormat.getDateInstance(DateFormat.LONG,Locale.getDefault()).format(new Date())]]></variableExpression>
+	</variable>
+	<title>
+		<band height="83" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="100" y="20" width="456" height="14" uuid="15a512c2-0882-46d5-ade0-d07a7bb872fd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orgao}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="35" width="456" height="14" uuid="e8bfeb96-52f5-4672-a759-e7fd5cbf199f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{titulo}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="100" y="50" width="456" height="14" isPrintWhenDetailOverflows="true" uuid="427de47d-e615-489b-80e4-c204e54fe407">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{descricao}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" vAlign="Middle" isLazy="true" onErrorType="Blank">
+				<reportElement x="0" y="2" width="99" height="81" uuid="195f7d2f-c17e-496f-9fd8-dfadbd9c7b23"/>
+				<imageExpression><![CDATA[$F{url_logo}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+</jasperReport>

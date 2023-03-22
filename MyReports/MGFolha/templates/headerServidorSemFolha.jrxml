@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="headerServidor01" pageWidth="546" pageHeight="49" whenNoDataType="NoDataSection" columnWidth="546" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="dcc7ca67-fa9a-4361-b89e-709521c697d5">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mgfolha_vps1"/>
+	<property name="ireport.jasperserver.url" value="http://162.214.145.146:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/MGFolha/templates/headerServidor01_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/MGFolha/templates/headerServidor01"/>
+	<parameter name="id_cad_servidor" class="java.lang.String">
+		<defaultValueExpression><![CDATA["1017"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ano" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2020"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="mes" class="java.lang.String">
+		<defaultValueExpression><![CDATA["12"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="parcela" class="java.lang.String">
+		<defaultValueExpression><![CDATA["000"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dominio" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ativos"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dbSchema" class="java.lang.String">
+		<defaultValueExpression><![CDATA["mgfolha_igaci"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select cs.*, cg.nome cargo, cl.departamento, cp.id_pccs, cp.nome_pccs
+from $P!{dbSchema}.cad_servidores cs 
+LEFT JOIN $P!{dbSchema}.fin_sfuncional ff ON ff.id_cad_servidores = cs.id
+LEFT JOIN $P!{dbSchema}.cad_cargos cg ON cg.id = ff.id_cad_cargos
+LEFT JOIN $P!{dbSchema}.cad_pccs cp ON cp.id = ff.id_pccs
+LEFT JOIN $P!{dbSchema}.cad_departamentos cl ON cl.id = ff.id_cad_departamentos
+where cs.id = $P{id_cad_servidor} and ff.ano = $P{ano} AND ff.dominio = $P{dominio} GROUP BY cs.id]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="slug" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="slug"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="status" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="status"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="dominio" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="dominio"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="evento" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="evento"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="created_at" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="created_at"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="updated_at" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="updated_at"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="url_foto" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="url_foto"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="matricula" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="matricula"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="nome" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nome"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="cpf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="cpf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="rg" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="rg"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="rg_emissor" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="rg_emissor"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="rg_uf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="rg_uf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="rg_d" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="rg_d"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="pispasep" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="pispasep"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="pispasep_d" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="pispasep_d"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="titulo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="titulo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="titulosecao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="titulosecao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="titulozona" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="titulozona"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="ctps" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ctps"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="ctps_serie" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ctps_serie"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="ctps_uf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ctps_uf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="ctps_d" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ctps_d"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="nascimento_d" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nascimento_d"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="pai" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="pai"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="mae" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="mae"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="cep" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="cep"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="logradouro" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="logradouro"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="numero" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="numero"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="complemento" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="complemento"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="bairro" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="bairro"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="cidade" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="cidade"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="uf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="uf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="naturalidade" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="naturalidade"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="naturalidade_uf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="naturalidade_uf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="telefone" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="telefone"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="celular" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="celular"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="email" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="email"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="idbanco" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="idbanco"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="banco_agencia" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_agencia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="banco_agencia_digito" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_agencia_digito"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="banco_conta" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_conta"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="banco_conta_digito" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_conta_digito"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="banco_operacao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_operacao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="nacionalidade" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nacionalidade"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="sexo" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="sexo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="raca" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="raca"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="estado_civil" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="estado_civil"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="tipodeficiencia" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="tipodeficiencia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="d_admissao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="d_admissao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_servidores"/>
+	</field>
+	<field name="cargo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="cargo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_cargos"/>
+	</field>
+	<field name="departamento" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="departamento"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_departamentos"/>
+	</field>
+	<field name="id_pccs" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="id_pccs"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_pccs"/>
+	</field>
+	<field name="nome_pccs" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nome_pccs"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cad_pccs"/>
+	</field>
+	<title>
+		<band height="40" splitType="Immediate">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="11" uuid="c624776c-71bd-4293-8ee1-54dff17d627d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Matricula:</b> " + String.format("%08d", $F{matricula})]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="80" y="0" width="80" height="11" uuid="a8684ea6-1103-4b59-b6c0-96b7c27c9d22">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>CPF:</b> " + ($F{cpf} != null && java.util.regex.Pattern.compile("(\\d{3})(\\d{3})(\\d{3})(\\d{2})").matcher($F{cpf}).matches() ?
+java.util.regex.Pattern.compile("(\\d{3})(\\d{3})(\\d{3})(\\d{2})").matcher($F{cpf}).replaceAll("$1.$2.$3-$4")  : "CPF inválido")]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="160" y="0" width="80" height="11" uuid="0551026c-ff8b-4258-a584-a2df55d71733">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>RG:</b> " + $F{rg}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="240" y="0" width="110" height="11" uuid="be0f7b74-545d-4c99-9e49-44de52f3f01e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>PIS/PASEP:</b> " + ($F{pispasep}.replace(".","") != null && java.util.regex.Pattern.compile("(\\d{3})(\\d{5})(\\d{2})(\\d{1})").matcher($F{pispasep}.replace(".","")).matches() ?
+java.util.regex.Pattern.compile("(\\d{3})(\\d{5})(\\d{2})(\\d{1})").matcher($F{pispasep}.replace(".","")).replaceAll("$1.$2.$3.$4")  : "PIS/PASEP inválido")]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="13" width="266" height="11" uuid="8dea379e-9618-4820-af74-c766ee6bd002">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Servidor: " + $F{nome} + "</b>"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="266" y="13" width="280" height="11" uuid="e32ded31-db37-4661-9f15-3a50c105f6dc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Cargo:</b> " + ($F{cargo}.length() > 0 ? $F{cargo} : "")]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="27" width="266" height="11" uuid="32082073-c43c-4e6d-89a9-24bfa73cd371">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Departamento:</b> " + ($F{departamento} != null && $F{departamento}.trim().length() > 0 ? $F{departamento} : "")]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="266" y="27" width="280" height="11" uuid="1a443ef8-152b-4703-9aa3-822f80fc15ef">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>PCC:</b> " + ($F{id_pccs} != null ? String.format("%04d", $F{id_pccs}) + " - " + $F{nome_pccs}.toUpperCase() : "")]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement stretchType="RelativeToTallestObject" x="460" y="0" width="86" height="11" uuid="917b30ac-d8d6-4d3a-8ee0-03c98c8e688a">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Admissão:</b> "  + ($F{d_admissao}.replace("/","") != null && java.util.regex.Pattern.compile("(\\d{2})(\\d{2})(\\d{4})").matcher($F{d_admissao}.replace("/","")).matches() ?
+java.util.regex.Pattern.compile("(\\d{2})(\\d{2})(\\d{4})").matcher($F{d_admissao}.replace(".","")).replaceAll("$1.$2.$3")  : "Data inválida")]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+</jasperReport>

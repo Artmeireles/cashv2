@@ -1,0 +1,30 @@
+_orgao_resp_contato (
+	id_orgao_resp 	int not null
+	tipo 			boolean not null comment('1-Telefone, 2-email, 3-Rede Social, 4-Site')
+	contato 		varchar(255)
+)
+
+
+exports.up = function(knex) {
+    return knex.schema.createTable('wwmgca_maribondo_ativos._orgao_resp_contato', table => {
+        table.engine('InnoDB')
+        table.charset('utf8mb4')
+        table.collate('utf8mb4_general_ci')
+        table.increments('id').primary()
+        table.integer('status').notNull().default(10)
+        table.integer('evento').notNull()
+        table.string('created_at').notNull()
+        table.string('updated_at')
+        table.integer('id_orgao_resp').notNull().comment("Orgão")
+        table.boolean('tipo').notNull().comment("1-Telefone, 2-email, 3-Rede Social, 4-Site")
+        table.string('contato', 255).comment("Contato")
+        
+
+        
+        table.foreign('id_orgao_resp').references('id').inTable('_orgao_resp').onUpdate('CASCADE').onDelete('NO ACTION')
+    })
+};
+
+exports.down = function(knex) {
+    return knex.schema.dropTable('wwmgca_maribondo_ativos._orgao_resp_contato')
+};

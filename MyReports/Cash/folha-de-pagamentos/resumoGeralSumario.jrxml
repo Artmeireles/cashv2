@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.16.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="resumoGeralSumario" pageWidth="555" pageHeight="842" whenNoDataType="NoPages" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="bab9a472-bd60-4268-ab90-c9b0392e1a1e">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MGCash"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.jasperserver.url" value="http://ns1.mgcash.app.br:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="jasperadmin"/>
+	<property name="ireport.jasperserver.report.resource" value="/reports/Cash/folha_de_pagamento/resumoGeralSumario_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/reports/Cash/folha_de_pagamento/resumoGeralSumario"/>
+	<style name="Zebrado" mode="Opaque" backcolor="rgba(255, 251, 240, 0.21568628)">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) != 0)]]></conditionExpression>
+			<style mode="Transparent"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="tServidores" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<parameter name="BUILD" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["06240922"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dbSchema" class="java.lang.String">
+		<defaultValueExpression><![CDATA["wwmgca_maribondo_ativos"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ano" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2021"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="mes" class="java.lang.String">
+		<defaultValueExpression><![CDATA["08"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="complementar" class="java.lang.String">
+		<defaultValueExpression><![CDATA["000"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="id_cad_servidores" class="java.lang.String" evaluationTime="Early">
+		<defaultValueExpression><![CDATA["ff.id_cad_servidores IS NOT NULL"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="id_cad_centros" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ff.id_cad_centros IS NOT NULL"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="id_cad_departamentos" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ff.id_cad_departamentos IS NOT NULL"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="id_cad_cargos" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ff.id_cad_cargos IS NOT NULL"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="id_cad_locais_trabalho" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ff.id_local_trabalho IS NOT NULL"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT d_situacao FROM $P!{dbSchema}.fin_parametros fp WHERE fp.ano = '$P!{ano}' AND fp.mes = '$P!{mes}' AND fp.complementar = '$P!{complementar}']]>
+	</queryString>
+	<field name="d_situacao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="d_situacao"/>
+		<property name="com.jaspersoft.studio.field.label" value="d_situacao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="fin_parametros"/>
+		<fieldDescription><![CDATA[Data situação]]></fieldDescription>
+	</field>
+	<variable name="dataAtual" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA["Emitido em: "+
+(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("EEEE")) + ", " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd-MMMM-yyyy")).replace("-", " de ") + " às " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"))).toLowerCase()]]></variableExpression>
+	</variable>
+	<variable name="mes_extenso" class="java.lang.String" resetType="None" calculation="Variance">
+		<variableExpression><![CDATA[($P{mes}.equals("01") ? "Janeiro" : 
+	($P{mes}.equals("02") ? "Fevereiro" : 
+		($P{mes}.equals("03") ? "Março" : 
+			($P{mes}.equals("04") ? "Abril" : 
+				($P{mes}.equals("05") ? "Maio" : 
+					($P{mes}.equals("06") ? "Junho" : 
+						($P{mes}.equals("07") ? "Julho" : 
+							($P{mes}.equals("08") ? "Agosto" : 
+								($P{mes}.equals("09") ? "Setembro" : 
+									($P{mes}.equals("10") ? "Outubro" : 
+										($P{mes}.equals("11") ? "Novembro" : 
+											($P{mes}.equals("12") ? "Dezembro" : "...")
+										)
+									)
+								)
+							)
+						)
+					)
+				)
+			)
+		)
+	)
+)]]></variableExpression>
+	</variable>
+	<variable name="t_proventos" class="java.lang.Double" calculation="Sum"/>
+	<variable name="t_descontos" class="java.lang.Double" calculation="Sum"/>
+	<variable name="t_inss_retido" class="java.lang.Double" calculation="Sum"/>
+	<variable name="t_inss_s_familia" class="java.lang.Double" calculation="Sum"/>
+	<variable name="t_rpps_retido" class="java.lang.Double" calculation="Sum"/>
+	<variable name="count_eventos_p" class="java.lang.Integer"/>
+	<variable name="count_eventos_d" class="java.lang.Integer"/>
+	<variable name="t_inss_patronal" class="java.lang.Double" calculation="Sum"/>
+	<variable name="t_rpps_patronal" class="java.lang.Double" calculation="Sum"/>
+	<variable name="t_inss_s_matern" class="java.lang.Double" calculation="Sum"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="53" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<subreport>
+				<reportElement x="2" y="3" width="270" height="50" uuid="1169996d-1684-4f89-a6cb-46f0d518e6b9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<subreportParameter name="V_FAMILIA">
+					<subreportParameterExpression><![CDATA[$V{t_inss_s_familia}.doubleValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="V_RETIDO">
+					<subreportParameterExpression><![CDATA[$V{t_inss_retido}.doubleValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="V_MATERNIDADE">
+					<subreportParameterExpression><![CDATA[$V{t_inss_s_matern}.doubleValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tipo_evento">
+					<subreportParameterExpression><![CDATA["0"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="dbSchema">
+					<subreportParameterExpression><![CDATA[$P{dbSchema}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ano">
+					<subreportParameterExpression><![CDATA[$P{ano}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="mes">
+					<subreportParameterExpression><![CDATA[$P{mes}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="complementar">
+					<subreportParameterExpression><![CDATA[$P{complementar}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_servidores">
+					<subreportParameterExpression><![CDATA[$P{id_cad_servidores}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_centros">
+					<subreportParameterExpression><![CDATA[$P{id_cad_centros}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_departamentos">
+					<subreportParameterExpression><![CDATA[$P{id_cad_departamentos}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_cargos">
+					<subreportParameterExpression><![CDATA[$P{id_cad_cargos}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_locais_trabalho">
+					<subreportParameterExpression><![CDATA[$P{id_cad_locais_trabalho}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="t_eventos" toVariable="t_proventos"/>
+				<returnValue subreportVariable="t_inss_s_matern" toVariable="t_inss_s_matern"/>
+				<returnValue subreportVariable="t_inss_s_familia" toVariable="t_inss_s_familia"/>
+				<returnValue subreportVariable="count_eventos" toVariable="count_eventos_p"/>
+				<subreportExpression><![CDATA["resumoGeralSumarioDetalhe.jrxml"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="283" y="3" width="270" height="50" uuid="71811787-c1ec-4970-a124-0b7f1a20141a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<subreportParameter name="tipo_evento">
+					<subreportParameterExpression><![CDATA["1"]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="dbSchema">
+					<subreportParameterExpression><![CDATA[$P{dbSchema}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ano">
+					<subreportParameterExpression><![CDATA[$P{ano}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="mes">
+					<subreportParameterExpression><![CDATA[$P{mes}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="complementar">
+					<subreportParameterExpression><![CDATA[$P{complementar}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_servidores">
+					<subreportParameterExpression><![CDATA[$P{id_cad_servidores}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_centros">
+					<subreportParameterExpression><![CDATA[$P{id_cad_centros}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_departamentos">
+					<subreportParameterExpression><![CDATA[$P{id_cad_departamentos}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_cargos">
+					<subreportParameterExpression><![CDATA[$P{id_cad_cargos}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_locais_trabalho">
+					<subreportParameterExpression><![CDATA[$P{id_cad_locais_trabalho}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="t_eventos" toVariable="t_descontos"/>
+				<returnValue subreportVariable="t_inss_retido" toVariable="t_inss_retido"/>
+				<returnValue subreportVariable="t_rpps_retido" toVariable="t_rpps_retido"/>
+				<returnValue subreportVariable="count_eventos" toVariable="count_eventos_d"/>
+				<returnValue subreportVariable="t_inss_patronal" toVariable="t_inss_patronal"/>
+				<returnValue subreportVariable="t_rpps_patronal" toVariable="t_rpps_patronal"/>
+				<subreportExpression><![CDATA["resumoGeralSumarioDetalhe.jrxml"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<summary>
+		<band height="105">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="124" y="28" width="62" height="12" uuid="e1ccbd1a-3350-45e4-beef-a75f4489b84c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("%,.2f", $V{t_descontos} != null ? $V{t_descontos} : 0.0)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="124" y="41" width="62" height="12" uuid="940fa1da-28da-4584-aed2-650467330d3e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("%,.2f", ($V{t_proventos} != null ? $V{t_proventos} : 0.0) - ($V{t_descontos} != null ? $V{t_descontos} : 0.0))]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="3" y="41" width="107" height="12" uuid="745793bf-d8c6-4fe8-9fd9-00d78ad073d1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total líquido:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="1" width="555" height="1" uuid="cc15ed50-8777-496b-adf1-988fdb226e98">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+			</line>
+			<textField>
+				<reportElement x="124" y="15" width="62" height="12" uuid="a7d2c070-018b-40d7-8d38-9da63903b578">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("%,.2f", $V{t_proventos} != null ? $V{t_proventos} : 0.0)]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="190" y="3" width="180" height="93" uuid="a6835d64-684f-4583-b30a-5075f5db4c93">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[$V{t_inss_retido}.doubleValue() > 0.0]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="DATA_FAIXA">
+					<subreportParameterExpression><![CDATA[$F{d_situacao}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="V_FAMILIA">
+					<subreportParameterExpression><![CDATA[$V{t_inss_s_familia}.doubleValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="V_RETIDO">
+					<subreportParameterExpression><![CDATA[$V{t_inss_retido}.doubleValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="V_MATERNIDADE">
+					<subreportParameterExpression><![CDATA[$V{t_inss_s_matern}.doubleValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="V_PATRONAL">
+					<subreportParameterExpression><![CDATA[$V{t_inss_patronal}.doubleValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="dbSchema">
+					<subreportParameterExpression><![CDATA[$P{dbSchema}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ano">
+					<subreportParameterExpression><![CDATA[$P{ano}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="mes">
+					<subreportParameterExpression><![CDATA[$P{mes}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="complementar">
+					<subreportParameterExpression><![CDATA[$P{complementar}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_servidores">
+					<subreportParameterExpression><![CDATA[$P{id_cad_servidores}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_centros">
+					<subreportParameterExpression><![CDATA[$P{id_cad_centros}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_departamentos">
+					<subreportParameterExpression><![CDATA[$P{id_cad_departamentos}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_cargos">
+					<subreportParameterExpression><![CDATA[$P{id_cad_cargos}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_locais_trabalho">
+					<subreportParameterExpression><![CDATA[$P{id_cad_locais_trabalho}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["resumoGeralSumarioINSS.jrxml"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="373" y="3" width="180" height="93" uuid="44941d38-408c-4f8f-a1be-456c90c4901d">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[$V{t_rpps_retido}.doubleValue() > 0.0]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="DATA_FAIXA">
+					<subreportParameterExpression><![CDATA[$F{d_situacao}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="V_RETIDO">
+					<subreportParameterExpression><![CDATA[$V{t_rpps_retido}.doubleValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="V_PATRONAL">
+					<subreportParameterExpression><![CDATA[$V{t_rpps_patronal}.doubleValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="dbSchema">
+					<subreportParameterExpression><![CDATA[$P{dbSchema}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ano">
+					<subreportParameterExpression><![CDATA[$P{ano}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="mes">
+					<subreportParameterExpression><![CDATA[$P{mes}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="complementar">
+					<subreportParameterExpression><![CDATA[$P{complementar}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_servidores">
+					<subreportParameterExpression><![CDATA[$P{id_cad_servidores}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_centros">
+					<subreportParameterExpression><![CDATA[$P{id_cad_centros}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_departamentos">
+					<subreportParameterExpression><![CDATA[$P{id_cad_departamentos}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_cargos">
+					<subreportParameterExpression><![CDATA[$P{id_cad_cargos}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_locais_trabalho">
+					<subreportParameterExpression><![CDATA[$P{id_cad_locais_trabalho}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["resumoGeralSumarioRPPS.jrxml"]]></subreportExpression>
+			</subreport>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="3" y="2" width="183" height="12" uuid="a288ec73-3ba2-4fb1-af4d-411b53ac336e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("Total de servidores: %06d", $P{tServidores})]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="3" y="15" width="107" height="12" uuid="b77ca43d-697b-46fc-a43a-858c39a306ed">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("Total de proventos (%04d):", $V{count_eventos_p} != null ? $V{count_eventos_p} : 0)]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="ScaleFont">
+				<reportElement x="3" y="28" width="107" height="12" uuid="c13763a6-4427-4c8f-a1c9-dac3495d2417">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("Total de descontos (%04d):", $V{count_eventos_d} != null ? $V{count_eventos_d} : 0)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="28" width="14" height="12" uuid="e94e47f1-450e-40cb-aff4-004e7e8a3b84">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["R$"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="41" width="14" height="12" uuid="339066fc-0416-4bc9-aa2a-51dcecb36088">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["R$"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="15" width="14" height="12" uuid="76bbdd07-bc18-40dc-8659-b50a1ca6d2f2">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["R$"]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

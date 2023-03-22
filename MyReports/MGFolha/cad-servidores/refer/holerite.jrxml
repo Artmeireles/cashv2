@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.10.0.final using JasperReports Library version 6.10.0-unknown  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="holerite" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="0" bottomMargin="0" uuid="1a113940-97f8-4fd0-9cd0-7cdab1c06d86">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.mgfolha.com.br.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="ano" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["2019"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="mes" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["09"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="parcela" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["000"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="url_root" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["http://localhost/mgfolha.com.br/holerite-on-line?token="]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dominio" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["ativos"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="id_cad_servidor" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["4"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="id_cad_servidor_f" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["10"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="usuario" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["E:/htdocs/mgfolha.com.br/pagamentos/reports/cad-servidores/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="url_printer" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["http://localhost/mgfolha.com.br"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[CALL get_holerites( $P{url_root}, $P{dominio}, $P{ano},  $P{mes}, $P{parcela} ,  $P{id_cad_servidor} ,  $P{id_cad_servidor_f} )]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+	</field>
+	<field name="id_cad_servidor" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="id_cad_servidor"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="id_cad_servidor"/>
+		<fieldDescription><![CDATA[id_cad_servidor]]></fieldDescription>
+	</field>
+	<field name="liquido" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.label" value="liquido"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="liquido"/>
+		<fieldDescription><![CDATA[liquido]]></fieldDescription>
+	</field>
+	<field name="extenso" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="extenso"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="extenso"/>
+		<fieldDescription><![CDATA[extenso]]></fieldDescription>
+	</field>
+	<field name="dominio" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="dominio"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="dominio"/>
+		<fieldDescription><![CDATA[dominio]]></fieldDescription>
+	</field>
+	<field name="ano" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ano"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="ano"/>
+		<fieldDescription><![CDATA[ano]]></fieldDescription>
+	</field>
+	<field name="mes" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="mes"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="mes"/>
+		<fieldDescription><![CDATA[mes]]></fieldDescription>
+	</field>
+	<field name="parcela" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="parcela"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="parcela"/>
+		<fieldDescription><![CDATA[parcela]]></fieldDescription>
+	</field>
+	<field name="matricula" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="matricula"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="matricula"/>
+		<fieldDescription><![CDATA[matricula]]></fieldDescription>
+	</field>
+	<field name="d_admissao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="d_admissao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="d_admissao"/>
+		<fieldDescription><![CDATA[d_admissao]]></fieldDescription>
+	</field>
+	<field name="nome" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nome"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="nome"/>
+		<fieldDescription><![CDATA[nome]]></fieldDescription>
+	</field>
+	<field name="cpf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="cpf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="cpf"/>
+		<fieldDescription><![CDATA[cpf]]></fieldDescription>
+	</field>
+	<field name="rg" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="rg"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="rg"/>
+		<fieldDescription><![CDATA[rg]]></fieldDescription>
+	</field>
+	<field name="pispasep" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="pispasep"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="pispasep"/>
+		<fieldDescription><![CDATA[pispasep]]></fieldDescription>
+	</field>
+	<field name="nomeBanco" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nomeBanco"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="nomeBanco"/>
+		<fieldDescription><![CDATA[nomeBanco]]></fieldDescription>
+	</field>
+	<field name="banco_agencia" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_agencia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="banco_agencia"/>
+		<fieldDescription><![CDATA[banco_agencia]]></fieldDescription>
+	</field>
+	<field name="banco_agencia_digito" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_agencia_digito"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="banco_agencia_digito"/>
+		<fieldDescription><![CDATA[banco_agencia_digito]]></fieldDescription>
+	</field>
+	<field name="banco_conta" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_conta"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="banco_conta"/>
+		<fieldDescription><![CDATA[banco_conta]]></fieldDescription>
+	</field>
+	<field name="banco_conta_digito" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_conta_digito"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="banco_conta_digito"/>
+		<fieldDescription><![CDATA[banco_conta_digito]]></fieldDescription>
+	</field>
+	<field name="banco_operacao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="banco_operacao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="banco_operacao"/>
+		<fieldDescription><![CDATA[banco_operacao]]></fieldDescription>
+	</field>
+	<field name="departamento" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="departamento"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="departamento"/>
+		<fieldDescription><![CDATA[departamento]]></fieldDescription>
+	</field>
+	<field name="cargo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="cargo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="cargo"/>
+		<fieldDescription><![CDATA[cargo]]></fieldDescription>
+	</field>
+	<field name="id_pccs" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="id_pccs"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="id_pccs"/>
+		<fieldDescription><![CDATA[id_pccs]]></fieldDescription>
+	</field>
+	<field name="nome_pccs" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nome_pccs"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="nome_pccs"/>
+		<fieldDescription><![CDATA[nome_pccs]]></fieldDescription>
+	</field>
+	<field name="margemConsignavel" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="margemConsignavel"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="margemConsignavel"/>
+		<fieldDescription><![CDATA[margemConsignavel]]></fieldDescription>
+	</field>
+	<field name="orgao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="orgao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="orgao"/>
+		<fieldDescription><![CDATA[orgao]]></fieldDescription>
+	</field>
+	<field name="logradouro" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="logradouro"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="logradouro"/>
+		<fieldDescription><![CDATA[logradouro]]></fieldDescription>
+	</field>
+	<field name="numero" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="numero"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="numero"/>
+		<fieldDescription><![CDATA[numero]]></fieldDescription>
+	</field>
+	<field name="complemento" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="complemento"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="complemento"/>
+		<fieldDescription><![CDATA[complemento]]></fieldDescription>
+	</field>
+	<field name="bairro" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="bairro"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="bairro"/>
+		<fieldDescription><![CDATA[bairro]]></fieldDescription>
+	</field>
+	<field name="cidade" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="cidade"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="cidade"/>
+		<fieldDescription><![CDATA[cidade]]></fieldDescription>
+	</field>
+	<field name="uf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="uf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="uf"/>
+		<fieldDescription><![CDATA[uf]]></fieldDescription>
+	</field>
+	<field name="telefone" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="telefone"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="telefone"/>
+		<fieldDescription><![CDATA[telefone]]></fieldDescription>
+	</field>
+	<field name="cnpj" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="cnpj"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="cnpj"/>
+		<fieldDescription><![CDATA[cnpj]]></fieldDescription>
+	</field>
+	<field name="mensagem" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="mensagem"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="mensagem"/>
+		<fieldDescription><![CDATA[mensagem]]></fieldDescription>
+	</field>
+	<field name="url_logo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="url_logo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+		<property name="net.sf.jasperreports.json.field.expression" value="url_logo"/>
+		<fieldDescription><![CDATA[url_logo]]></fieldDescription>
+	</field>
+	<field name="token_validacao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="token_validacao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="temp_holerites"/>
+	</field>
+	<field name="shortened" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="shortened"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="sis_shortener"/>
+	</field>
+	<variable name="dataAtual" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[//DateFormat.getDateInstance(DateFormat.LONG,Locale.getDefault()).format(new Date()).toLowerCase()
+(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("EEEE")) + ", " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd-MMMM-yyyy")).replace("-", " de ") + " às " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"))).toLowerCase()]]></variableExpression>
+	</variable>
+	<variable name="valorLiquido" class="java.lang.Double" resetType="Group" resetGroup="Servidor">
+		<variableExpression><![CDATA[0.00]]></variableExpression>
+	</variable>
+	<group name="Servidor">
+		<groupExpression><![CDATA[$F{matricula}]]></groupExpression>
+		<groupHeader>
+			<band height="149">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<image hAlign="Center" vAlign="Middle" onErrorType="Blank">
+					<reportElement x="5" y="18" width="99" height="83" uuid="2bcf4b09-927c-4e70-9e63-09e0cfd4cadc">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<imageExpression><![CDATA["https://www.mgfolha.com.br//pagamentos/assets_b/_arquivos/uploads/imagens/olho_dagua_grande/ativos/brasao_512.png"]]></imageExpression>
+				</image>
+				<textField>
+					<reportElement x="111" y="25" width="440" height="25" uuid="2fa20b0d-b70f-4467-b44b-4ce6cf6a6fd2">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="15" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{orgao}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="111" y="50" width="440" height="15" uuid="61d2923e-ecc5-4aee-8e4f-b98d4ee2c9f7">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{logradouro} + ", " + $F{numero} +($F{complemento}.length() > 0 ?  ", " + $F{complemento} : "") + " - " + $F{bairro} + " - Fone: " + $F{telefone}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="111" y="65" width="440" height="15" uuid="cb6ac863-58b2-47b8-903c-3f928d2fc1ee">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["CNPJ: " + $F{cnpj}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="111" y="80" width="440" height="20" uuid="e1d562e3-09c2-4d7c-bcfb-26e1473589e5"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Demonstrativo de Pagamento de Salário]]></text>
+				</staticText>
+				<line>
+					<reportElement x="1" y="101" width="555" height="1" uuid="bca3afc8-9725-4ccd-acf3-f93b4d0b9489">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineWidth="1.0" lineStyle="Solid"/>
+					</graphicElement>
+				</line>
+				<textField>
+					<reportElement x="5" y="103" width="99" height="15" uuid="632c5cd0-fe2e-40c2-8213-b7348a35331a">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>Matricula:</b> " + String.format("%08d", $F{matricula})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="104" y="103" width="100" height="15" uuid="964ddce9-1dd2-4bcf-9bfc-006bfe2e8ce4">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>CPF:</b> " + ($F{cpf} != null && java.util.regex.Pattern.compile("(\\d{3})(\\d{3})(\\d{3})(\\d{2})").matcher($F{cpf}).matches() ?
+java.util.regex.Pattern.compile("(\\d{3})(\\d{3})(\\d{3})(\\d{2})").matcher($F{cpf}).replaceAll("$1.$2.$3-$4")  : "CPF inválido")]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="204" y="103" width="83" height="15" uuid="c8c82208-a998-40d1-b3ca-e19ba51a6152">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>RG:</b> " + $F{rg}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="287" y="103" width="126" height="15" uuid="98141bf9-4f84-4539-9b1b-9c5178d29cf8">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>PIS/PASEP:</b> " + ($F{pispasep}.replace(".","") != null && java.util.regex.Pattern.compile("(\\d{3})(\\d{5})(\\d{2})(\\d{1})").matcher($F{pispasep}.replace(".","")).matches() ?
+java.util.regex.Pattern.compile("(\\d{3})(\\d{5})(\\d{2})(\\d{1})").matcher($F{pispasep}.replace(".","")).replaceAll("$1.$2.$3.$4")  : "PIS/PASEP inválido")]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="413" y="103" width="74" height="15" uuid="a7c58186-2d68-450c-8ee9-aed14bf93759">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>Folha:</b> " + String.format("%s/%s", $F{mes}, $F{ano})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="487" y="103" width="64" height="15" uuid="05c00f4f-421f-4d4f-96db-4ebe5e6c04a8">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>Parcela:</b> " + String.format("%s", $F{parcela})]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="5" y="118" width="266" height="15" uuid="f5d38ccd-a411-4713-a0df-973ab2cc779d">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>Servidor: " + $F{nome} + "</b>"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="271" y="118" width="280" height="15" uuid="09c7c8bb-d235-458c-928a-8f11237795df">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>Cargo:</b> " + $F{cargo} + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"<b>Admissão:</b> "  + ($F{d_admissao}.replace("/","") != null && java.util.regex.Pattern.compile("(\\d{2})(\\d{2})(\\d{4})").matcher($F{d_admissao}.replace("/","")).matches() ?
+java.util.regex.Pattern.compile("(\\d{2})(\\d{2})(\\d{4})").matcher($F{d_admissao}.replace(".","")).replaceAll("$1.$2.$3")  : "Data inválida")]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="5" y="134" width="266" height="15" uuid="579ca003-f3d3-4f5d-a115-24d7d9c2a22b">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>Departamento:</b> " + ($F{departamento} != null && $F{departamento}.trim().length() > 0 ? $F{departamento} : "")]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="271" y="134" width="280" height="15" uuid="b5bff053-9aaf-4e23-a611-3c4c905b7712">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<b>PCC:</b> " + String.format("%04d", $F{id_pccs}) + " - " + $F{nome_pccs}.toUpperCase()]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="555" y="17" width="1" height="132" uuid="73fb287b-8322-4319-ab51-1300af08b93b">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+				</line>
+				<line>
+					<reportElement x="0" y="17" width="555" height="1" uuid="da5427b3-487a-4af0-be2a-efc8d03da6e5">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+				</line>
+				<line>
+					<reportElement x="0" y="17" width="1" height="132" uuid="edcf9b51-0480-45bb-82dc-3c6ac3f47fe6">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="68">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField>
+					<reportElement x="0" y="3" width="500" height="14" uuid="4da0fd4b-421e-4cc8-a50d-40b00883299f"/>
+					<box leftPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Declaro ter recebido a importância de R$ " + String.format("%.2f",$V{valorLiquido}) + " (" +$F{extenso} + ")"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="17" width="500" height="14" uuid="10d7a2fa-d895-4970-ac2e-a6c463623f07"/>
+					<box leftPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["O valor liquido se encontra depositado na conta: " + $F{banco_conta} + "-" + $F{banco_conta_digito} + " da agência: " + $F{banco_agencia} + "-" + $F{banco_agencia_digito} + ($F{banco_operacao}.length() > 0 ? ". Operação: " + $F{banco_operacao} : "")]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="32" width="500" height="14" uuid="f6066345-33a9-4e6b-ad30-2e953f7c2fee">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box leftPadding="2" rightPadding="2"/>
+					<textElement verticalAlignment="Middle" markup="html">
+						<font size="8" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nomeBanco}.trim().length() >0 && !$F{nomeBanco}.trim().equals("null") ? $F{nomeBanco}.toUpperCase() : ""]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="1" width="555" height="1" uuid="8d876fcd-588b-40c9-b722-358219b72952">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineWidth="1.0" lineStyle="Solid"/>
+					</graphicElement>
+				</line>
+				<line>
+					<reportElement x="555" y="0" width="1" height="50" uuid="3e79f204-56ad-4ce0-9c41-9eb5c5db8b60">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+				</line>
+				<line>
+					<reportElement x="0" y="0" width="1" height="50" uuid="06ee0db9-ec2e-423e-b557-81464673bb86">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+				</line>
+				<line>
+					<reportElement x="0" y="49" width="555" height="1" uuid="663d46d1-120a-4644-b0cc-079cfb800fcd">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineWidth="1.0" lineStyle="Solid"/>
+					</graphicElement>
+				</line>
+				<textField>
+					<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToTallestObject" x="0" y="50" width="180" height="9" uuid="06612b33-3226-46bd-be30-ecc36e113b33">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="Calibri" size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Emitido em: "+$V{dataAtual}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToTallestObject" x="180" y="50" width="374" height="18" uuid="62f2755b-1899-47a2-b80e-b04d9926b021">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
+						<font fontName="Calibri" size="7"/>
+					</textElement>
+					<textFieldExpression><![CDATA["<a href='" + $P{url_printer} + "ss/" + $F{shortened} + "' target='_blank'>Para validar este holerite aponte a câmera, clique aqui ou  acesse: " + $P{url_printer} + "ss/" +  $F{shortened} + "</a>"]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement x="500" y="1" width="56" height="48" uuid="65319ebf-e13d-4964-b22e-aa7caf37912b">
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+						<jr:codeExpression><![CDATA[$P{url_printer} + "../ss/" + $F{shortened}]]></jr:codeExpression>
+					</jr:QRCode>
+				</componentElement>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="202" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<subreport overflowType="NoStretch">
+				<reportElement isPrintRepeatedValues="false" x="1" y="0" width="555" height="202" uuid="4f8aa921-3575-4ca7-9718-e5a1999f1af1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<subreportParameter name="ano">
+					<subreportParameterExpression><![CDATA[$F{ano}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="mes">
+					<subreportParameterExpression><![CDATA[$F{mes}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="parcela">
+					<subreportParameterExpression><![CDATA[$F{parcela}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="id_cad_servidor">
+					<subreportParameterExpression><![CDATA[$F{id_cad_servidor}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="margemConsignavel">
+					<subreportParameterExpression><![CDATA[$F{margemConsignavel}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="mensagemMes">
+					<subreportParameterExpression><![CDATA[$F{mensagem}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="dominio">
+					<subreportParameterExpression><![CDATA[$F{dominio}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="usuario">
+					<subreportParameterExpression><![CDATA[$P{usuario}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="url_printer">
+					<subreportParameterExpression><![CDATA[$P{url_printer}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="valorLiquido" toVariable="valorLiquido"/>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "holeriteRubricas.jasper"]]></subreportExpression>
+			</subreport>
+			<line>
+				<reportElement x="555" y="0" width="1" height="202" uuid="7424c687-e27a-4f41-8d71-3a25c4acf8f7">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="1" height="202" uuid="5d95bbb4-77e0-43b9-a780-c6dc54e5f901">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,14 @@
+https://docs.comtele.com.br/#enviar-sms
+
+POST: https://sms.comtele.com.br/api/v2/send
+
+headers = {
+    'content-type': "application/json",
+    'auth-key': "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+}
+
+body = {
+    "Sender": "MGCash.app.br",
+    "Receivers": "82981499024,34999178363",
+    "Content": "Para liberar seu acesso à nossa plataforma, utilize o código: ?????"
+}

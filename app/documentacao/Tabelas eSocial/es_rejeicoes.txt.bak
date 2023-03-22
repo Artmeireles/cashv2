@@ -1,0 +1,9 @@
+es_rejeicoes (
+    id_es_envios        int not null,
+    id_rejeicao        int not null,
+    codigo           int not null,
+    ocorrencia 		VARCHAR(255)
+);
+
+Referência das rejeições: 
+	https://atendimento.tecnospeed.com.br/hc/pt-br/articles/4406537286807-C%C3%B3digos-de-retorno-valida%C3%A7%C3%B5es-eSocial

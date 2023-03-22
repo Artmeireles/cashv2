@@ -1,0 +1,37 @@
+exports.up = function(knex, Promise) {
+    return knex.schema.createTable('users', table => {
+        table.engine('InnoDB')
+        table.charset('utf8mb4')
+        table.collate('utf8mb4_general_ci')
+        table.increments('id').primary()
+        table.integer('evento').notNull()
+        table.string('created_at').notNull()
+        table.string('updated_at')
+        table.string('name').notNull()
+        table.string('cpf').notNull().unique()
+        table.string('email').notNull().unique()
+        table.string('telefone')
+        table.string('password').notNull()
+        table.string('password_reset_token')
+        table.string('sms_token')
+        table.integer('id_cadas').notNull().unsigned()
+        table.string('cliente').comment('cliente em snake_case')
+        table.string('dominio').comment('dominio do usuário')
+        table.boolean('admin').notNull().defaultTo(0)
+        table.boolean('gestor').notNull().defaultTo(0)
+        table.boolean('multiCliente').notNull().defaultTo(0)
+        table.boolean('tipoUsuario').notNull().defaultTo(-1)
+        table.boolean('averbaOnline').notNull().defaultTo(0)
+        table.boolean('cad_servidores').notNull().defaultTo(0)
+        table.boolean('financeiro').notNull().defaultTo(0)
+        table.boolean('con_contratos').notNull().defaultTo(0)
+        table.boolean('cad_orgao').notNull().defaultTo(0)
+        table.string('f_ano').notNull()
+        table.string('f_mes').notNull()
+        table.string('f_complementar').notNull()
+    })
+};
+
+exports.down = function(knex, Promise) {
+    return knex.schema.dropTable('users')
+};
