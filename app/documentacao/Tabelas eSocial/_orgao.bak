@@ -18,3 +18,28 @@ _orgao (
     codigo_recolhimento          varchar(500),
     mes_descsindical             varchar(2)
 )
+
+{
+            "status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "nr_insc": "19094835000186",
+            "cnpj_efr": "41759632000110",
+            "class_trib": "2",
+            "ind_opt_reg_eletron": "20",
+            "razao_social": "Nome 2",
+            "id_cidade": "1",
+            "cep": "41710765",
+            "bairro": "Bairro",
+            "logradouro": "Rua",
+            "nr": "02",
+            "complemento": "nao",
+            "email": "empresa02@gmail.com.br",
+            "telefone": "713020405060",
+            "codigo_fpas": "01",
+            "codigo_gps": "02",
+            "codigo_cnae": "03",
+            "codigo_recolhimento": "04",
+            "mes_descsindical": "03"
+        }

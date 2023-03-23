@@ -28,3 +28,15 @@ exports.up = function(knex) {
 exports.down = function(knex) {
     return knex.schema.dropTable('wwmgca_maribondo_ativos._orgao_resp_contato')
 };
+
+
+
+{
+            "status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_emp_resp": "1",
+            "tipo": "1",
+            "contato": "7130223022"
+}

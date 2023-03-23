@@ -53,3 +53,27 @@ exports.up = function(knex) {
 exports.down = function(knex) {
     return knex.schema.dropTable('wwmgca_maribondo_ativos._orgao')
 };
+
+
+
+
+{
+            "status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_emp": "1",
+            "c_ua": "1100",
+            "cardug": "1",
+            "cnpj": "70731474000199",
+            "nome": "Nome",
+            "id_cidade": "1",
+            "cep": "41710765",
+            "bairro": "Bairro",
+            "logradouro": "Rua",
+            "nr": "01",
+            "complemento": "nao",
+            "id_emp_resp": "1",
+            "email": "empreUA@gmail.com",
+            "telefone": "713020405060"
+            }

@@ -45,3 +45,26 @@ exports.up = function(knex) {
 exports.down = function(knex) {
     return knex.schema.dropTable('wwmgca_maribondo_ativos.es_envios')
 };
+
+
+
+
+
+{
+            "status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_es_param": "1",
+            "es_lote": "01018996-fa38-42b3-8a49-09214f4e298a",
+            "es_idevento": "ID1122279710000002023031011424603954",
+            "es_evento": "2200",
+            "es_recibo": "1.1.0000000018877213565",
+            "es_status": "1",
+            "exercicio": "03",
+            "tabela": "Servidores",
+            "tbl_field": "002",
+            "tbl_id": "0002",
+            "ambiente": "2",
+            "ver_process": "S.01.01.00"
+}

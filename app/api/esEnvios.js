@@ -5,7 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'empresa'
+    const tabela = 'es_envios'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
@@ -26,24 +26,18 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${user.cliente}_${user.dominio}.${tabela}`
 
         try {
-            existsOrError(body.nr_insc, 'CPF ou CNPJ não informado')
-            existsOrError(body.cnpj_efr, 'CNPJ do Ente Federativo não informado')
-            existsOrError(body.class_trib, 'Classificação Tributária não informada')
-            existsOrError(body.ind_opt_reg_eletron, 'Opção pelo Registro Eletrônico de Empregados não informado')
-            existsOrError(body.razao_social, 'Razão Social não informada')
-            existsOrError(body.id_cidade, 'Cidade não informada')
-            existsOrError(body.cep, 'CEP não informado')
-            existsOrError(body.bairro, 'Bairro não informado')
-            existsOrError(body.logradouro, 'Logradouro não informado')
-            existsOrError(body.nr, 'Número não informado')
-            existsOrError(body.complemento, 'Complemento não informado')
-            existsOrError(body.email, 'Email não informado')
-            existsOrError(body.telefone, 'telefone não informado')
-            existsOrError(body.codigo_fpas, 'Código FPAS não informado')
-            existsOrError(body.codigo_gps, 'Código GPS não informado')
-            existsOrError(body.codigo_cnae, 'Código CNAE não informado')
-            existsOrError(body.codigo_recolhimento, 'Código de Recolhimento não informado')
-            existsOrError(body.mes_descsindical, 'Mês Desconto Sindical não informado')
+            existsOrError(body.id_es_param, 'eSocial Parametros não informado')
+            existsOrError(body.es_lote, 'eSocial Lote não informado')
+            existsOrError(body.es_idevento, 'eSocial IDEvento não informado')
+            existsOrError(body.es_evento, 'eSocial Evento não informado')
+            existsOrError(body.es_recibo, 'eSocial Recibo não informado')
+            existsOrError(body.es_status, 'eSocial Status não informado')
+            existsOrError(body.exercicio, 'Exercício não informado')
+            existsOrError(body.tabela, 'Tabela não informada')
+            existsOrError(body.tbl_field, 'Tabela Field não informada')
+            existsOrError(body.tbl_id, 'Tabela ID não informada')
+            existsOrError(body.ambiente, 'Ambiente não informado')
+            existsOrError(body.ver_process, 'Versão do Processo não informado')
         }
          catch (error) {
             return res.status(400).send(error)
@@ -71,7 +65,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('Orgão não foi encontrado')
+                else res.status(200).send('O Parâmetro não foi encontrado')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -128,15 +122,15 @@ module.exports = app => {
         let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
             .where({ status: STATUS_ACTIVE })
         if (key)
-            sql.where('nr_insc', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('razao_social', 'like', `%${key.toLowerCase()}%`)
+            sql.where('exercicio', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
         const ret = app.db(`${tabelaDomain}`)
         if (key)
-            ret.where('nr_insc', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('razao_social', 'like', `%${key.toLowerCase()}%`)
+            ret.where('exercicio', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
         ret.limit(limit).offset(page * limit - limit)
         ret.then(body => {
                 return res.json({ data: body, count, limit })

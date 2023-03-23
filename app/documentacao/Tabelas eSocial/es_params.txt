@@ -36,3 +36,20 @@ exports.up = function(knex) {
 exports.down = function(knex) {
     return knex.schema.dropTable('wwmgca_maribondo_ativos.es_params')
 };
+
+
+
+
+{
+            "status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "ambiente": "1",
+            "cnpj_sh": "86590559000134",
+            "token_sh": "001",
+            "ver_process": "S.01.01.00",
+            "id_emp": "1",
+            "cnpj_transmissor": "97526503000137",
+            "cnpj_efr": "97526503000137"
+}
