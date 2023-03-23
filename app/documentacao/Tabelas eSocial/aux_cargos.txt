@@ -1,0 +1,4 @@
+aux_cargos (
+	nmCargo
+	CBOCargo
+)

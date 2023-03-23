@@ -1,0 +1,30 @@
+servidores (
+	id_orgao					int not null,
+	cpf_trab
+	nm_trab
+	nmSoc_21
+	id_params_sexo
+	id_params_raca_cor
+	id_params_est_civ
+	id_params_grau_instr
+	dt_nascto char(10)
+	id_params_paisNascto
+	id_params_paisNac 27=105
+	id_params_tpLograd 61=R
+	id_cidades
+	cep char(10)
+	tpLograd_61
+	dscLograd
+	nrLograd
+	complemento
+	bairro 
+	defFisica boolean
+	defVisual boolean
+	defAuditiva 85=N
+	defMental 86=N
+	defIntelectual 87=N
+	reabReadap 88=N
+	observacao
+	fonePrinc 103=82991932215
+	emailPrinc_105
+)

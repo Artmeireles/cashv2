@@ -1,0 +1,15 @@
+rubricas (
+	id_orgao					int not null,
+	cod_rubr					int not null comment('Gestor, Controlador, Contador, DIRF, SIAP, MANAD, SEFIP')
+    ide_tab_rubr     			varchar(7) not null comment('CPF ou CNPJ do responsável'),
+	iniValid 					varchar(14),
+    dsc_rubr	            	varchar(255) not null,
+	id_params_nat_rubr 			int not null,
+    id_params_tipo				int not null comment('Tipo da rúbrica')
+	id_params_cod_inc_cp 
+    id_params_cod_inc_irrf
+    id_params_cod_inc_fgts
+    id_params_cod_inc_cprp
+    teto_remun 
+	observacao
+)

@@ -1,0 +1,11 @@
+serv_dependentes (
+	id_serv					int not null,
+	id_params_tpDep_92=
+	nmDep_93=
+	dtNascto_251=
+	cpfDep_95=
+	id_params_sexoDep_252=
+	depIRRF_96=
+	depSF_97=
+	incTrab_99= 
+)
