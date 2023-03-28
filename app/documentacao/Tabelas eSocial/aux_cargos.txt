@@ -2,3 +2,12 @@ aux_cargos (
 	nmCargo
 	CBOCargo
 )
+
+{
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+			"nome":"Vigilante",
+			"cbo":"122155"
+}

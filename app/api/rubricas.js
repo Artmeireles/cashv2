@@ -5,7 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'es_envios'
+    const tabela = 'rubricas'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
@@ -26,18 +26,18 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.id_es_param, 'eSocial Parametros não informado')
-            existsOrError(body.es_lote, 'eSocial Lote não informado')
-            existsOrError(body.es_idevento, 'eSocial IDEvento não informado')
-            existsOrError(body.es_evento, 'eSocial Evento não informado')
-            existsOrError(body.es_recibo, 'eSocial Recibo não informado')
-            existsOrError(body.es_status, 'eSocial Status não informado')
-            existsOrError(body.exercicio, 'Exercício não informado')
-            existsOrError(body.tabela, 'Tabela não informada')
-            existsOrError(body.tbl_field, 'Tabela Field não informada')
-            existsOrError(body.tbl_id, 'Tabela ID não informada')
-            existsOrError(body.ambiente, 'Ambiente não informado')
-            existsOrError(body.ver_process, 'Versão do Processo não informado')
+            existsOrError(body.id_emp, 'Órgão não informado')
+            existsOrError(body.cod_rubr, 'Código da Rúbrica não informado')
+            existsOrError(body.ini_valid, 'Inicio da válidade não informado')
+            existsOrError(body.dsc_rubr, 'Descrição da Rúbrica não informada')
+            existsOrError(body.id_param_nat_rubr, 'Natureza da Rúbrica não informada')
+            existsOrError(body.id_param_tipo, 'Tipo da Rúbrica não informado')
+            existsOrError(body.id_param_cod_inc_cp, 'Código de Incidência Tributária não informado')
+            existsOrError(body.id_param_cod_inc_irrf, 'Código IRRF não informado')
+            existsOrError(body.id_param_cod_inc_fgts, 'Código FGTS não informado')
+            existsOrError(body.id_param_cod_inc_cprp, 'Código CPRP não informado')
+            existsOrError(body.teto_remun, 'Teto Remuneratório não informado')
+            existsOrError(body.observacao, 'Observação não informado')
         }
          catch (error) {
             return res.status(400).send(error)
@@ -65,7 +65,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('O Parâmetro não foi encontrado')
+                else res.status(200).send('Rúbrica não foi encontrada')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -122,15 +122,15 @@ module.exports = app => {
         let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
             .where({ status: STATUS_ACTIVE })
         if (key)
-            sql.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+            sql.where('id_emp', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('cod_rubr', 'like', `%${key.toLowerCase()}%`)
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
         const ret = app.db(`${tabelaDomain}`)
         if (key)
-            ret.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+            ret.where('id_emp', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('cod_rubr', 'like', `%${key.toLowerCase()}%`)
         ret.limit(limit).offset(page * limit - limit)
         ret.then(body => {
                 return res.json({ data: body, count, limit })

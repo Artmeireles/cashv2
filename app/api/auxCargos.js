@@ -5,7 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'es_envios'
+    const tabela = 'aux_cargos'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
@@ -26,18 +26,8 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.id_es_param, 'eSocial Parametros não informado')
-            existsOrError(body.es_lote, 'eSocial Lote não informado')
-            existsOrError(body.es_idevento, 'eSocial IDEvento não informado')
-            existsOrError(body.es_evento, 'eSocial Evento não informado')
-            existsOrError(body.es_recibo, 'eSocial Recibo não informado')
-            existsOrError(body.es_status, 'eSocial Status não informado')
-            existsOrError(body.exercicio, 'Exercício não informado')
-            existsOrError(body.tabela, 'Tabela não informada')
-            existsOrError(body.tbl_field, 'Tabela Field não informada')
-            existsOrError(body.tbl_id, 'Tabela ID não informada')
-            existsOrError(body.ambiente, 'Ambiente não informado')
-            existsOrError(body.ver_process, 'Versão do Processo não informado')
+            existsOrError(body.nome, 'Nome não informado')
+            existsOrError(body.cbo, 'CBO não informado')
         }
          catch (error) {
             return res.status(400).send(error)
@@ -122,15 +112,15 @@ module.exports = app => {
         let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
             .where({ status: STATUS_ACTIVE })
         if (key)
-            sql.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+            sql.where('cbo', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
         const ret = app.db(`${tabelaDomain}`)
         if (key)
-            ret.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+            ret.where('cbo', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
         ret.limit(limit).offset(page * limit - limit)
         ret.then(body => {
                 return res.json({ data: body, count, limit })

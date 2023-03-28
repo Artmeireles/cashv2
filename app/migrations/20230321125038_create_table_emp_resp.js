@@ -19,7 +19,7 @@ exports.up = function(knex) {
         table.string('logradouro', 255).notNull().comment("Logradouro")
         table.string('nr', 255).notNull().comment("Número")
         table.string('complemento', 255).notNull().comment("Complemento")
-        table.string('d_nascimento', 255).comment("Data de Nascimento")
+        table.string('d_nascimento', 255).comment("Data de Nascimento") //char(10)
         
         table.foreign('id_emp').references('id').inTable('empresa').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_local_params_tipo').references('id').inTable('es_params').onUpdate('CASCADE').onDelete('NO ACTION')

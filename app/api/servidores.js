@@ -5,7 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'es_envios'
+    const tabela = 'servidores'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
@@ -26,18 +26,34 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.id_es_param, 'eSocial Parametros não informado')
-            existsOrError(body.es_lote, 'eSocial Lote não informado')
-            existsOrError(body.es_idevento, 'eSocial IDEvento não informado')
-            existsOrError(body.es_evento, 'eSocial Evento não informado')
-            existsOrError(body.es_recibo, 'eSocial Recibo não informado')
-            existsOrError(body.es_status, 'eSocial Status não informado')
-            existsOrError(body.exercicio, 'Exercício não informado')
-            existsOrError(body.tabela, 'Tabela não informada')
-            existsOrError(body.tbl_field, 'Tabela Field não informada')
-            existsOrError(body.tbl_id, 'Tabela ID não informada')
-            existsOrError(body.ambiente, 'Ambiente não informado')
-            existsOrError(body.ver_process, 'Versão do Processo não informado')
+            existsOrError(body.id_emp, 'Órgão não informado')
+            existsOrError(body.cpf_trab, 'CPF do Trabalhador não informado')
+            existsOrError(body.nome, 'Nome não informado')
+            existsOrError(body.nome_social, 'Nome Social não informado')
+            existsOrError(body.id_param_sexo, 'Sexo não informado')
+            existsOrError(body.id_param_raca_cor, 'Raça ou Cor não informado')
+            existsOrError(body.id_param_est_civ, 'Estado Cívil não informado')
+            existsOrError(body.id_param_grau_instr, 'Grau de Instrução não informado')
+            existsOrError(body.dt_nascto, 'Data de Nascimento não informada')
+            existsOrError(body.id_param_p_nascto, 'País de Nascimento não informado')
+            existsOrError(body.id_param_p_nacld, 'País de Nacionalidade não informado')
+            existsOrError(body.id_param_tplograd, 'Tipo de Logradouro não informado')
+            existsOrError(body.cep, 'CEP não informado')
+            existsOrError(body.id_cidade, 'Cidade não informada')
+            existsOrError(body.bairro, 'Bairro não informado')
+            existsOrError(body.logradouro, 'Logradouro não informado')
+            existsOrError(body.dsc_lograd, 'Descrição do Logradouro não informado')
+            existsOrError(body.nr, 'Número não informado')
+            existsOrError(body.complemento, 'Complemento não informado')
+            existsOrError(body.def_fisica, 'Deficiência Física não informada')
+            existsOrError(body.def_visual, 'Deficiência Visual não informada')
+            existsOrError(body.def_auditiva, 'Deficiência Auditiva não informada')
+            existsOrError(body.def_mental, 'Deficiência Mental não informada')
+            existsOrError(body.def_intelectual, 'Deficiência Intelectual não informada')
+            existsOrError(body.reab_readap, 'Reabilitado /Readaptado não informado')
+            existsOrError(body.observacao, 'Observação não informada')
+            existsOrError(body.telefone, 'Telefone não informado')
+            existsOrError(body.email, 'E-mail não informado')
         }
          catch (error) {
             return res.status(400).send(error)
@@ -65,7 +81,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('O Parâmetro não foi encontrado')
+                else res.status(200).send('Rúbrica não foi encontrada')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -122,15 +138,15 @@ module.exports = app => {
         let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
             .where({ status: STATUS_ACTIVE })
         if (key)
-            sql.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+            sql.where('cpf_trab', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
         const ret = app.db(`${tabelaDomain}`)
         if (key)
-            ret.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+            ret.where('cpf_trab', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
         ret.limit(limit).offset(page * limit - limit)
         ret.then(body => {
                 return res.json({ data: body, count, limit })

@@ -5,7 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'es_envios'
+    const tabela = 'serv_vinculos'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
@@ -26,18 +26,26 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.id_es_param, 'eSocial Parametros não informado')
-            existsOrError(body.es_lote, 'eSocial Lote não informado')
-            existsOrError(body.es_idevento, 'eSocial IDEvento não informado')
-            existsOrError(body.es_evento, 'eSocial Evento não informado')
-            existsOrError(body.es_recibo, 'eSocial Recibo não informado')
-            existsOrError(body.es_status, 'eSocial Status não informado')
-            existsOrError(body.exercicio, 'Exercício não informado')
-            existsOrError(body.tabela, 'Tabela não informada')
-            existsOrError(body.tbl_field, 'Tabela Field não informada')
-            existsOrError(body.tbl_id, 'Tabela ID não informada')
-            existsOrError(body.ambiente, 'Ambiente não informado')
-            existsOrError(body.ver_process, 'Versão do Processo não informado')
+            existsOrError(body.id_serv, 'Servidor não informado')
+            existsOrError(body.matricula, 'Matrícula do Trabalhador não informada')
+            existsOrError(body.tp_reg_trab, 'Tipo Regime Trabalhista não informado')
+            existsOrError(body.tp_reg_prev, 'Tipo Regime Previdência não informado')
+            existsOrError(body.cad_ini, 'Cadastro Inicial não informado')
+            existsOrError(body.id_param_tp_prov, 'Tipo Provimento não informado')
+            existsOrError(body.data_exercicio, 'Data do Exercício não informado')
+            existsOrError(body.tp_plan_rp, 'Tipo Plano Segregação da Massa não informado')
+            existsOrError(body.teto_rgps, 'Teto RGPS não informado')
+            existsOrError(body.abono_perm, 'Abono Permanência não informado')
+            existsOrError(body.d_inicio_abono, 'Data Início do Abono não informado')
+            existsOrError(body.d_ing_cargo, 'Data de Ingressão do Cargo não informado')
+            existsOrError(body.id_cargo, 'Cargo não informado')
+            existsOrError(body.acum_cargo, 'Cargo Acumulável não informado')
+            existsOrError(body.id_param_cod_catg, 'Código da Categoria não informado')
+            existsOrError(body.qtd_hr_sem, 'Quantidade de Horas Semanais não informada')
+            existsOrError(body.id_param_tp_jor, 'Tipo Jornada não informada')
+            existsOrError(body.id_param_tmp_parc, 'Tempo Parcial não informado')
+            existsOrError(body.hr_noturno, 'Horário Noturno não informado')
+            existsOrError(body.desc_jornd, 'Descrição da Jornada não informada')
         }
          catch (error) {
             return res.status(400).send(error)
@@ -65,7 +73,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('O Parâmetro não foi encontrado')
+                else res.status(200).send('Rúbrica não foi encontrada')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -122,15 +130,15 @@ module.exports = app => {
         let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
             .where({ status: STATUS_ACTIVE })
         if (key)
-            sql.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+            sql.where('id_serv', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('matricula', 'like', `%${key.toLowerCase()}%`)
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
         const ret = app.db(`${tabelaDomain}`)
         if (key)
-            ret.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+            ret.where('id_serv', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('matricula', 'like', `%${key.toLowerCase()}%`)
         ret.limit(limit).offset(page * limit - limit)
         ret.then(body => {
                 return res.json({ data: body, count, limit })

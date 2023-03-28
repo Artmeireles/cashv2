@@ -8,21 +8,27 @@ module.exports = app => {
     const get = (req, res) => {
         const body = { ...req.body }
         const first = body.first && body.first == true
-        const forceDominio = body.forceDominio && body.forceDominio === true
+        const forceDominio = body.forceDominio && body.forceDominio == true
         const order = body.order || 'created_at'
         try {
-            existsOrError(body.dominio, 'Domínio não informado')
             existsOrError(body.meta, 'Meta de retorno não informado')
         } catch (error) {
             return res.status(400).send(error)
         }
         const meta = body.meta
-        let sql = app.db(`${tabela}`)
-            .where({ meta: meta })
-            .where(app.db.raw(req.user.admin && !forceDominio ? '1=1' : `${tabela}.dominio = '${body.dominio}'`))
-            .where(app.db.raw(body.value ? `${tabela}.value = '${body.value}'` : '1=1'))
-            .where(app.db.raw(`${tabela}.value != 'root'`))
-            .where({'params.status' : STATUS_ACTIVE})
+        let sql = app.db({ tbl1: tabela })
+            .where({ meta: meta, 'tbl1.status': STATUS_ACTIVE })
+            console.log(forceDominio);
+        if (forceDominio) {
+            try {
+                existsOrError(body.dominio, 'Domínio não informado')
+            } catch (error) {
+                return res.status(400).send(error)
+            }
+        }
+        if (body.dominio) sql.where({ 'tbl1.dominio': body.dominio })
+        if (body.value) sql.where({ 'tbl1.value': body.value })
+        sql.where(app.db.raw(`tbl1.value != 'root'`))
             .orderBy(order)
         if (first) sql.first()
         result = app.db.raw(sql.toString())
@@ -35,7 +41,7 @@ module.exports = app => {
 
     const getById = async (req, res) => {
         const ret = app.db(tabela)
-            .where({ id: req.params.id })
+            .where({ id: req.params.id, status: STATUS_ACTIVE })
             .first()
             .then(body => {
                 return res.json({ data: body })
@@ -45,6 +51,8 @@ module.exports = app => {
                 return res.status(500).send(error)
             })
     }
+
+
 
     const getPonteId = async (req, res) => {
         const ret = app.db(tabela)
@@ -71,6 +79,7 @@ module.exports = app => {
                 return res.status(500).send(error)
             })
     }
+
     const getESocialId = async (req, res) => {
         const ret = app.db(tabela)
             .where({ dominio: 'root', meta: 'esocial' })
@@ -83,6 +92,7 @@ module.exports = app => {
                 return res.status(500).send(error)
             })
     }
+
     const getESocialJarId = async (req, res) => {
         const ret = app.db(tabela)
             .where({ dominio: 'root', meta: 'esocialjar' })

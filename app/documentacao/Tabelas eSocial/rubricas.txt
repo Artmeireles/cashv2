@@ -13,3 +13,23 @@ rubricas (
     teto_remun 
 	observacao
 )
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_emp":"1", 
+            "cod_rubr":"ABC",        
+            "ini_valid":"03/2023",            
+            "dsc_rubr":"Primeira",         
+            "id_param_nat_rubr":"1",    
+            "id_param_tipo":"1",
+            "id_param_cod_inc_cp":"1",  
+            "id_param_cod_inc_irrf":"1",
+            "id_param_cod_inc_fgts":"1",
+            "id_param_cod_inc_cprp":"1",
+            "teto_remun": "1",
+            "observacao":"primeira"                  
+}

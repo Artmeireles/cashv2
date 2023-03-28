@@ -1,0 +1,43 @@
+exports.up = function(knex) {
+    return knex.schema.createTable('wwmgca_maribondo_ativos.serv_vinculos', table => {
+        table.engine('InnoDB')
+        table.charset('utf8mb4')
+        table.collate('utf8mb4_general_ci')
+        table.increments('id').primary()
+        table.integer('status').notNull().default(10)
+        table.integer('evento').notNull()
+        table.string('created_at').notNull()
+        table.string('updated_at')
+        table.integer('id_serv').notNull().unsigned().comment("Servidor")
+        table.string('matricula', 30).notNull().comment("Matrícula do Trabalhador")
+        table.boolean('tp_reg_trab').notNull().default(2).comment("Tipo Regime Trabalhista")
+        table.boolean('tp_reg_prev').notNull().comment("Tipo Regime Previdenciário")
+        table.boolean('cad_ini').notNull().comment("S-(Cad Inicial), N-(Admissão)")
+        table.integer('id_param_tp_prov').notNull().unsigned().comment("Vínculo Trabalhista")
+        table.specificType('data_exercicio', 'char(10)').notNull().comment("Data da Entrada em Exercício")
+        table.boolean('tp_plan_rp').comment("Plano Segregação da Massa")
+        table.boolean('teto_rgps').comment("S-Sim, N-Não")
+        table.boolean('abono_perm').comment("S-Sim, N-Não / Abono Permanência")
+        table.specificType('d_inicio_abono', 'char(10)').notNull().comment("Data de Início Abono")
+        table.specificType('d_ing_cargo', 'char(10)').notNull().comment("Data de Ingressão no Cargo")
+        table.integer('id_cargo').notNull().unsigned().comment("Cargo")
+        table.boolean('acum_cargo').comment("S-Sim, N-Não / Acumulável")
+        table.integer('id_param_cod_catg').notNull().unsigned().comment("Código da Categoria")
+        table.string('qtd_hr_sem', 4).comment("Quantidade de Horas Semanais")
+        table.integer('id_param_tp_jor').notNull().unsigned().comment("Tipo de Jornada")
+        table.integer('id_param_tmp_parc').notNull().unsigned().comment("Tempo Parcial")
+        table.boolean('hr_noturno').notNull().default("N").comment("S-Sim, N-Não")
+        table.string('desc_jornd', 999).comment("Descrição de Jornada")
+
+        table.foreign('id_serv').references('id').inTable('servidores').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tp_prov').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_cargo').references('id').inTable('aux_cargos').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_cod_catg').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tp_jor').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tmp_parc').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+    })
+};
+
+exports.down = function(knex) {
+    return knex.schema.dropTable('wwmgca_maribondo_ativos.serv_vinculos')
+};
