@@ -59,10 +59,13 @@ module.exports = app => {
         .get(app.api.sisEvents.getByField)
     app.route('/params')
         .all(app.config.passport.authenticate())
-        .post(app.api.params.get)
+        .post(app.api.params.save)
+        .get(app.api.params.get)
     app.route('/params/:id')
         .all(app.config.passport.authenticate())
+        .put(app.api.params.save)
         .get(app.api.params.getById)
+        .delete(app.api.params.remove)
     app.route('/ponte-id').post(app.api.params.getPonteId)
     app.route('/siap-id').post(app.api.params.getSiapId)
     app.route('/esocial-id').post(app.api.params.getESocialId)
@@ -73,7 +76,6 @@ module.exports = app => {
     app.route('/mailer-noncli')
         // .all(app.config.passport.authenticate())
         .post(app.api.mailerCli.mailyCliSender)
-
     /**
     * Novas Rotas /////////////////////////////////////////////////////
     * 
@@ -197,5 +199,15 @@ module.exports = app => {
         .put(app.api.servVinculos.save)
         .get(app.api.servVinculos.getById)
         .delete(app.api.servVinculos.remove)
+
+    app.route('/local-params')
+        .all(app.config.passport.authenticate())
+        .post(app.api.localParams.save)
+        .get(app.api.localParams.get)
+    app.route('/local-params/:id')
+        .all(app.config.passport.authenticate())
+        .put(app.api.localParams.save)
+        .get(app.api.localParams.getById)
+        .delete(app.api.localParams.remove)
 
 }

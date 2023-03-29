@@ -1,11 +1,12 @@
+const moment = require('moment')
+const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, isMatchOrError, noAccessMsg } = app.api.validation
-    const database = 'api'
-    const tabela = 'params'
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { mailyCliSender } = app.api.mailerCli
+    const tabela = 'local_params'
     const STATUS_ACTIVE = 10
-    const STATUS_TRASH = 20
     const STATUS_DELETE = 99
 
     const save = async (req, res) => {
@@ -22,15 +23,14 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${database}.${tabela}`
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.dominio, 'Domínio não informado')
-            existsOrError(body.meta, 'Meta não informado')
-            existsOrError(body.value, 'Valor não informado')
+            existsOrError(body.grupo, 'Grupo não informado')
+            existsOrError(body.parametro, 'Parâmetro não informado')
             existsOrError(body.label, 'Label não informado')
         }
-        catch (error) {
+         catch (error) {
             return res.status(400).send(error)
         }
 
@@ -56,7 +56,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('Parâmetro não foi encontrado')
+                else res.status(200).send('O Parâmetro não foi encontrado')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -95,34 +95,37 @@ module.exports = app => {
         }
     }
 
-    const get = (req, res) => {
-        const body = { ...req.body }
-        const first = body.first && body.first == true
-        const forceDominio = body.forceDominio && body.forceDominio == true
-        const order = body.order || 'created_at'
+    const limit = 20 // usado para paginação
+    const get = async(req, res) => {
+        let user = req.user
+        const key = req.query.key ? req.query.key : undefined
+        const uParams = await app.db('users').where({ id: user.id }).first();
         try {
-            existsOrError(body.meta, 'Meta de retorno não informado')
+            // Alçada para exibição
+            isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de financeiros"`)
         } catch (error) {
-            return res.status(400).send(error)
+            return res.status(401).send(error)
         }
-        const meta = body.meta
-        let sql = app.db({ tbl1: tabela })
-            .where({ meta: meta, 'tbl1.status': STATUS_ACTIVE })
-        console.log(forceDominio);
-        if (forceDominio) {
-            try {
-                existsOrError(body.dominio, 'Domínio não informado')
-            } catch (error) {
-                return res.status(400).send(error)
-            }
-        }
-        if (body.dominio) sql.where({ 'tbl1.dominio': body.dominio })
-        if (body.value) sql.where({ 'tbl1.value': body.value })
-        sql.where(app.db.raw(`tbl1.value != 'root'`))
-            .orderBy(order)
-        if (first) sql.first()
-        result = app.db.raw(sql.toString())
-            .then(ret => res.status(200).send({ data: ret[0] }))
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+
+        const page = req.query.page || 1
+
+        let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
+            .where({ status: STATUS_ACTIVE })
+        if (key)
+            sql.where('cnpj_sh', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('cnpj_transmissor', 'like', `%${key.toLowerCase()}%`)
+        sql = await app.db.raw(sql.toString())
+        const count = sql[0][0].count
+
+        const ret = app.db(`${tabelaDomain}`)
+        if (key)
+            ret.where('cnpj_sh', 'like', `%${key.toLowerCase()}%`)
+            .orWhere('cnpj_transmissor', 'like', `%${key.toLowerCase()}%`)
+        ret.limit(limit).offset(page * limit - limit)
+        ret.then(body => {
+                return res.json({ data: body, count, limit })
+            })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)
@@ -130,68 +133,24 @@ module.exports = app => {
     }
 
     const getById = async (req, res) => {
-        const ret = app.db(tabela)
-            .where({ id: req.params.id, status: STATUS_ACTIVE })
-            .first()
+        let user = req.user
+        const uParams = await app.db('users').where({ id: user.id }).first();
+        try {
+            // Alçada para exibição
+            isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Exibição de cadastro de ${tabela}"`)
+        } catch (error) {
+            return res.status(401).send(error)
+        }
+
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+        const ret = app.db({ tbl1: tabelaDomain })
+            .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
+            .where({ id: req.params.id, status: STATUS_ACTIVE }).first()
             .then(body => {
-                return res.json({ data: body })
+                return res.json(body)
             })
             .catch(error => {
-                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
-            })
-    }
-
-
-
-    const getPonteId = async (req, res) => {
-        const ret = app.db(tabela)
-            .where({ dominio: 'root', meta: 'ponte' })
-            .first()
-            .then(body => {
-                return res.json({ data: body.value })
-            })
-            .catch(error => {
-                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
-            })
-    }
-
-    const getSiapId = async (req, res) => {
-        const ret = app.db(tabela)
-            .where({ dominio: 'root', meta: 'siap' })
-            .first()
-            .then(body => {
-                return res.json({ data: body.value })
-            })
-            .catch(error => {
-                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
-            })
-    }
-
-    const getESocialId = async (req, res) => {
-        const ret = app.db(tabela)
-            .where({ dominio: 'root', meta: 'esocial' })
-            .first()
-            .then(body => {
-                return res.json({ data: body.value })
-            })
-            .catch(error => {
-                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
-            })
-    }
-
-    const getESocialJarId = async (req, res) => {
-        const ret = app.db(tabela)
-            .where({ dominio: 'root', meta: 'esocialjar' })
-            .first()
-            .then(body => {
-                return res.json({ data: body.value })
-            })
-            .catch(error => {
-                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
                 return res.status(500).send(error)
             })
     }
@@ -205,7 +164,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${database}.${tabela}`
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const registro = { status: STATUS_DELETE }
         try {
             // registrar o evento na tabela de eventos
@@ -236,6 +195,5 @@ module.exports = app => {
             res.status(400).send(error)
         }
     }
-
-    return { save, remove, get, getById, getPonteId, getSiapId, getESocialId, getESocialJarId }
+    return { save, get, getById, remove }
 }
