@@ -13,6 +13,7 @@ module.exports = app => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
         const body = { ...req.body }
+        body.id_serv = req.params.id_serv
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
@@ -26,7 +27,6 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.id_serv, 'Servidor não informado')
             existsOrError(body.matricula, 'Matrícula do Trabalhador não informada')
             existsOrError(body.tp_reg_trab, 'Tipo Regime Trabalhista não informado')
             existsOrError(body.tp_reg_prev, 'Tipo Regime Previdência não informado')
@@ -47,9 +47,10 @@ module.exports = app => {
             existsOrError(body.hr_noturno, 'Horário Noturno não informado')
             existsOrError(body.desc_jornd, 'Descrição da Jornada não informada')
         }
-         catch (error) {
+        catch (error) {
             return res.status(400).send(error)
         }
+        body.matricula = body.matricula.padStart(8, '0')
 
         if (body.id) {
             // Variáveis da edição de um registro
@@ -113,7 +114,7 @@ module.exports = app => {
     }
 
     const limit = 20 // usado para paginação
-    const get = async(req, res) => {
+    const get = async (req, res) => {
         let user = req.user
         const key = req.query.key ? req.query.key : undefined
         const uParams = await app.db('users').where({ id: user.id }).first();
@@ -131,18 +132,18 @@ module.exports = app => {
             .where({ status: STATUS_ACTIVE })
         if (key)
             sql.where('id_serv', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('matricula', 'like', `%${key.toLowerCase()}%`)
+                .orWhere('matricula', 'like', `%${key.toLowerCase()}%`)
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
         const ret = app.db(`${tabelaDomain}`)
         if (key)
             ret.where('id_serv', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('matricula', 'like', `%${key.toLowerCase()}%`)
-        ret.limit(limit).offset(page * limit - limit)
+                .orWhere('matricula', 'like', `%${key.toLowerCase()}%`)
+        ret.orderBy('matricula', 'desc').limit(limit).offset(page * limit - limit)
         ret.then(body => {
-                return res.json({ data: body, count, limit })
-            })
+            return res.json({ data: body, count, limit })
+        })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)

@@ -12,7 +12,9 @@ module.exports = app => {
     const save = async (req, res) => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
-        const body = { ...req.body }
+        let body = { ...req.body }
+        delete body.id_serv
+        body.id_serv = req.params.id_serv
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
@@ -26,7 +28,6 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.id_serv, 'Servidores não informado')
             existsOrError(body.id_param_tp_dep, 'Tipo do Dependente não informado')
             existsOrError(body.nome, 'Nome não informado')
             existsOrError(body.data_nasc, 'Data de Nascimento não informada')
@@ -35,11 +36,20 @@ module.exports = app => {
             existsOrError(body.dep_irrf, 'Dedução pelo Imposto de Renda não informado')
             existsOrError(body.dep_sf, 'Recebimento do Salário Família não informado')
             existsOrError(body.inc_trab, 'Incapacidade Física ou Mental não informada')
+            const depExists = await app.db(tabelaDomain)
+                .where({ 'cpf': body.cpf })
+                .where(app.db.raw(`id_serv != ${body.id_serv}`)).first()
+            notExistsOrError(depExists, 'CPF de dependente já informado para outro servidor')
         }
-         catch (error) {
+        catch (error) {
             return res.status(400).send(error)
         }
 
+        delete body.hash
+
+        const { changeUpperCase, removeAccentsObj } = app.api.facilities
+        body = (JSON.parse(JSON.stringify(body), removeAccentsObj));
+        body = (JSON.parse(JSON.stringify(body), changeUpperCase));
         if (body.id) {
             // Variáveis da edição de um registro
             // registrar o evento na tabela de eventos
@@ -101,10 +111,11 @@ module.exports = app => {
         }
     }
 
-    const limit = 20 // usado para paginação
-    const get = async(req, res) => {
+    const limit = 5 // usado para paginação
+    const get = async (req, res) => {
         let user = req.user
-        const key = req.query.key ? req.query.key : undefined
+        const id_serv = req.params.id_serv
+        const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
             // Alçada para exibição
@@ -116,22 +127,23 @@ module.exports = app => {
 
         const page = req.query.page || 1
 
-        let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
-            .where({ status: STATUS_ACTIVE })
-        if (key)
-            sql.where('id_serv', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
+        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
+            .where({ status: STATUS_ACTIVE, id_serv: req.params.id_serv })
+            .where(function () {
+                this.where(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
+            })
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
-        const ret = app.db(`${tabelaDomain}`)
-        if (key)
-            ret.where('id_serv', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
-        ret.limit(limit).offset(page * limit - limit)
-        ret.then(body => {
-                return res.json({ data: body, count, limit })
+        const ret = app.db({ tbl1: tabelaDomain })
+            .where({ status: STATUS_ACTIVE, id_serv: req.params.id_serv })
+            .where(function () {
+                this.where(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
             })
+        ret.orderBy('nome').limit(limit).offset(page * limit - limit)
+        ret.then(body => {
+            return res.json({ data: body, count, limit })
+        })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)
@@ -151,7 +163,7 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const ret = app.db({ tbl1: tabelaDomain })
             .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
-            .where({ id: req.params.id, status: STATUS_ACTIVE }).first()
+            .where({ id_serv: req.params.id_serv, id: req.params.id, status: STATUS_ACTIVE }).first()
             .then(body => {
                 return res.json(body)
             })
@@ -193,7 +205,7 @@ module.exports = app => {
                     updated_at: new Date(),
                     evento: evento
                 })
-                .where({ id: req.params.id })
+                .where({ id_serv: req.params.id_serv, id: req.params.id })
             existsOrError(rowsUpdated, 'Registro não foi encontrado')
 
             res.status(204).send()

@@ -1,4 +1,5 @@
 const { cpf, cnpj } = require('cpf-cnpj-validator')
+const { dbPrefix } = require("../.env")
 
 module.exports = app => {
     function cpfOrError(value, msg) {
@@ -63,5 +64,16 @@ module.exports = app => {
 
     const noAccessMsg = 'Ops!!! Parece que seu perfil não dá acesso a essa operação'
 
-    return { cpfOrError, cnpjOrError, lengthOrError, existsOrError, booleanOrError, valueOrError, valueMinorOrError, notExistsOrError, equalsOrError, diffOrError, isMatchOrError, emailOrError, noAccessMsg }
+    async function isParamOrError(meta, id) {
+        const param = await app.db(`${dbPrefix}_api.params`)
+            .select('id', 'meta', 'label')
+            .where({ 'status': 10, 'dominio': 'root', 'meta': meta, 'id': id }).first()
+        if (param && param.id > 0) return true
+    }
+
+    return {
+        cpfOrError, cnpjOrError, lengthOrError, existsOrError, booleanOrError,
+        valueOrError, valueMinorOrError, notExistsOrError, equalsOrError, diffOrError,
+        isMatchOrError, emailOrError, noAccessMsg, isParamOrError
+    }
 }

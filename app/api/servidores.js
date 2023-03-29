@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, cpfOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'servidores'
     const STATUS_ACTIVE = 10
@@ -12,7 +12,7 @@ module.exports = app => {
     const save = async (req, res) => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
-        const body = { ...req.body }
+        let body = { ...req.body }
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
@@ -28,16 +28,25 @@ module.exports = app => {
         try {
             existsOrError(body.id_emp, 'Órgão não informado')
             existsOrError(body.cpf_trab, 'CPF do Trabalhador não informado')
+            cpfOrError(body.cpf_trab, 'CPF inválido')
             existsOrError(body.nome, 'Nome não informado')
             existsOrError(body.nome_social, 'Nome Social não informado')
             existsOrError(body.id_param_sexo, 'Sexo não informado')
+            existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Sexo selecionado não existe')
             existsOrError(body.id_param_raca_cor, 'Raça ou Cor não informado')
-            existsOrError(body.id_param_est_civ, 'Estado Cívil não informado')
+            existsOrError(await isParamOrError('raca', body.id_param_raca_cor), 'Raça selecionada não existe')
+            existsOrError(body.id_param_est_civ, 'Estado Civil não informado')
+            existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Opção selecionada não existe')
             existsOrError(body.id_param_grau_instr, 'Grau de Instrução não informado')
+            existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Opção selecionada não existe')
             existsOrError(body.dt_nascto, 'Data de Nascimento não informada')
+            existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Opção selecionada não existe')
             existsOrError(body.id_param_p_nascto, 'País de Nascimento não informado')
+            existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Opção selecionada não existe')
             existsOrError(body.id_param_p_nacld, 'País de Nacionalidade não informado')
+            existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Opção selecionada não existe')
             existsOrError(body.id_param_tplograd, 'Tipo de Logradouro não informado')
+            existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Opção selecionada não existe')
             existsOrError(body.cep, 'CEP não informado')
             existsOrError(body.id_cidade, 'Cidade não informada')
             existsOrError(body.bairro, 'Bairro não informado')
@@ -45,19 +54,20 @@ module.exports = app => {
             existsOrError(body.dsc_lograd, 'Descrição do Logradouro não informado')
             existsOrError(body.nr, 'Número não informado')
             existsOrError(body.complemento, 'Complemento não informado')
-            existsOrError(body.def_fisica, 'Deficiência Física não informada')
-            existsOrError(body.def_visual, 'Deficiência Visual não informada')
-            existsOrError(body.def_auditiva, 'Deficiência Auditiva não informada')
-            existsOrError(body.def_mental, 'Deficiência Mental não informada')
-            existsOrError(body.def_intelectual, 'Deficiência Intelectual não informada')
-            existsOrError(body.reab_readap, 'Reabilitado /Readaptado não informado')
             existsOrError(body.observacao, 'Observação não informada')
             existsOrError(body.telefone, 'Telefone não informado')
             existsOrError(body.email, 'E-mail não informado')
         }
-         catch (error) {
+        catch (error) {
             return res.status(400).send(error)
         }
+
+        delete body.matricula
+        delete body.hash
+
+        const { changeUpperCase, removeAccentsObj } = app.api.facilities
+        body = (JSON.parse(JSON.stringify(body), removeAccentsObj));
+        body = (JSON.parse(JSON.stringify(body), changeUpperCase));
 
         if (body.id) {
             // Variáveis da edição de um registro
@@ -121,9 +131,15 @@ module.exports = app => {
     }
 
     const limit = 20 // usado para paginação
-    const get = async(req, res) => {
+    const get = async (req, res) => {
         let user = req.user
-        const key = req.query.key ? req.query.key : undefined
+        const key = req.query.key ? req.query.key.trim() : ''
+        let keyCpf = req.query.keyCpf ? req.query.keyCpf : ''
+        let keyMat = req.query.keyMat ? req.query.keyMat : ''
+        if (req.query.key) {
+            keyCpf = key.replace(/([^\d])+/gim, "").length <= 11 ? key.replace(/([^\d])+/gim, "") : ''
+            keyMat = key.replace(/([^\d])+/gim, "").length <= 8 ? key.replace(/([^\d])+/gim, "").padStart(8, '0') : ''
+        }
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
             // Alçada para exibição
@@ -132,25 +148,35 @@ module.exports = app => {
             return res.status(401).send(error)
         }
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+        const tabelaVinculosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.serv_vinculos`
 
         const page = req.query.page || 1
 
-        let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
-            .where({ status: STATUS_ACTIVE })
-        if (key)
-            sql.where('cpf_trab', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
+        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
+            .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
+            .where({ 'tbl1.status': STATUS_ACTIVE })
+            .where(function () {
+                this.where({ 'sv.matricula': keyMat })
+                    .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
+                    .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
+            })
+
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
-        const ret = app.db(`${tabelaDomain}`)
-        if (key)
-            ret.where('cpf_trab', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
-        ret.limit(limit).offset(page * limit - limit)
-        ret.then(body => {
-                return res.json({ data: body, count, limit })
+        const ret = app.db({ tbl1: tabelaDomain })
+            .select('tbl1.*', 'sv.matricula')
+            .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
+            .where({ 'tbl1.status': STATUS_ACTIVE })
+            .where(function () {
+                this.where({ 'sv.matricula': keyMat })
+                    .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
+                    .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
             })
+        ret.orderBy('nome').limit(limit).offset(page * limit - limit)
+        ret.then(body => {
+            return res.json({ data: body, count, limit })
+        })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)
