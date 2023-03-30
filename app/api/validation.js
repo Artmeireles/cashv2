@@ -71,9 +71,16 @@ module.exports = app => {
         if (param && param.id > 0) return true
     }
 
+    async function isCityOrError(uf, id) {
+        const param = await app.db(`${dbPrefix}_api.cidades`)
+            .select('id', 'uf', 'municipio')
+            .where({ 'status': 10, 'uf': uf, 'id': id }).first()
+        if (param && param.id > 0) return true
+    }
+
     return {
         cpfOrError, cnpjOrError, lengthOrError, existsOrError, booleanOrError,
         valueOrError, valueMinorOrError, notExistsOrError, equalsOrError, diffOrError,
-        isMatchOrError, emailOrError, noAccessMsg, isParamOrError
+        isMatchOrError, emailOrError, noAccessMsg, isParamOrError, isCityOrError
     }
 }

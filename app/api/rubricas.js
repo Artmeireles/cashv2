@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'rubricas'
     const STATUS_ACTIVE = 10
@@ -31,13 +31,19 @@ module.exports = app => {
             existsOrError(body.ini_valid, 'Inicio da válidade não informado')
             existsOrError(body.dsc_rubr, 'Descrição da Rúbrica não informada')
             existsOrError(body.id_param_nat_rubr, 'Natureza da Rúbrica não informada')
+            existsOrError(await isParamOrError('natRubrica', body.id_param_nat_rubr), 'Natureza da Rúbrica selecionada não existe')
             existsOrError(body.id_param_tipo, 'Tipo da Rúbrica não informado')
+            existsOrError(await isParamOrError('tipoRubrica', body.id_param_tipo), 'Tipo da Rúbrica selecionada não existe')
             existsOrError(body.id_param_cod_inc_cp, 'Código de Incidência Tributária não informado')
+            existsOrError(await isParamOrError('codIncCP', body.id_param_cod_inc_cp), 'Código de Incidência Tributária selecionado não existe')
             existsOrError(body.id_param_cod_inc_irrf, 'Código IRRF não informado')
+            existsOrError(await isParamOrError('codIncIRRF', body.id_param_cod_inc_irrf), 'Código IRRF selecionado não existe')
             existsOrError(body.id_param_cod_inc_fgts, 'Código FGTS não informado')
+            existsOrError(await isParamOrError('codIncFGTS', body.id_param_cod_inc_fgts), 'Código FGTS selecionado não existe')
             existsOrError(body.id_param_cod_inc_cprp, 'Código CPRP não informado')
+            existsOrError(await isParamOrError('codIncCPRP', body.id_param_cod_inc_cprp), 'Código CPRP selecionado não existe')
             existsOrError(body.teto_remun, 'Teto Remuneratório não informado')
-            existsOrError(body.observacao, 'Observação não informado')
+            //existsOrError(body.observacao, 'Observação não informado')
         }
          catch (error) {
             return res.status(400).send(error)

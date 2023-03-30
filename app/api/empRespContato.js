@@ -28,7 +28,7 @@ module.exports = app => {
         try {
             existsOrError(body.id_emp_resp, 'Órgão Responsável não informado')
             existsOrError(body.tipo, 'Tipo do Contato não informado')
-            existsOrError(body.contato, 'Contato não informado')
+            //existsOrError(body.contato, 'Contato não informado')
         }
          catch (error) {
             return res.status(400).send(error)
@@ -96,9 +96,9 @@ module.exports = app => {
     }
 
     const limit = 20 // usado para paginação
-    const get = async(req, res) => {
+    const get = async (req, res) => {
         let user = req.user
-        const key = req.query.key ? req.query.key : undefined
+        const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
             // Alçada para exibição
@@ -110,22 +110,23 @@ module.exports = app => {
 
         const page = req.query.page || 1
 
-        let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
+        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
             .where({ status: STATUS_ACTIVE })
-        if (key)
-            sql.where('id_emp_resp', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('contato', 'like', `%${key.toLowerCase()}%`)
+            .where(function () {
+                this.where(app.db.raw(`tbl1.id_emp_resp regexp('${key.toString().replace(' ', '.+')}')`))
+            })
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
-        const ret = app.db(`${tabelaDomain}`)
-        if (key)
-            ret.where('id_emp_resp', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('contato', 'like', `%${key.toLowerCase()}%`)
-        ret.limit(limit).offset(page * limit - limit)
-        ret.then(body => {
-                return res.json({ data: body, count, limit })
+        const ret = app.db({ tbl1: tabelaDomain })
+            .where({ status: STATUS_ACTIVE })
+            .where(function () {
+                this.where(app.db.raw(`tbl1.id_emp_resp regexp('${key.toString().replace(' ', '.+')}')`))
             })
+        ret.orderBy('id_emp_resp').limit(limit).offset(page * limit - limit)
+        ret.then(body => {
+            return res.json({ data: body, count, limit })
+        })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)

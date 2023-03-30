@@ -32,11 +32,11 @@ module.exports = app => {
             existsOrError(body.es_evento, 'eSocial Evento não informado')
             existsOrError(body.es_recibo, 'eSocial Recibo não informado')
             existsOrError(body.es_status, 'eSocial Status não informado')
-            existsOrError(body.exercicio, 'Exercício não informado')
-            existsOrError(body.tabela, 'Tabela não informada')
-            existsOrError(body.tbl_field, 'Tabela Field não informada')
-            existsOrError(body.tbl_id, 'Tabela ID não informada')
-            existsOrError(body.ambiente, 'Ambiente não informado')
+            // existsOrError(body.exercicio, 'Exercício não informado')
+            // existsOrError(body.tabela, 'Tabela não informada')
+            // existsOrError(body.tbl_field, 'Tabela Field não informada')
+            // existsOrError(body.tbl_id, 'Tabela ID não informada')
+            // existsOrError(body.ambiente, 'Ambiente não informado')
             existsOrError(body.ver_process, 'Versão do Processo não informado')
         }
          catch (error) {
@@ -105,9 +105,44 @@ module.exports = app => {
     }
 
     const limit = 20 // usado para paginação
-    const get = async(req, res) => {
+    // const get = async(req, res) => {
+    //     let user = req.user
+    //     const key = req.query.key ? req.query.key : undefined
+    //     const uParams = await app.db('users').where({ id: user.id }).first();
+    //     try {
+    //         // Alçada para exibição
+    //         isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de financeiros"`)
+    //     } catch (error) {
+    //         return res.status(401).send(error)
+    //     }
+    //     const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+
+    //     const page = req.query.page || 1
+
+    //     let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
+    //         .where({ status: STATUS_ACTIVE })
+    //     if (key)
+    //         sql.where('exercicio', 'like', `%${key.toLowerCase()}%`)
+    //         .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+    //     sql = await app.db.raw(sql.toString())
+    //     const count = sql[0][0].count
+
+    //     const ret = app.db(`${tabelaDomain}`)
+    //     if (key)
+    //         ret.where('exercicio', 'like', `%${key.toLowerCase()}%`)
+    //         .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+    //     ret.limit(limit).offset(page * limit - limit)
+    //     ret.then(body => {
+    //             return res.json({ data: body, count, limit })
+    //         })
+    //         .catch(error => {
+    //             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+    //             return res.status(500).send(error)
+    //         })
+    // }
+    const get = async (req, res) => {
         let user = req.user
-        const key = req.query.key ? req.query.key : undefined
+        const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
             // Alçada para exibição
@@ -119,22 +154,27 @@ module.exports = app => {
 
         const page = req.query.page || 1
 
-        let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
+        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
             .where({ status: STATUS_ACTIVE })
-        if (key)
-            sql.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
+            .where(function () {
+                this.where(app.db.raw(`tbl1.id_es_param regexp('${key.toString().replace(' ', '.+')}')`))
+                .orWhere(app.db.raw(`tbl1.es_lote regexp('${key.toString().replace(' ', '.+')}')`))
+                .orWhere(app.db.raw(`tbl1.es_recibo regexp('${key.toString().replace(' ', '.+')}')`))
+            })
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
-        const ret = app.db(`${tabelaDomain}`)
-        if (key)
-            ret.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
-        ret.limit(limit).offset(page * limit - limit)
-        ret.then(body => {
-                return res.json({ data: body, count, limit })
+        const ret = app.db({ tbl1: tabelaDomain })
+            .where({ status: STATUS_ACTIVE })
+            .where(function () {
+                this.where(app.db.raw(`tbl1.id_es_param regexp('${key.toString().replace(' ', '.+')}')`))
+                .orWhere(app.db.raw(`tbl1.es_lote regexp('${key.toString().replace(' ', '.+')}')`))
+                .orWhere(app.db.raw(`tbl1.es_recibo regexp('${key.toString().replace(' ', '.+')}')`))
             })
+        ret.orderBy('id_es_param').limit(limit).offset(page * limit - limit)
+        ret.then(body => {
+            return res.json({ data: body, count, limit })
+        })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)

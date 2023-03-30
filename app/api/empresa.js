@@ -3,7 +3,8 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, cpfOrError, 
+    isCityOrError, cnpjOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'empresa'
     const STATUS_ACTIVE = 10
@@ -27,23 +28,35 @@ module.exports = app => {
 
         try {
             existsOrError(body.nr_insc, 'CPF ou CNPJ não informado')
+            if (body.nr_insc && body.nr_insc.length == 11) cpfOrError(body.nr_insc)
+            else if (body.nr_insc && body.nr_insc.length == 14) cnpjOrError(body.nr_insc)
+            else throw 'Documento (CNPJ ou CPF) inválido. Favor verificar'
             existsOrError(body.cnpj_efr, 'CNPJ do Ente Federativo não informado')
+            cnpjOrError(body.cnpj_efr, 'CNPJ do Ente Federativo inválido')
             existsOrError(body.class_trib, 'Classificação Tributária não informada')
             existsOrError(body.ind_opt_reg_eletron, 'Opção pelo Registro Eletrônico de Empregados não informado')
             existsOrError(body.razao_social, 'Razão Social não informada')
             existsOrError(body.id_cidade, 'Cidade não informada')
+            //existsOrError(await isCityOrError('uf', body.id_cidade), 'Cidade selecionada não existe')
             existsOrError(body.cep, 'CEP não informado')
             existsOrError(body.bairro, 'Bairro não informado')
             existsOrError(body.logradouro, 'Logradouro não informado')
             existsOrError(body.nr, 'Número não informado')
-            existsOrError(body.complemento, 'Complemento não informado')
-            existsOrError(body.email, 'Email não informado')
-            existsOrError(body.telefone, 'telefone não informado')
-            existsOrError(body.codigo_fpas, 'Código FPAS não informado')
-            existsOrError(body.codigo_gps, 'Código GPS não informado')
-            existsOrError(body.codigo_cnae, 'Código CNAE não informado')
-            existsOrError(body.codigo_recolhimento, 'Código de Recolhimento não informado')
-            existsOrError(body.mes_descsindical, 'Mês Desconto Sindical não informado')
+            // existsOrError(body.complemento, 'Complemento não informado')
+            // existsOrError(body.email, 'Email não informado')
+            // existsOrError(body.telefone, 'telefone não informado')
+            // existsOrError(body.codigo_fpas, 'Código FPAS não informado')
+            // existsOrError(body.codigo_gps, 'Código GPS não informado')
+            // existsOrError(body.codigo_cnae, 'Código CNAE não informado')
+            // existsOrError(body.codigo_recolhimento, 'Código de Recolhimento não informado')
+            // existsOrError(body.mes_descsindical, 'Mês Desconto Sindical não informado')
+            if (body.nr_insc) {
+                const dataFromDB = await app.db(tabelaDomain)
+                    .where({ nr_insc: body.nr_insc })
+                    .andWhere(app.db.raw(body.id ? (`id != '${body.id}'`) : '1=1'))
+                    .first()
+                notExistsOrError(dataFromDB, 'Combinação de CNPJ/ CPF já cadastrado')
+            }
         }
          catch (error) {
             return res.status(400).send(error)
@@ -111,13 +124,48 @@ module.exports = app => {
     }
 
     const limit = 20 // usado para paginação
-    const get = async(req, res) => {
+    // const get = async(req, res) => {
+    //     let user = req.user
+    //     const key = req.query.key ? req.query.key : undefined
+    //     const uParams = await app.db('users').where({ id: user.id }).first();
+    //     try {
+    //         // Alçada para exibição
+    //         isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de financeiros"`)
+    //     } catch (error) {
+    //         return res.status(401).send(error)
+    //     }
+    //     const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+
+    //     const page = req.query.page || 1
+
+    //     let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
+    //         .where({ status: STATUS_ACTIVE })
+    //     if (key)
+    //         sql.where('nr_insc', 'like', `%${key.toLowerCase()}%`)
+    //         .orWhere('razao_social', 'like', `%${key.toLowerCase()}%`)
+    //     sql = await app.db.raw(sql.toString())
+    //     const count = sql[0][0].count
+
+    //     const ret = app.db(`${tabelaDomain}`)
+    //     if (key)
+    //         ret.where('nr_insc', 'like', `%${key.toLowerCase()}%`)
+    //         .orWhere('razao_social', 'like', `%${key.toLowerCase()}%`)
+    //     ret.limit(limit).offset(page * limit - limit)
+    //     ret.then(body => {
+    //             return res.json({ data: body, count, limit })
+    //         })
+    //         .catch(error => {
+    //             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+    //             return res.status(500).send(error)
+    //         })
+    // }
+    const get = async (req, res) => {
         let user = req.user
-        const key = req.query.key ? req.query.key : undefined
+        const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
             // Alçada para exibição
-            isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de financeiros"`)
+            isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de empresa"`)
         } catch (error) {
             return res.status(401).send(error)
         }
@@ -125,22 +173,22 @@ module.exports = app => {
 
         const page = req.query.page || 1
 
-        let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
-            .where({ status: STATUS_ACTIVE })
-        if (key)
-            sql.where('nr_insc', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('razao_social', 'like', `%${key.toLowerCase()}%`)
+        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
+        .where({ status: STATUS_ACTIVE })
+        .where(function () {
+            this.where(app.db.raw(`tbl1.nr_insc regexp('${key.toString().replace(' ', '.+')}')`))
+        })
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
-
-        const ret = app.db(`${tabelaDomain}`)
-        if (key)
-            ret.where('nr_insc', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('razao_social', 'like', `%${key.toLowerCase()}%`)
-        ret.limit(limit).offset(page * limit - limit)
-        ret.then(body => {
-                return res.json({ data: body, count, limit })
+        const ret = app.db({ tbl1: tabelaDomain })
+            .where({ status: STATUS_ACTIVE })
+            .where(function () {
+                this.where(app.db.raw(`tbl1.nr_insc regexp('${key.toString().replace(' ', '.+')}')`))
             })
+        ret.orderBy('nr_insc').limit(limit).offset(page * limit - limit)
+        ret.then(body => {
+            return res.json({ data: body, count, limit })
+        })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)

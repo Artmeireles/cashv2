@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'serv_dependentes'
     const STATUS_ACTIVE = 10
@@ -29,10 +29,12 @@ module.exports = app => {
 
         try {
             existsOrError(body.id_param_tp_dep, 'Tipo do Dependente não informado')
+            existsOrError(await isParamOrError('tpDep', body.id_param_tp_dep), 'Tipo do Dependente selecionado não existe')
             existsOrError(body.nome, 'Nome não informado')
             existsOrError(body.data_nasc, 'Data de Nascimento não informada')
-            existsOrError(body.cpf, 'CPF não informado')
+            //existsOrError(body.cpf, 'CPF não informado')
             existsOrError(body.id_param_sexo, 'Sexo não informado')
+            existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Sexo selecionado não existe')
             existsOrError(body.dep_irrf, 'Dedução pelo Imposto de Renda não informado')
             existsOrError(body.dep_sf, 'Recebimento do Salário Família não informado')
             existsOrError(body.inc_trab, 'Incapacidade Física ou Mental não informada')
