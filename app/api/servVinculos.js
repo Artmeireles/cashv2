@@ -45,7 +45,7 @@ module.exports = app => {
             existsOrError(body.id_param_cod_catg, 'Código da Categoria não informado')
             existsOrError(await isParamOrError('codCatg', body.id_param_cod_catg), 'Código da Categoria selecionado não existe')
             //existsOrError(body.qtd_hr_sem, 'Quantidade de Horas Semanais não informada')
-            existsOrError(body.id_param_tp_jor, 'Tipo Jornada não informada')
+            existsOrError(body.id_param_tp_jor, 'Tipo Jornada não informado')
             existsOrError(await isParamOrError('tpJornada', body.id_param_tp_jor), 'Tipo Jornada selecionado não existe')
             existsOrError(body.id_param_tmp_parc, 'Tempo Parcial não informado')
             existsOrError(await isParamOrError('tmpParc', body.id_param_tmp_parc), 'Tempo Parcial selecionado não existe')

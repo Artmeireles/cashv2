@@ -37,7 +37,7 @@ module.exports = app => {
             existsOrError(body.ind_opt_reg_eletron, 'Opção pelo Registro Eletrônico de Empregados não informado')
             existsOrError(body.razao_social, 'Razão Social não informada')
             existsOrError(body.id_cidade, 'Cidade não informada')
-            //existsOrError(await isCityOrError('uf', body.id_cidade), 'Cidade selecionada não existe')
+            existsOrError(await isCityOrError(body.id_cidade), 'Cidade selecionada não existe')
             existsOrError(body.cep, 'CEP não informado')
             existsOrError(body.bairro, 'Bairro não informado')
             existsOrError(body.logradouro, 'Logradouro não informado')

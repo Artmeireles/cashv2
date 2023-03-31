@@ -66,15 +66,13 @@ module.exports = app => {
 
     async function isParamOrError(meta, id) {
         const param = await app.db(`${dbPrefix}_api.params`)
-            .select('id', 'meta', 'label')
             .where({ 'status': 10, 'dominio': 'root', 'meta': meta, 'id': id }).first()
         if (param && param.id > 0) return true
     }
 
-    async function isCityOrError(uf, id) {
-        const param = await app.db(`${dbPrefix}_api.cidades`)
-            .select('id', 'uf', 'municipio')
-            .where({ 'status': 10, 'uf': uf, 'id': id }).first()
+    async function isCityOrError(id) {
+        const param = await app.db(`${dbPrefix}_api.cidades`) 
+            .where({ 'status': 10, 'id': id }).first()
         if (param && param.id > 0) return true
     }
 

@@ -13,6 +13,8 @@ module.exports = app => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
         const body = { ...req.body }
+        delete body.id_es_param
+        body.id_es_param = req.params.id_es_param
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
@@ -26,12 +28,12 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.id_es_param, 'eSocial Parametros não informado')
-            existsOrError(body.es_lote, 'eSocial Lote não informado')
-            existsOrError(body.es_idevento, 'eSocial IDEvento não informado')
-            existsOrError(body.es_evento, 'eSocial Evento não informado')
-            existsOrError(body.es_recibo, 'eSocial Recibo não informado')
-            existsOrError(body.es_status, 'eSocial Status não informado')
+            existsOrError(body.id_es_param, 'Parametros não informado')
+            existsOrError(body.es_lote, 'Lote não informado')
+            existsOrError(body.es_idevento, 'IDEvento não informado')
+            existsOrError(body.es_evento, 'Evento não informado')
+            existsOrError(body.es_recibo, 'Recibo não informado')
+            existsOrError(body.es_status, 'Status não informado')
             // existsOrError(body.exercicio, 'Exercício não informado')
             // existsOrError(body.tabela, 'Tabela não informada')
             // existsOrError(body.tbl_field, 'Tabela Field não informada')
@@ -65,7 +67,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('O Parâmetro não foi encontrado')
+                else res.status(200).send('O Envio não foi encontrado')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -105,43 +107,9 @@ module.exports = app => {
     }
 
     const limit = 20 // usado para paginação
-    // const get = async(req, res) => {
-    //     let user = req.user
-    //     const key = req.query.key ? req.query.key : undefined
-    //     const uParams = await app.db('users').where({ id: user.id }).first();
-    //     try {
-    //         // Alçada para exibição
-    //         isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de financeiros"`)
-    //     } catch (error) {
-    //         return res.status(401).send(error)
-    //     }
-    //     const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
-
-    //     const page = req.query.page || 1
-
-    //     let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
-    //         .where({ status: STATUS_ACTIVE })
-    //     if (key)
-    //         sql.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-    //         .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
-    //     sql = await app.db.raw(sql.toString())
-    //     const count = sql[0][0].count
-
-    //     const ret = app.db(`${tabelaDomain}`)
-    //     if (key)
-    //         ret.where('exercicio', 'like', `%${key.toLowerCase()}%`)
-    //         .orWhere('tabela', 'like', `%${key.toLowerCase()}%`)
-    //     ret.limit(limit).offset(page * limit - limit)
-    //     ret.then(body => {
-    //             return res.json({ data: body, count, limit })
-    //         })
-    //         .catch(error => {
-    //             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-    //             return res.status(500).send(error)
-    //         })
-    // }
     const get = async (req, res) => {
         let user = req.user
+        const id_es_param = req.params.id_es_param
         const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
@@ -155,7 +123,7 @@ module.exports = app => {
         const page = req.query.page || 1
 
         let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-            .where({ status: STATUS_ACTIVE })
+            .where({ status: STATUS_ACTIVE, id_es_param: req.params.id_es_param })
             .where(function () {
                 this.where(app.db.raw(`tbl1.id_es_param regexp('${key.toString().replace(' ', '.+')}')`))
                 .orWhere(app.db.raw(`tbl1.es_lote regexp('${key.toString().replace(' ', '.+')}')`))
@@ -165,11 +133,11 @@ module.exports = app => {
         const count = sql[0][0].count
 
         const ret = app.db({ tbl1: tabelaDomain })
-            .where({ status: STATUS_ACTIVE })
+            .where({ status: STATUS_ACTIVE, id_es_param: req.params.id_es_param })
             .where(function () {
                 this.where(app.db.raw(`tbl1.id_es_param regexp('${key.toString().replace(' ', '.+')}')`))
-                .orWhere(app.db.raw(`tbl1.es_lote regexp('${key.toString().replace(' ', '.+')}')`))
-                .orWhere(app.db.raw(`tbl1.es_recibo regexp('${key.toString().replace(' ', '.+')}')`))
+                    .orWhere(app.db.raw(`tbl1.es_lote regexp('${key.toString().replace(' ', '.+')}')`))
+                    .orWhere(app.db.raw(`tbl1.es_recibo regexp('${key.toString().replace(' ', '.+')}')`))
             })
         ret.orderBy('id_es_param').limit(limit).offset(page * limit - limit)
         ret.then(body => {
@@ -194,7 +162,7 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const ret = app.db({ tbl1: tabelaDomain })
             .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
-            .where({ id: req.params.id, status: STATUS_ACTIVE }).first()
+            .where({ id_es_param: req.params.id_es_param, id: req.params.id, status: STATUS_ACTIVE }).first()
             .then(body => {
                 return res.json(body)
             })
@@ -236,7 +204,7 @@ module.exports = app => {
                     updated_at: new Date(),
                     evento: evento
                 })
-                .where({ id: req.params.id })
+                .where({ id_es_param: req.params.id_es_param, id: req.params.id })
             existsOrError(rowsUpdated, 'Registro não foi encontrado')
 
             res.status(204).send()

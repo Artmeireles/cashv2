@@ -14,6 +14,8 @@ module.exports = app => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
         const body = { ...req.body }
+        delete body.id_emp
+        body.id_emp = req.params.id_emp
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
@@ -76,7 +78,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('O Parâmetro não foi encontrado')
+                else res.status(200).send('Responsável pela Empresa não foi encontrada')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -118,6 +120,7 @@ module.exports = app => {
     const limit = 20 // usado para paginação
     const get = async (req, res) => {
         let user = req.user
+        const id_emp = req.params.id_emp
         const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
@@ -131,7 +134,7 @@ module.exports = app => {
         const page = req.query.page || 1
 
         let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-            .where({ status: STATUS_ACTIVE })
+            .where({ status: STATUS_ACTIVE, id_emp: req.params.id_emp })
             .where(function () {
                 this.where(app.db.raw(`tbl1.id_emp regexp('${key.toString().replace(' ', '.+')}')`))
                 this.orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
@@ -140,7 +143,7 @@ module.exports = app => {
         const count = sql[0][0].count
 
         const ret = app.db({ tbl1: tabelaDomain })
-            .where({ status: STATUS_ACTIVE })
+            .where({ status: STATUS_ACTIVE, id_emp: req.params.id_emp })
             .where(function () {
                 this.where(app.db.raw(`tbl1.id_emp regexp('${key.toString().replace(' ', '.+')}')`))
                 this.orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
@@ -154,53 +157,6 @@ module.exports = app => {
                 return res.status(500).send(error)
             })
     }
-    // const get = async (req, res) => {
-    //     let user = req.user
-    //     const key = req.query.key ? req.query.key.trim() : ''
-    //     let keyCpf = req.query.keyCpf ? req.query.keyCpf : ''
-    //     let keyCnpj = req.query.keyCnpj ? req.query.keyCnpj : ''
-    //     if (req.query.key) {
-    //         keyCpf = key.replace(/([^\d])+/gim, "").length <= 11 ? key.replace(/([^\d])+/gim, "") : ''
-    //         keyCnpj = key.replace(/([^\d])+/gim, "").length <= 14 ? key.replace(/([^\d])+/gim, "") : ''
-    //     }
-    //     const uParams = await app.db('users').where({ id: user.id }).first();
-    //     try {
-    //         // Alçada para exibição
-    //         isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Exibição de financeiros"`)
-    //     } catch (error) {
-    //         return res.status(401).send(error)
-    //     }
-    //     const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
-    //     const page = req.query.page || 1
-
-    //     let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-    //         .where({ 'tbl1.status': STATUS_ACTIVE })
-    //         .where(function () {
-    //             this.where(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
-    //                 .orWhere(app.db.raw(`tbl1.nr_insc like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
-    //                 .orWhere(app.db.raw(`tbl1.nr_insc like '%${keyCnpj.replace(/([^\d])+/gim, "")}%'`))
-    //         })
-
-    //     sql = await app.db.raw(sql.toString())
-    //     const count = sql[0][0].count
-
-    //     const ret = app.db({ tbl1: tabelaDomain })
-    //         .where({ 'tbl1.status': STATUS_ACTIVE })
-    //         .where(function () {
-    //             this.where(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
-    //                 .orWhere(app.db.raw(`tbl1.nr_insc like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
-    //                 .orWhere(app.db.raw(`tbl1.nr_insc like '%${keyCnpj.replace(/([^\d])+/gim, "")}%'`))
-    //         })
-    //     ret.orderBy('nome').limit(limit).offset(page * limit - limit)
-    //     ret.then(body => {
-    //         return res.json({ data: body, count, limit })
-    //     })
-    //         .catch(error => {
-    //             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-    //             return res.status(500).send(error)
-    //         })
-    // }
-
     const getById = async (req, res) => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
@@ -214,7 +170,7 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const ret = app.db({ tbl1: tabelaDomain })
             .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
-            .where({ id: req.params.id, status: STATUS_ACTIVE }).first()
+            .where({ id_emp: req.params.id_emp, id: req.params.id, status: STATUS_ACTIVE }).first()
             .then(body => {
                 return res.json(body)
             })
@@ -256,7 +212,7 @@ module.exports = app => {
                     updated_at: new Date(),
                     evento: evento
                 })
-                .where({ id: req.params.id })
+                .where({ id_emp: req.params.id_emp, id: req.params.id })
             existsOrError(rowsUpdated, 'Registro não foi encontrado')
 
             res.status(204).send()

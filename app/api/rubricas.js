@@ -13,6 +13,8 @@ module.exports = app => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
         const body = { ...req.body }
+        delete body.id_emp
+        body.id_emp = req.params.id_emp
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
@@ -28,7 +30,7 @@ module.exports = app => {
         try {
             existsOrError(body.id_emp, 'Órgão não informado')
             existsOrError(body.cod_rubr, 'Código da Rúbrica não informado')
-            existsOrError(body.ini_valid, 'Inicio da válidade não informado')
+            existsOrError(body.ini_valid, 'Inicio da válidade não informada')
             existsOrError(body.dsc_rubr, 'Descrição da Rúbrica não informada')
             existsOrError(body.id_param_nat_rubr, 'Natureza da Rúbrica não informada')
             existsOrError(await isParamOrError('natRubrica', body.id_param_nat_rubr), 'Natureza da Rúbrica selecionada não existe')
@@ -71,7 +73,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('Rúbrica não foi encontrada')
+                else res.status(200).send('Rúbrica não encontrada')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -111,9 +113,10 @@ module.exports = app => {
     }
 
     const limit = 20 // usado para paginação
-    const get = async(req, res) => {
-        let user = req.user
-        const key = req.query.key ? req.query.key : undefined
+    const get = async (req, res) => {
+        let user = req.user        
+        const id_emp = req.params.id_emp
+        const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
             // Alçada para exibição
@@ -125,22 +128,25 @@ module.exports = app => {
 
         const page = req.query.page || 1
 
-        let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
-            .where({ status: STATUS_ACTIVE })
-        if (key)
-            sql.where('id_emp', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('cod_rubr', 'like', `%${key.toLowerCase()}%`)
+        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
+            .where({ status: STATUS_ACTIVE, id_emp: req.params.id_emp })
+            .where(function () {
+                this.where(app.db.raw(`tbl1.cod_rubr regexp('${key.toString().replace(' ', '.+')}')`))
+                this.orWhere(app.db.raw(`tbl1.dsc_rubr regexp('${key.toString().replace(' ', '.+')}')`))
+            })
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
-        const ret = app.db(`${tabelaDomain}`)
-        if (key)
-            ret.where('id_emp', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('cod_rubr', 'like', `%${key.toLowerCase()}%`)
-        ret.limit(limit).offset(page * limit - limit)
-        ret.then(body => {
-                return res.json({ data: body, count, limit })
+        const ret = app.db({ tbl1: tabelaDomain })
+            .where({ status: STATUS_ACTIVE, id_emp: req.params.id_emp })
+            .where(function () {
+                this.where(app.db.raw(`tbl1.cod_rubr regexp('${key.toString().replace(' ', '.+')}')`))
+                this.orWhere(app.db.raw(`tbl1.dsc_rubr regexp('${key.toString().replace(' ', '.+')}')`))
             })
+        ret.orderBy('cod_rubr').limit(limit).offset(page * limit - limit)
+        ret.then(body => {
+            return res.json({ data: body, count, limit })
+        })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)
@@ -160,7 +166,7 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const ret = app.db({ tbl1: tabelaDomain })
             .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
-            .where({ id: req.params.id, status: STATUS_ACTIVE }).first()
+            .where({ id_emp: req.params.id_emp, id: req.params.id, status: STATUS_ACTIVE }).first()
             .then(body => {
                 return res.json(body)
             })
@@ -202,7 +208,7 @@ module.exports = app => {
                     updated_at: new Date(),
                     evento: evento
                 })
-                .where({ id: req.params.id })
+                .where({ id_emp: req.params.id_emp, id: req.params.id })
             existsOrError(rowsUpdated, 'Registro não foi encontrado')
 
             res.status(204).send()

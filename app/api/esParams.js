@@ -13,6 +13,8 @@ module.exports = app => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
         const body = { ...req.body }
+        delete body.id_emp
+        body.id_emp = req.params.id_emp
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
@@ -105,6 +107,7 @@ module.exports = app => {
     const limit = 20 // usado para paginação
     const get = async (req, res) => {
         let user = req.user
+        const id_emp = req.params.id_emp
         const key = req.query.key ? req.query.key : ''
         let keyCnpj = req.query.keyCnpj ? req.query.keyCnpj : ''
         if (req.query.key) {
@@ -122,7 +125,7 @@ module.exports = app => {
         const page = req.query.page || 1
 
         let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-            .where({ status: STATUS_ACTIVE })
+            .where({ status: STATUS_ACTIVE, id_emp: req.params.id_emp })
             .where(function () {
                 this.where(app.db.raw(`tbl1.id_emp regexp('${key.toString().replace(' ', '.+')}')`))
                 .orWhere(app.db.raw(`tbl1.cnpj_sh like '%${keyCnpj.replace(/([^\d])+/gim, "")}%'`))
@@ -131,7 +134,7 @@ module.exports = app => {
         const count = sql[0][0].count
 
         const ret = app.db({ tbl1: tabelaDomain })
-            .where({ status: STATUS_ACTIVE })
+            .where({ status: STATUS_ACTIVE, id_emp: req.params.id_emp })
             .where(function () {
                 this.where(app.db.raw(`tbl1.id_emp regexp('${key.toString().replace(' ', '.+')}')`))
                 .orWhere(app.db.raw(`tbl1.cnpj_sh like '%${keyCnpj.replace(/([^\d])+/gim, "")}%'`))
@@ -159,7 +162,7 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const ret = app.db({ tbl1: tabelaDomain })
             .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
-            .where({ id: req.params.id, status: STATUS_ACTIVE }).first()
+            .where({ id_emp: req.params.id_emp, id: req.params.id, status: STATUS_ACTIVE }).first()
             .then(body => {
                 return res.json(body)
             })
@@ -201,7 +204,7 @@ module.exports = app => {
                     updated_at: new Date(),
                     evento: evento
                 })
-                .where({ id: req.params.id })
+                .where({ id_emp: req.params.id_emp, id: req.params.id })
             existsOrError(rowsUpdated, 'Registro não foi encontrado')
 
             res.status(204).send()

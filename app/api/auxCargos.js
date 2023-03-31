@@ -95,9 +95,9 @@ module.exports = app => {
     }
 
     const limit = 20 // usado para paginação
-    const get = async(req, res) => {
+    const get = async (req, res) => {
         let user = req.user
-        const key = req.query.key ? req.query.key : undefined
+        const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
             // Alçada para exibição
@@ -109,22 +109,25 @@ module.exports = app => {
 
         const page = req.query.page || 1
 
-        let sql = app.db(`${tabelaDomain}`).count('id', { as: 'count' })
+        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
             .where({ status: STATUS_ACTIVE })
-        if (key)
-            sql.where('cbo', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
+            .where(function () {
+                this.where(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
+                this.orWhere(app.db.raw(`tbl1.cbo regexp('${key.toString().replace(' ', '.+')}')`))
+            })
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
-        const ret = app.db(`${tabelaDomain}`)
-        if (key)
-            ret.where('cbo', 'like', `%${key.toLowerCase()}%`)
-            .orWhere('nome', 'like', `%${key.toLowerCase()}%`)
-        ret.limit(limit).offset(page * limit - limit)
-        ret.then(body => {
-                return res.json({ data: body, count, limit })
+        const ret = app.db({ tbl1: tabelaDomain })
+            .where({ status: STATUS_ACTIVE })
+            .where(function () {
+                this.where(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
+                this.orWhere(app.db.raw(`tbl1.cbo regexp('${key.toString().replace(' ', '.+')}')`))
             })
+        ret.orderBy('nome').limit(limit).offset(page * limit - limit)
+        ret.then(body => {
+            return res.json({ data: body, count, limit })
+        })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)

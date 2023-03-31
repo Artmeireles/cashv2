@@ -28,7 +28,7 @@ module.exports = app => {
             existsOrError(body.dominio, 'Domínio não informado')
             existsOrError(body.meta, 'Meta não informado')
             existsOrError(body.value, 'Valor não informado')
-            existsOrError(body.label, 'Label não informado')
+            //existsOrError(body.label, 'Label não informado')
         }
         catch (error) {
             return res.status(400).send(error)
