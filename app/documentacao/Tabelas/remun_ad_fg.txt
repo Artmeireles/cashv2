@@ -1,0 +1,6 @@
+remun_ad_fg (
+	tipo comment(1=Adicional; 2=Função Gratificada)
+	inicio
+	publicacao
+	nr_publicacao
+	id_param_vei_publi FK

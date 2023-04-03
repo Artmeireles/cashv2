@@ -1,0 +1,11 @@
+remuneracao (
+	id_serv_vinculos FK
+	id_remun_param FK
+	id_rubrica FK
+	id_ad_fg FK
+	qtdRubr_49=
+	fatorRubr_50=1
+	vrRubr_52=7000	
+	indApurIR_115 default('1')
+	prazo_i char(3)
+	prazo_f char(3)

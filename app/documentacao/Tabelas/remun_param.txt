@@ -1,0 +1,10 @@
+remun_param (
+	ano
+	mes
+	complementar default('000')
+	ano_i
+	mes_i
+	complementar_i default('000')
+	descrição
+	mensagem
+	mensagem_especial

@@ -1,0 +1,6 @@
+remun_oe ( "outros entes"
+	id_serv_vinculos FK
+	id_param_indMV_18=3
+	nrInsc_110=09569391000134
+	id_param_codCateg_22=302
+	vlrRemunOE_23=7220.00

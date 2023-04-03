@@ -1,0 +1,7 @@
+serv_desligamento (
+	id_serv_vinculos FK
+	mtvDeslig_17=10
+	dtDeslig_18=2023-02-28
+	indPagtoAPI_19=N
+	obs
+)

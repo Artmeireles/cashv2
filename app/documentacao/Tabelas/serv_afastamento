@@ -1,0 +1,13 @@
+serv_afastamento (
+	id_serv_vinculos FK
+	codMotAfast_id_param FK
+	dtInicio_61=
+	dtFim_62=
+	infoMesmoMtv_20 boolean
+	tpAcidTransito_id_param FK (1 - Atropelamento; 2 - Colisão; 3 - Outros)
+	onus_id_param FK (1 - Ônus do cedente; 2 - Ônus do cessionário; 3 - Ônus do cedente e cessionário)
+	cnpj_onus
+	tipo_id_param FK ( 1 - Temporário; 2 - Definitivo)
+	indRemunCargo - Indicar se o servidor optou pela remuneração do cargo efetivo - boolean
+	obs (not null se licença sem vencimento ou readaptação)
+)

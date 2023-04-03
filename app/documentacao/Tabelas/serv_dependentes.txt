@@ -8,6 +8,14 @@ serv_dependentes (
 	depIRRF_96=
 	depSF_97=
 	incTrab_99= 
+	dt_limite_previdencia
+	dt_limite_irpf
+	certidao varchar(255)
+	cert_livro varchar(255)
+	cert_folha varchar(255)
+	cert_dt char(10)
+	cart_vacinacao boolean
+	declaracao_escolar boolean
 )
 
 

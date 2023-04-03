@@ -1,0 +1,8 @@
+serv_ferias (
+	id_serv_vinculos FK
+	dt_i_aquisicao
+	dt_f_aquisicao
+	dt_início
+	periodo
+	obs
+)

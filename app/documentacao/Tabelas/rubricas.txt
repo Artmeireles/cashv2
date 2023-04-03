@@ -10,7 +10,9 @@ rubricas (
     id_params_cod_inc_irrf
     id_params_cod_inc_fgts
     id_params_cod_inc_cprp
-    teto_remun 
+    teto_remun
+	>>>>>>>>>>>>>>>>>>> consignado boolean
+	>>>>>>>>>>>>>>>>>>> consignavel boolean
 	observacao
 )
 

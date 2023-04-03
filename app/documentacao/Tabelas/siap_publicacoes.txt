@@ -1,0 +1,4 @@
+siap_publicacoes
+	publicacao_dt
+    publicacao_nr
+    id_param_vei_publi

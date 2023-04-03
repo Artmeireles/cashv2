@@ -1,0 +1,43 @@
+serv_vinculo (	
+	id_serv					int not null,
+	id_vinc_principal int(10) unsingned
+	matricula 108=00001911
+	>>>>>>>>>>>>>>>>>> sit_func comment('1=Ativo; 2=Aposentado; 3=Pensionista')
+	tpRegPrev comment('1=RGPS; 2=RPPS') 
+	id_params_tpProv comment(Vinculo trabalhista)
+	dtExercicio 144=2022-01-03
+	tpPlanRP_145
+	indTetoRGPS_222=
+	indAbonoPerm_223=
+	dtIniAbono_224=
+	dtIngrCargo_227=
+	id_cg_fn foreign
+	acumCargo 230=N
+	id_params_codCateg 151=306
+	qtdHrsSem 176=40
+	id_params_tpJornada 177=9
+	id_params_tmpParc 179=0
+	horNoturno 241=N
+	dscJorn 
+	
+	>>>>>>>>>>>>> pis	
+	>>>>>>>>>>>>> pis_data
+	
+	>>>>>>>>>>>>> tempo_servico
+	>>>>>>>>>>>>> tempo_final
+	
+	>>>>>>>>>>>>> titulo
+	>>>>>>>>>>>>> tit_uf
+	>>>>>>>>>>>>> tit_zona
+	>>>>>>>>>>>>> tit_secao
+	
+	>>>>>>>>>>>>> nomeacao_dt
+	>>>>>>>>>>>>> nom_edital
+	>>>>>>>>>>>>> nom_nr_inscr
+	>>>>>>>>>>>>> id_siap_publi
+	
+	>>>>>>>>>>>>> id_param_grauExp_64
+	>>>>>>>>>>>>> id_param_codCateg_112=302 	
+	
+	
+)

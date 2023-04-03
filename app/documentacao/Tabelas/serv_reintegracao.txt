@@ -1,0 +1,9 @@
+serv_reintegracao (
+	id_serv_vinculos FK
+	tpReint_id_param FK (1 - Reintegração por decisão judicial;2 - Reintegração por anistia legal;3 - Reversão de servidor público;4 - Recondução de servidor público;5 - Reinclusão de militar;9 - Outros)
+	nrProcJud_18=
+	nrLeiAnistia_19=
+	dtEfetRetorno_20=
+	dtEfeito_22=
+	obs
+)
