@@ -1,107 +1,85 @@
-<template>
-  <div id="app">
-    <vue-confirm-dialog></vue-confirm-dialog>
-    <Header title="Cash" :hideUserDropdown="!user" id="header" />
-    <Loading v-if="validatingToken" />
-    <Content v-else />
-    <Footer />
-  </div>
-</template>
-
-<script>
-import axios from "axios";
-import { userKey } from "@/global";
-import { baseApiUrl } from "@/env";
-import { mapState } from "vuex";
-import Header from "@/components/template/Header";
-import Content from "@/components/template/Content";
-import Footer from "@/components/template/Footer";
-import Loading from "@/components/template/Loading";
-
-export default {
-  name: "App",
-  components: { Header, Content, Footer, Loading },
-  computed: mapState(["user"]),
-  data: function () {
-    return {
-      validatingToken: true,
-    };
-  },
-  methods: {
-    async validateToken() {
-      this.validatingToken = true;
-
-      const json = localStorage.getItem(userKey);
-      const userData = JSON.parse(json);
-      this.$store.commit("setUser", null);
-
-      // Declarar rotas alternativas criadas em router.js
-      // As rotas alternativas dispensam validação de usuário
-      const alternates = [
-        "auth",
-        "apresentacao",
-        "validator",
-        "request-password-reset",
-        "password-reset",
-      ];
-
-      // rota primária
-      if (!userData && this.$route.name === "user-unlock") {
-        const res = await axios.get(
-          `${baseApiUrl}/${this.$route.name}/${this.$route.params.id}/${this.$route.params.token}`
-        );
-
-        this.$toasted.global.defaultSuccess({ msg: res.data });
-        this.$router.push({ name: alternates[0] });
-      }
-
-      if (!userData && alternates.indexOf(this.$route.name) < 0) {
-        this.$cookies.set("noUserRoute", this.$route.fullPath);
-        this.validatingToken = false;
-        this.$router.push({ name: alternates[0] });
-        return;
-      } else {
-        const res = await axios.post(`${baseApiUrl}/validateToken`, userData);
-
-        if (res.data) {
-          this.$store.commit("setUser", userData);
-        } else {
-          localStorage.removeItem(userKey);
-          if (alternates.indexOf(this.$route.name) < 0)
-            this.$router.push({ name: alternates[0] });
-        }
-
-        this.validatingToken = false;
-      }
-    },
-  },
-  created() {
-    this.validateToken();
-    this.$cookies.set("uLast", this.$route.fullPath);
-  },
-};
+<script setup>
+import { RouterLink, RouterView } from 'vue-router'
+import HelloWorld from './components/HelloWorld.vue'
 </script>
 
-<style>
-* {
-  font-family: "Lato", sans-serif;
+<template>
+  <header>
+    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+
+    <div class="wrapper">
+      <HelloWorld msg="You did it!" />
+
+      <nav>
+        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/about">About</RouterLink>
+      </nav>
+    </div>
+  </header>
+
+  <RouterView />
+</template>
+
+<style scoped>
+header {
+  line-height: 1.5;
+  max-height: 100vh;
 }
 
-body {
-  margin: 0;
+.logo {
+  display: block;
+  margin: 0 auto 2rem;
 }
 
-#app {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+nav {
+  width: 100%;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 2rem;
+}
 
-  height: 100vh;
-  display: grid;
-  grid-template-rows: 60px 1fr 40px;
-  grid-template-columns: 300px 1fr;
-  grid-template-areas:
-    "header header"
-    "content content"
-    "footer footer";
+nav a.router-link-exact-active {
+  color: var(--color-text);
+}
+
+nav a.router-link-exact-active:hover {
+  background-color: transparent;
+}
+
+nav a {
+  display: inline-block;
+  padding: 0 1rem;
+  border-left: 1px solid var(--color-border);
+}
+
+nav a:first-of-type {
+  border: 0;
+}
+
+@media (min-width: 1024px) {
+  header {
+    display: flex;
+    place-items: center;
+    padding-right: calc(var(--section-gap) / 2);
+  }
+
+  .logo {
+    margin: 0 2rem 0 0;
+  }
+
+  header .wrapper {
+    display: flex;
+    place-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  nav {
+    text-align: left;
+    margin-left: -1rem;
+    font-size: 1rem;
+
+    padding: 1rem 0;
+    margin-top: 1rem;
+  }
 }
 </style>
