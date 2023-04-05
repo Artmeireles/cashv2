@@ -1,41 +1,14 @@
-import Vue from 'vue'
-import { BootstrapVueIcons } from 'bootstrap-vue'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 
+import App from './App.vue'
+import router from './router'
 
-import App from './App'
-import VueCookies from 'vue-cookies'
+import './assets/main.css'
 
-import ViaCep from 'vue-viacep'
-import money from 'v-money'
+const app = createApp(App)
 
-import './config/bootstrap'
-import './config/msgs'
-import './config/axios'
-import './config/mq'
+app.use(createPinia())
+app.use(router)
 
-import store from './config/store'
-import router from './config/router'
-import VueConfirmDialog from 'vue-confirm-dialog'
-import vSelect from 'vue-select'
-
-Vue.use(BootstrapVueIcons)
-Vue.use(VueConfirmDialog)
-Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
-Vue.component('v-select', vSelect)
-Vue.use(ViaCep);
-Vue.use(money, {
-    decimal: ",",
-    thousands: ".",
-    prefix: "",
-    suffix: "",
-    precision: 2,
-    masked: false,
-});
-Vue.config.productionTip = false
-Vue.use(VueCookies)
-
-new Vue({
-    store,
-    router,
-    render: h => h(App)
-}).$mount('#app')
+app.mount('#app')
