@@ -9,7 +9,7 @@ exports.up = function(knex) {
         table.string('created_at').notNull()
         table.string('updated_at')
         table.integer('id_emp').notNull().unsigned().comment("Órgão")
-        table.string('cod_rubr', 30).notNull().comment("Código da Rúbrica")
+        table.string('cod_rubr', 8).notNull().comment("Código da Rúbrica")
         table.string('ini_valid', 7).notNull().comment("Início da Validade das Informações")
         table.string('dsc_rubr', 100).notNull().comment("Descrição (nome) da Rubrica ")
         table.integer('id_param_nat_rubr').notNull().unsigned().comment("Natureza Rubrica")
@@ -19,6 +19,8 @@ exports.up = function(knex) {
         table.integer('id_param_cod_inc_fgts').notNull().unsigned().comment("Código de Incidência FGTS")
         table.integer('id_param_cod_inc_cprp').notNull().unsigned().comment("Código de Incidência RPPS")
         table.boolean('teto_remun').notNull().comment("S-Sim, N-Não")
+        table.boolean('consignado').notNull().comment("S-Sim, N-Não")
+        table.boolean('consignavel').notNull().comment("S-Sim, N-Não")
         table.string('observacao', 255).comment("Informações Relacionadas a Rubrica")
         
         table.foreign('id_emp').references('id').inTable('empresa').onUpdate('CASCADE').onDelete('NO ACTION')

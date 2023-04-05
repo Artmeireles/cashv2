@@ -2,7 +2,7 @@ serv_vinculo (
 	id_serv					int not null,
 	id_vinc_principal int(10) unsingned
 	matricula 108=00001911
-	>>>>>>>>>>>>>>>>>> sit_func comment('1=Ativo; 2=Aposentado; 3=Pensionista')
+	>>>>>>>>>>sit_func comment('1=Ativo; 2=Aposentado; 3=Pensionista')
 	tpRegPrev comment('1=RGPS; 2=RPPS') 
 	id_params_tpProv comment(Vinculo trabalhista)
 	dtExercicio 144=2022-01-03
@@ -11,9 +11,9 @@ serv_vinculo (
 	indAbonoPerm_223=
 	dtIniAbono_224=
 	dtIngrCargo_227=
-	id_cg_fn foreign
+	id_cargo_fn foreign
 	acumCargo 230=N
-	id_params_codCateg 151=306
+	id_param_codCateg 151=306
 	qtdHrsSem 176=40
 	id_params_tpJornada 177=9
 	id_params_tmpParc 179=0
@@ -37,7 +37,46 @@ serv_vinculo (
 	>>>>>>>>>>>>> id_siap_publi
 	
 	>>>>>>>>>>>>> id_param_grauExp_64
-	>>>>>>>>>>>>> id_param_codCateg_112=302 	
-	
 	
 )
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_serv": "1",
+            "id_vinc_principal":"1",
+            "matricula":"541", 
+            "sit_func":"541", 
+            "tp_reg_prev":"1", 
+            "id_param_tp_prov":"553", 
+            "data_exercicio":"05/04/2023", 
+            "tp_plan_rp":"2", 
+            "teto_rgps":"2", 
+            "abono_perm":"1", 
+            "d_inicio_abono":"05/04/2023", 
+            "d_ing_cargo":"05/04/2023", 
+            "id_cargo":"1", 
+            "acum_cargo":"1", 
+            "id_param_cod_categ":"622", 
+            "qtd_hr_sem":"80", 
+            "id_param_tp_jor":"653", 
+            "id_param_tmp_parc":"658", 
+            "hr_noturno":"2", 
+            "desc_jornd":"Segunda-feira das 08:00 às 13:00, Terça-feira das 08:00 às 13:00, Quarta-feira das 08:00 às 13:00", 
+            "pis":"110154", 
+            "dt_pis":"05/04/2023", 
+            "tempo_servico":"10", 
+            "tempo_final":"20", 
+            "titulo":"541", 
+            "tit_uf":"541", 
+            "tit_zona":"541", 
+            "tit_secao":"541", 
+            "dt_nomeacao":"05/04/2023", 
+            "nom_edital":"541", 
+            "nom_nr_inscr":"541", 
+            "id_siap_pub":"1", 
+            "id_param_grau_exp":"1" 
+}

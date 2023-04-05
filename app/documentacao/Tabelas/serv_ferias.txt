@@ -6,3 +6,19 @@ serv_ferias (
 	periodo
 	obs
 )
+
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_serv_vinc": "1",
+            "dt_i_aquisicao":"05/04/2023",
+            "dt_f_aquisicao":"05/04/2023", 
+            "dt_inicio":"05/04/2023",
+            "periodo":"1",
+            "obs":"Não sei"
+            
+}

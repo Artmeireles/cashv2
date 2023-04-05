@@ -4,3 +4,16 @@ remun_oe ( "outros entes"
 	nrInsc_110=09569391000134
 	id_param_codCateg_22=302
 	vlrRemunOE_23=7220.00
+	
+	
+	{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_param_ind_mv": "1",
+            "nr_insc":"0668",
+            "id_param_cod_categ":"100", 
+            "vlr_remun_oe":"200"
+            
+}

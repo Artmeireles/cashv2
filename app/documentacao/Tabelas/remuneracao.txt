@@ -9,3 +9,23 @@ remuneracao (
 	indApurIR_115 default('1')
 	prazo_i char(3)
 	prazo_f char(3)
+	
+	
+	
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_serv_vinc": "1",
+            "id_remun_param":"1",
+            "id_rubrica":"1", 
+            "id_ad_fg":"2",
+            "qtd_rubr":"12",
+            "fator_rubr":"200",
+            "valor_rubr":"200",
+            "ind_apur_ir":"200",
+            "prazo_i":"200",
+            "prazo_f":"200"
+            
+}

@@ -31,3 +31,43 @@ servidores (
 	>>>>>>>>>>>>> pai
 	>>>>>>>>>>>>> naturalidade
 )
+
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_emp":"1", 
+            "cpf_trab":"23472006072",        
+            "nome":"João",            
+            "nome_social":"Joãozin",         
+            "id_param_sexo":"17",    
+            "id_param_raca_cor":"332",
+            "id_param_est_civ":"339",  
+            "id_param_grau_instr":"342",
+            "dt_nascto":"05/04/2023",
+            "id_param_p_nascto":"18",
+            "id_param_p_nacld": "18",              
+            "id_param_tplograd":"405",                
+            "id_cidade":"2",    
+            "cep":"41710765",              
+            "dsc_lograd":"primeira",              
+            "nr":"1",              
+            "bairro":"primeira",              
+            "logradouro":"primeira",              
+            "complemento":"primeira",              
+            "def_fisica":"1",              
+            "def_visual":"2",              
+            "def_auditiva":"1",              
+            "def_mental":"2",              
+            "def_intelectual":"1",              
+            "reab_readap":"2",              
+            "observacao":"primeira",              
+            "telefone":"primeira",              
+            "email":"joao@gmail.com",              
+            "mae":"Joana",              
+            "pai":"Joano",              
+            "naturalidade":"Joaocity"             
+}

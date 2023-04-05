@@ -10,12 +10,12 @@ serv_dependentes (
 	incTrab_99= 
 	dt_limite_previdencia
 	dt_limite_irpf
-	certidao varchar(255)
-	cert_livro varchar(255)
-	cert_folha varchar(255)
-	cert_dt char(10)
-	cart_vacinacao boolean
-	declaracao_escolar boolean
+	>>>certidao varchar(255)
+	>>>cert_livro varchar(255)
+	>>>cert_folha varchar(255)
+	>>>cert_dt char(10)
+	>>>cart_vacinacao boolean
+	>>>declaracao_escolar boolean
 )
 
 
@@ -25,12 +25,20 @@ serv_dependentes (
             "created_at": "0",
             "updated_at": "0",
             "id_serv":"1", 
-            "id_param_tp_dep":"1",        
+            "id_param_tp_dep":"541",        
             "nome":"Pedro João",            
             "data_nasc":"27/03/2000",         
             "cpf":"5859131069",    
-            "id_param_sexo":"2",
+            "id_param_sexo":"17",
             "dep_irrf":"1",  
             "dep_sf":"0",
-            "inc_trab":"0"
+            "inc_trab":"0",
+            "dt_limite_prev":"05/04/2023",
+            "dt_limite_irpf":"05/04/2023",
+            "certidao":"1000",
+            "cert_livro":"001",
+            "cert_folha":"0021",
+            "dt_cert":"05/04/2023",
+            "cart_vacinacao":"3",
+            "declaracao_escolar":"1"
 }

@@ -1,7 +1,6 @@
 rubricas (
 	id_orgao					int not null,
-	cod_rubr					int not null comment('Gestor, Controlador, Contador, DIRF, SIAP, MANAD, SEFIP')
-    ide_tab_rubr     			varchar(7) not null comment('CPF ou CNPJ do responsável'),
+	cod_rubr					varchar(8)
 	iniValid 					varchar(14),
     dsc_rubr	            	varchar(255) not null,
 	id_params_nat_rubr 			int not null,
@@ -26,12 +25,14 @@ rubricas (
             "cod_rubr":"ABC",        
             "ini_valid":"03/2023",            
             "dsc_rubr":"Primeira",         
-            "id_param_nat_rubr":"1",    
-            "id_param_tipo":"1",
-            "id_param_cod_inc_cp":"1",  
-            "id_param_cod_inc_irrf":"1",
-            "id_param_cod_inc_fgts":"1",
-            "id_param_cod_inc_cprp":"1",
-            "teto_remun": "1",
-            "observacao":"primeira"                  
+            "id_param_nat_rubr":"53",    
+            "id_param_tipo":"208",
+            "id_param_cod_inc_cp":"219",  
+            "id_param_cod_inc_irrf":"235",
+            "id_param_cod_inc_fgts":"321",
+            "id_param_cod_inc_cprp":"330",
+            "teto_remun": "1",              
+            "consignado":"1",                
+            "consignavel":"2",    
+            "observacao":"primeira"              
 }
