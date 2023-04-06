@@ -3,9 +3,9 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'rubricas'
+    const tabela = 'remun_params'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
@@ -13,8 +13,6 @@ module.exports = app => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
         const body = { ...req.body }
-        delete body.id_emp
-        body.id_emp = req.params.id_emp
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
@@ -28,26 +26,15 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.id_emp, 'Órgão não informado')
-            existsOrError(body.cod_rubr, 'Código da Rúbrica não informado')
-            existsOrError(body.ini_valid, 'Inicio da válidade não informada')
-            existsOrError(body.dsc_rubr, 'Descrição da Rúbrica não informada')
-            existsOrError(body.id_param_nat_rubr, 'Natureza da Rúbrica não informada')
-            existsOrError(await isParamOrError('natRubrica', body.id_param_nat_rubr), 'Natureza da Rúbrica selecionada não existe')
-            existsOrError(body.id_param_tipo, 'Tipo da Rúbrica não informado')
-            existsOrError(await isParamOrError('tipoRubrica', body.id_param_tipo), 'Tipo da Rúbrica selecionada não existe')
-            existsOrError(body.id_param_cod_inc_cp, 'Código de Incidência Tributária não informado')
-            existsOrError(await isParamOrError('codIncCP', body.id_param_cod_inc_cp), 'Código de Incidência Tributária selecionado não existe')
-            existsOrError(body.id_param_cod_inc_irrf, 'Código IRRF não informado')
-            existsOrError(await isParamOrError('codIncIRRF', body.id_param_cod_inc_irrf), 'Código IRRF selecionado não existe')
-            existsOrError(body.id_param_cod_inc_fgts, 'Código FGTS não informado')
-            existsOrError(await isParamOrError('codIncFGTS', body.id_param_cod_inc_fgts), 'Código FGTS selecionado não existe')
-            existsOrError(body.id_param_cod_inc_cprp, 'Código CPRP não informado')
-            existsOrError(await isParamOrError('codIncCPRP', body.id_param_cod_inc_cprp), 'Código CPRP selecionado não existe')
-            existsOrError(body.teto_remun, 'Teto Remuneratório não informado')
-            existsOrError(body.consignado, 'Consignado não informado')
-            existsOrError(body.consignavel, 'Consignável não informado')
-            //existsOrError(body.observacao, 'Observação não informado')
+            existsOrError(body.ano, 'Ano não informado')
+            existsOrError(body.mes, 'Mês não informado')
+            existsOrError(body.complementar, 'Complementar não informada')
+            existsOrError(body.ano_inf, 'Ano da Informação não informado')
+            existsOrError(body.mes_inf, 'Mês da Informação não informado')
+            existsOrError(body.inf_complementar, 'Informação Complementar não informada')
+            existsOrError(body.descricao, 'Descrição não informada')
+            existsOrError(body.mensagem, 'Mensagem não informada')
+            existsOrError(body.mensagem_especial, 'Mensagem Especial não informada')
         }
          catch (error) {
             return res.status(400).send(error)
@@ -75,7 +62,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('Rúbrica não encontrada')
+                else res.status(200).send('O Parâmetro não foi encontrado')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -116,8 +103,7 @@ module.exports = app => {
 
     const limit = 20 // usado para paginação
     const get = async (req, res) => {
-        let user = req.user        
-        const id_emp = req.params.id_emp
+        let user = req.user
         const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();
         try {
@@ -131,21 +117,21 @@ module.exports = app => {
         const page = req.query.page || 1
 
         let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-            .where({ status: STATUS_ACTIVE, id_emp: req.params.id_emp })
+            .where({ status: STATUS_ACTIVE })
             .where(function () {
-                this.where(app.db.raw(`tbl1.cod_rubr regexp('${key.toString().replace(' ', '.+')}')`))
-                this.orWhere(app.db.raw(`tbl1.dsc_rubr regexp('${key.toString().replace(' ', '.+')}')`))
+                this.where(app.db.raw(`tbl1.ano regexp('${key.toString().replace(' ', '.+')}')`))
+                this.orWhere(app.db.raw(`tbl1.mes regexp('${key.toString().replace(' ', '.+')}')`))
             })
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
         const ret = app.db({ tbl1: tabelaDomain })
-            .where({ status: STATUS_ACTIVE, id_emp: req.params.id_emp })
+            .where({ status: STATUS_ACTIVE })
             .where(function () {
-                this.where(app.db.raw(`tbl1.cod_rubr regexp('${key.toString().replace(' ', '.+')}')`))
-                this.orWhere(app.db.raw(`tbl1.dsc_rubr regexp('${key.toString().replace(' ', '.+')}')`))
+                this.where(app.db.raw(`tbl1.ano regexp('${key.toString().replace(' ', '.+')}')`))
+                this.orWhere(app.db.raw(`tbl1.mes regexp('${key.toString().replace(' ', '.+')}')`))
             })
-        ret.orderBy('cod_rubr').limit(limit).offset(page * limit - limit)
+        ret.orderBy('ano').limit(limit).offset(page * limit - limit)
         ret.then(body => {
             return res.json({ data: body, count, limit })
         })
@@ -168,7 +154,7 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const ret = app.db({ tbl1: tabelaDomain })
             .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
-            .where({ id_emp: req.params.id_emp, id: req.params.id, status: STATUS_ACTIVE }).first()
+            .where({ id: req.params.id, status: STATUS_ACTIVE }).first()
             .then(body => {
                 return res.json(body)
             })
@@ -210,7 +196,7 @@ module.exports = app => {
                     updated_at: new Date(),
                     evento: evento
                 })
-                .where({ id_emp: req.params.id_emp, id: req.params.id })
+                .where({ id: req.params.id })
             existsOrError(rowsUpdated, 'Registro não foi encontrado')
 
             res.status(204).send()

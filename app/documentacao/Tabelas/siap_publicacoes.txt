@@ -1,4 +1,36 @@
 siap_publicacoes
-	publicacao_dt
-    publicacao_nr
+	dt_publicacao
+	nr_ publicacao
     id_param_vei_publi
+	
+	
+	
+	
+	
+	
+Ordem:	
+
+-serv dep
+-siap pub
+-serv vinc
+-remun_ad_fg
+-remun_oe
+-remun_param
+-remuneracao
+-serv_afastamento
+-serv_desligamento
+-serv_ferias
+-serv_reintegracao
+
+
+Tabelas para criar:
+
+id_param_v_pub
+id_param_grau_exp
+id_param_ind_mv
+id_par_mtv_af
+id_par_tp_acid
+id_par_onus
+id_par_tp_af
+id_par_mt_dlg
+id_par_tp_rein

@@ -2,8 +2,24 @@ serv_reintegracao (
 	id_serv_vinculos FK
 	tpReint_id_param FK (1 - Reintegração por decisão judicial;2 - Reintegração por anistia legal;3 - Reversão de servidor público;4 - Recondução de servidor público;5 - Reinclusão de militar;9 - Outros)
 	nrProcJud_18=
-	nrLeiAnistia_19=
+	nrLeiAnistia_19= Preenchimento obrigatório se tpReint = [2].
 	dtEfetRetorno_20=
 	dtEfeito_22=
 	obs
 )
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_serv_vinc": "1",
+            "id_par_tp_rein":"1",
+            "nr_proc_jud":"70215", 
+            "nr_lei_anistia":"8965", 
+            "dt_efet_retorno":"05/04/2023",
+            "dt_i_efeito":"05/04/2023",
+            "obs":"Não sei"
+            
+}

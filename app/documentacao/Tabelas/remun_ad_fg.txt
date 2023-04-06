@@ -4,3 +4,17 @@ remun_ad_fg (
 	publicacao
 	nr_publicacao
 	id_param_vei_publi FK
+	
+	
+	{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "tipo": "1",
+            "dt_inicio":"05/04/2023",
+            "publicacao":"100", 
+            "nr_pub":"200",
+            "id_param_vei_pub":"1"
+            
+}

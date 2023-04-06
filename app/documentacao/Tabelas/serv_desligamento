@@ -1,7 +1,22 @@
 serv_desligamento (
 	id_serv_vinculos FK
-	mtvDeslig_17=10
+	id_param_mtvDeslig
 	dtDeslig_18=2023-02-28
 	indPagtoAPI_19=N
 	obs
 )
+
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_serv_vinc": "1",
+            "id_par_mt_dlg":"1",
+            "dt_deslig":"05/04/2023", 
+            "ind_pagto_ap":"2",
+            "obs":"Não tem"
+            
+}

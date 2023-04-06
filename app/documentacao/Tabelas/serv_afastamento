@@ -4,10 +4,31 @@ serv_afastamento (
 	dtInicio_61=
 	dtFim_62=
 	infoMesmoMtv_20 boolean
-	tpAcidTransito_id_param FK (1 - Atropelamento; 2 - Colisão; 3 - Outros)
-	onus_id_param FK (1 - Ônus do cedente; 2 - Ônus do cessionário; 3 - Ônus do cedente e cessionário)
+	id_param_tpAcidTransito FK (1 - Atropelamento; 2 - Colisão; 3 - Outros)
+	id_param_onus FK (1 - Ônus do cedente; 2 - Ônus do cessionário; 3 - Ônus do cedente e cessionário)
 	cnpj_onus
-	tipo_id_param FK ( 1 - Temporário; 2 - Definitivo)
+	id_param_tipo FK ( 1 - Temporário; 2 - Definitivo)
 	indRemunCargo - Indicar se o servidor optou pela remuneração do cargo efetivo - boolean
 	obs (not null se licença sem vencimento ou readaptação)
 )
+
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_serv_vinc": "1",
+            "id_par_mtv_af":"1",
+            "dt_inicio":"05/04/2023", 
+            "dt_fim":"05/04/2023",
+            "info_mesmo_mtv":"12",
+            "id_par_tp_acid":"1",
+            "id_par_onus":"1",
+            "cnpj_onus":"200",
+            "id_par_tp_af":"1",
+            "ind_remun_cargo":"1",
+            "obs":"200"
+            
+}

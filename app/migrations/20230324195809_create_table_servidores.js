@@ -36,6 +36,9 @@ exports.up = function(knex) {
         table.string('observacao', 255).comment("Observação")
         table.string('telefone', 13).comment("Telefone")
         table.string('email', 60).comment("E-mail")
+        table.string('mae', 70).comment("Nome da Mãe")
+        table.string('pai', 70).comment("Nome do Pai")
+        table.string('naturalidade', 60).comment("Naturalidade")
 
         table.foreign('id_emp').references('id').inTable('empresa').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_sexo').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
