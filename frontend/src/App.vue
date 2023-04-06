@@ -1,24 +1,64 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <HelloWorld :msg="msg" />
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/auth" v-if="!this.userStore.id">SignIn</RouterLink>
+        <RouterLink to="#" @click.native="logout" v-else>SignOut</RouterLink>
       </nav>
     </div>
   </header>
 
   <RouterView />
 </template>
+
+<script>
+import { RouterLink, RouterView } from 'vue-router'
+import HelloWorld from './components/HelloWorld.vue'
+import { useUserStore } from "@/stores/user"
+import { mapState } from 'pinia'
+import { userKey } from "@/global"
+
+export default {
+  name: "App",
+  components: { HelloWorld, RouterLink, RouterView },
+  data: function () {
+    return {
+      msg: 'You did it!',
+    }
+  },
+  methods: {
+    logout() {
+      this.$router.push({ path: "/" });
+      useUserStore().logout()
+    },
+    async validateToken() {
+      const json = localStorage.getItem(userKey);
+      const userData = JSON.parse(json);
+
+      const store = useUserStore()
+      await store.validateToken(userData)
+    },
+  },
+  computed: {
+    ...mapState(useUserStore, ['userStore']),
+  },
+  watch: {
+    userStore() {
+      if (this.userStore.name) this.msg = `You did it ${this.userStore.name.split(' ')[0]}!`
+      else this.msg = 'You did it!'
+    }
+  },
+  created() {
+    this.validateToken();
+  }
+}
+</script>
 
 <style scoped>
 header {
