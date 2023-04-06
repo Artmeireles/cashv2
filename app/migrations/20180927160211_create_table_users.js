@@ -25,10 +25,11 @@ exports.up = function(knex, Promise) {
         table.boolean('cad_servidores').notNull().defaultTo(0)
         table.boolean('financeiro').notNull().defaultTo(0)
         table.boolean('con_contratos').notNull().defaultTo(0)
-        table.boolean('cad_orgao').notNull().defaultTo(0)
+        table.boolean('cad_empresa').notNull().defaultTo(0)
         table.string('f_ano').notNull()
         table.string('f_mes').notNull()
         table.string('f_complementar').notNull()
+        table.string('tkn_api')
     })
 };
 

@@ -1,5 +1,5 @@
 exports.up = function(knex) {
-    return knex.schema.createTable('wwmgca_maribondo_ativos.con_contratos', table => {
+    return knex.schema.createTable('wwmgca_cliente_ativos.con_contratos', table => {
         table.engine('InnoDB')
         table.charset('utf8mb4')
         table.collate('utf8mb4_general_ci')
@@ -10,9 +10,8 @@ exports.up = function(knex) {
         table.string('updated_at')
         table.string('token').notNull().unique()
         table.integer('id_user').notNull()
-        table.integer('id_consignatario').notNull().unsigned()
-        table.integer('id_cad_servidores').notNull()
-        table.integer('id_con_eventos').notNull().unsigned()
+        table.integer('id_consign').notNull().unsigned()
+        table.integer('id_serv').notNull().unsigned()
         table.string('contrato').notNull()
         table.string('primeiro_vencimento').notNull()
         table.decimal('valor_parcela', 11, 2).notNull()
@@ -25,12 +24,11 @@ exports.up = function(knex) {
         table.string('data_averbacao')
         table.string('data_liquidacao')
 
-        table.foreign('id_cad_servidores').references('id').inTable('cad_servidores').onUpdate('Cascade').onDelete('NO ACTION')
-        table.foreign('id_con_eventos').references('id').inTable('con_eventos').onUpdate('Cascade').onDelete('NO ACTION')
-        table.foreign('id_consignatario').references('id').inTable('consignatarios').onUpdate('Cascade').onDelete('NO ACTION')
+        table.foreign('id_serv').references('id').inTable('servidores').onUpdate('Cascade').onDelete('NO ACTION')
+        table.foreign('id_consign').references('id').inTable('con_consign').onUpdate('Cascade').onDelete('NO ACTION')
     })
 };
 
 exports.down = function(knex) {
-    return knex.schema.dropTable('wwmgca_maribondo_ativos.con_contratos')
+    return knex.schema.dropTable('wwmgca_cliente_ativos.con_contratos')
 };
