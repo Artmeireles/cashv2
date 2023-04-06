@@ -57,7 +57,7 @@ Descrição do passo a passo para importação dos dados de convenentes
 #5 - SqlYog - Atualizar o domínio, o id_cad_servidores e o status
         # para os contratos existentes e no ano e mês da folha informada na importação
         UPDATE wwmgca_api.con_liquidacoes cl
-            JOIN wwmgca_maribondo_ativos.con_contratos cc ON cc.contrato = cl.contrato
+            JOIN wwmgca_cliente_ativos.con_contratos cc ON cc.contrato = cl.contrato
             SET cl.`dominio` = 'ativos', cl.`id_cad_servidores` = cc.`id_cad_servidores`, cl.`status` = 20
             WHERE cl.folha_ano = '2021' AND cl.folha_mes = '11' AND (cl.`dominio` IS NULL OR LENGTH(TRIM(cl.`dominio`)) = 0) AND cl.`id_cad_servidores` IS NULL;
         UPDATE wwmgca_api.con_liquidacoes cl
@@ -93,14 +93,14 @@ Descrição do passo a passo para importação dos dados de convenentes
 ## = Testes para verificação direto no BD (SQL)
     # Localizar registros no bd do cliente por número de contrato
         SELECT cc.contrato, cc.id_cad_servidores, cl.id_cad_servidores, cl.dominio, cl.cliente, cl.folha_ano, cl.folha_mes 
-        FROM wwmgca_maribondo_ativos.con_contratos cc
+        FROM wwmgca_cliente_ativos.con_contratos cc
         JOIN wwmgca_api.con_liquidacoes cl ON cc.contrato = cl.contrato
         WHERE cl.folha_ano = '2021' AND cl.folha_mes = 10.mes
         GROUP BY cc.contrato;
     # Atualizar o domínio e o id_cad_servidores para os contratos existentes e no ano e mês da folha informada 
     # na importação
         UPDATE wwmgca_api.con_liquidacoes cl
-        JOIN wwmgca_maribondo_ativos.con_contratos cc ON cc.contrato = cl.contrato
+        JOIN wwmgca_cliente_ativos.con_contratos cc ON cc.contrato = cl.contrato
         SET cl.`dominio` = 'ativos', cl.`id_cad_servidores` = cc.`id_cad_servidores`
         WHERE cl.folha_ano = '2021' AND cl.folha_mes = '11' AND (cl.`dominio` IS NULL OR LENGTH(TRIM(cl.`dominio`)) = 0)
         AND cl.`id_cad_servidores` IS NULL;
@@ -136,7 +136,7 @@ Descrição do passo a passo para importação dos dados de convenentes
             FROM wwmgca_api.con_liquidacoes cl WHERE id_cad_servidores IS NULL
             AND folha_ano = '2021' AND folha_mes = 10 ORDER BY nome;
     # Localizar no BD por número de contrato        
-        SELECT * FROM wwmgca_maribondo_ativos.con_contratos WHERE contrato = '013209110001778951';
+        SELECT * FROM wwmgca_cliente_ativos.con_contratos WHERE contrato = '013209110001778951';
         SELECT * FROM wwmgca_major_previdencia.con_contratos WHERE contrato = '013209110001778951';	
     # Selecionar wwmgca_api.con_liquidacoes por CPF
         SELECT cl.contrato, cl.nome, cl.cpf, cl.dominio, cl.id_cad_servidores, cl.v_prestacao, cl.prestacao, cl.prz_total, cl.v_prestacao * cl.prz_total Total
@@ -149,21 +149,21 @@ Descrição do passo a passo para importação dos dados de convenentes
             WHERE cl.id_cad_servidores IS NULL;
     # Contar contratos em todos os domínios
         SELECT 
-            (SELECT COUNT(*) FROM wwmgca_maribondo_ativos.con_contratos WHERE STATUS = 10) + 
+            (SELECT COUNT(*) FROM wwmgca_cliente_ativos.con_contratos WHERE STATUS = 10) + 
             (SELECT COUNT(*) FROM wwmgca_major_previdencia.con_contratos WHERE STATUS = 10) COUNT;
     # Receber as linhas que serão importadas para o MGFolha
         SELECT cl.folha_ano, cl.folha_mes, cs.matricula, cb.febraban, cl.prestacao, cl.prz_total, cl.v_pagar 
             FROM wwmgca_api.con_liquidacoes AS cl 
-            INNER JOIN wwmgca_maribondo_ativos.cad_servidores AS cs ON cs.id = cl.id_cad_servidores 
-            INNER JOIN wwmgca_maribondo_ativos.consignatarios AS ct ON ct.id = cl.id_consignatario 
-            INNER JOIN wwmgca_maribondo_ativos.cad_bancos AS cb ON cb.id = ct.id_cad_bancos 
+            INNER JOIN wwmgca_cliente_ativos.cad_servidores AS cs ON cs.id = cl.id_cad_servidores 
+            INNER JOIN wwmgca_cliente_ativos.consignatarios AS ct ON ct.id = cl.id_consignatario 
+            INNER JOIN wwmgca_cliente_ativos.cad_bancos AS cb ON cb.id = ct.id_cad_bancos 
             WHERE cl.folha_ano = '2021' AND cl.folha_mes = 10 AND cl.dominio = 'ativos'.DOMINIO AND cl.status IN (20);
     # Receber os totais do que será importado para o MGFolha e então conferir com a planilha
         SELECT SUM(cl.v_pagar), COUNT(cl.id) 
             FROM wwmgca_api.con_liquidacoes AS cl 
-            INNER JOIN wwmgca_maribondo_ativos.cad_servidores AS cs ON cs.id = cl.id_cad_servidores 
-            INNER JOIN wwmgca_maribondo_ativos.consignatarios AS ct ON ct.id = cl.id_consignatario 
-            INNER JOIN wwmgca_maribondo_ativos.cad_bancos AS cb ON cb.id = ct.id_cad_bancos 
+            INNER JOIN wwmgca_cliente_ativos.cad_servidores AS cs ON cs.id = cl.id_cad_servidores 
+            INNER JOIN wwmgca_cliente_ativos.consignatarios AS ct ON ct.id = cl.id_consignatario 
+            INNER JOIN wwmgca_cliente_ativos.cad_bancos AS cb ON cb.id = ct.id_cad_bancos 
             WHERE cl.folha_ano = '2021' AND cl.folha_mes = 10 AND cl.dominio = 'ativos' AND cl.status IN (20);
 
 #6 = Postman (receber as linhas para importar para o MGFolha)

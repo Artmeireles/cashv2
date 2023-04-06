@@ -1,5 +1,5 @@
 exports.up = function(knex) {
-    return knex.schema.createTable('wwmgca_maribondo_ativos.emp_ua', table => {
+    return knex.schema.createTable('wwmgca_cliente_ativos.emp_ua', table => {
         table.engine('InnoDB')
         table.charset('utf8mb4')
         table.collate('utf8mb4_general_ci')
@@ -30,5 +30,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-    return knex.schema.dropTable('wwmgca_maribondo_ativos._emp_ua')
+    return knex.schema.dropTable('wwmgca_cliente_ativos._emp_ua')
 };

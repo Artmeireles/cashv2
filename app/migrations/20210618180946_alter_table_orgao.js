@@ -1,5 +1,5 @@
 exports.up = function(knex, Promise) {
-    return knex.schema.alterTable('wwmgca_maribondo_ativos.orgao', table => {
+    return knex.schema.alterTable('wwmgca_cliente_ativos.orgao', table => {
         table.string('cpf_resp_gestao')
         table.string('nome_resp_gestao')
         table.string('cpf_resp_contInt')
@@ -10,7 +10,7 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-    return knex.schema.alterTable('wwmgca_maribondo_ativos.orgao', table => {
+    return knex.schema.alterTable('wwmgca_cliente_ativos.orgao', table => {
         table.string('cpf_resp_gestao').delete()
         table.string('nome_resp_gestao').delete()
         table.string('cpf_resp_contInt').delete()

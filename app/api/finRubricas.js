@@ -5,7 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'rubricas'
+    const tabela = 'fin_rubricas'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
