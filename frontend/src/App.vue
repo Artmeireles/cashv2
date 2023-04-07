@@ -8,13 +8,15 @@
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/auth" v-if="!this.userStore.id">SignIn</RouterLink>
+        <RouterLink to="#" v-if="!this.userStore.id" @click.native="showSignin">SignIn</RouterLink>
         <RouterLink to="#" @click.native="logout" v-else>SignOut</RouterLink>
       </nav>
     </div>
   </header>
 
   <RouterView />
+  <Toast />
+  <DynamicDialog />
 </template>
 
 <script>
@@ -23,7 +25,7 @@ import HelloWorld from './components/HelloWorld.vue'
 import { useUserStore } from "@/stores/user"
 import { mapState } from 'pinia'
 import { userKey } from "@/global"
-
+import SignInView from './views/SignInView.vue'
 export default {
   name: "App",
   components: { HelloWorld, RouterLink, RouterView },
@@ -43,6 +45,9 @@ export default {
 
       const store = useUserStore()
       await store.validateToken(userData)
+    },
+    showSignin() {
+      this.$dialog.open(SignInView);
     },
   },
   computed: {

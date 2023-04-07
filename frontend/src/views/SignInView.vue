@@ -1,19 +1,52 @@
+
 <template>
-  <div class="">
-    <h1>Seja bem vindo ao {{ this.appName }}</h1>
-    <form @submit.prevent="this.signin">
-      <input placeholder="Seu nome" v-model="userAuth.email">
-      <input type="password" placeholder="Sua senha" v-model="userAuth.password">
-      <button>Acessar</button>
-    </form>
+  <div class="flex justify-content-center p-fluid">
+    <div v-focustrap class="card">
+      <form @submit.prevent="this.signin">
+        <h1>Seja bem vindo ao {{ this.appName }}</h1>
+        <div class="field mt-2">
+          <InputText id="input" v-model="userAuth.name" type="text" placeholder="Name" focused />
+        </div>
+        <div class="field mt-4">
+          <div class="p-input-icon-right">
+            <i class="pi pi-envelope" />
+            <InputText id="email" v-model="userAuth.email" type="email" placeholder="Email" />
+          </div>
+        </div>
+        <div class="field">
+          <div class="p-float-label">
+            <Password v-model="userAuth.password" toggleMask>
+              <template #header>
+                <h6>Pick a password</h6>
+              </template>
+              <template #footer>
+                <Divider />
+                <p class="mt-2">Suggestions</p>
+                <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                  <li>At least one lowercase</li>
+                  <li>At least one uppercase</li>
+                  <li>At least one numeric</li>
+                  <li>Minimum 8 characters</li>
+                </ul>
+              </template>
+            </Password>
+            <label for="password">Password</label>
+          </div>
+        </div>
+        <div class="field-checkbox">
+          <Checkbox id="accept" v-model="userAuth.accept" name="accept" value="Accept" />
+          <label for="accept">I agree to the terms and conditions*</label>
+        </div>
+        <Button type="submit" label="Submit" class="mt-2" />
+      </form>
+    </div>
   </div>
 </template>
 
 <script>
-import { appName, userKey } from "@/global"
-import { baseApiUrl } from "@/env"
+import { mapState } from 'pinia'
+import { appName } from "@/global"
 import { useUserStore } from "@/stores/user"
-import axios from 'axios'
 export default {
   name: "SignInView",
   data: () => {
@@ -22,13 +55,26 @@ export default {
       userAuth: {},
     }
   },
+  emits: ['signin'],
+  inject: ['dialogRef'],
   methods: {
-    signin() {
+    async signin() {
       const store = useUserStore()
-      store.registerUser(this.userAuth.email, this.userAuth.password)
-      this.$router.push({ path: "/" });
-    }
-  }
+      await store.registerUser(this.userAuth.email, this.userAuth.password)
+      console.log(store.userStore);
+      if (store.userStore && store.userStore.id) {
+        this.closeDialog();
+        this.$toast.add({ severity: 'success', detail: `Seja bem vindo ${store.userStore.name}!`, life: 3000 });
+        this.$router.push({ path: "/" });
+      }
+    },
+    closeDialog() {
+      this.dialogRef.close();
+    },
+  },
+  computed: {
+    ...mapState(useUserStore, ['userStore']),
+  },
 }
 </script>
 

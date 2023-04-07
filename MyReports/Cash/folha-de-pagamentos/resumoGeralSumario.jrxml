@@ -20,7 +20,7 @@
 		<defaultValueExpression><![CDATA["06240922"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="dbSchema" class="java.lang.String">
-		<defaultValueExpression><![CDATA["wwmgca_maribondo_ativos"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["wwmgca_cliente_ativos"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="ano" class="java.lang.String">
 		<defaultValueExpression><![CDATA["2021"]]></defaultValueExpression>

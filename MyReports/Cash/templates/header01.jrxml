@@ -17,7 +17,7 @@
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<parameter name="dbSchema" class="java.lang.String">
-		<defaultValueExpression><![CDATA["wwmgca_maribondo_ativos"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["wwmgca_cliente_ativos"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="titulo" class="java.lang.String"/>
 	<parameter name="descricao" class="java.lang.String"/>

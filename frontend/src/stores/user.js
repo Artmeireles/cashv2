@@ -6,6 +6,7 @@ import axios from 'axios'
 export const useUserStore = defineStore('users', {
   state: () => ({
     user: {},
+    timeToLogOut: 600,
     isTokenValid: false,
   }),
   getters: {
@@ -26,6 +27,7 @@ export const useUserStore = defineStore('users', {
             delete axios.defaults.headers.common['Authorization']
           }
           localStorage.setItem(userKey, JSON.stringify(res.data));
+          return this.user
         })
         .catch(error => {
           console.log(error);
@@ -40,6 +42,7 @@ export const useUserStore = defineStore('users', {
           if (this.isTokenValid) {
             this.user = userData
             axios.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`
+            this.timeToLogOut = 600
           }
           // else {
           //   this.logout()

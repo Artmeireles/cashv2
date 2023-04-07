@@ -1,5 +1,5 @@
 exports.up = function(knex) {
-    return knex.schema.createTable('wwmgca_maribondo_ativos.remuneracao', table => {
+    return knex.schema.createTable('wwmgca_cliente_ativos.remuneracao', table => {
         table.engine('InnoDB')
         table.charset('utf8mb4')
         table.collate('utf8mb4_general_ci')
@@ -21,11 +21,11 @@ exports.up = function(knex) {
 
         table.foreign('id_serv_vinc').references('id').inTable('serv_vinculos').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_remun_param').references('id').inTable('remun_params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_rubrica').references('id').inTable('rubricas').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_rubrica').references('id').inTable('fin_rubricas').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_ad_fg').references('id').inTable('remun_ad_fg').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 
 exports.down = function(knex) {
-    return knex.schema.dropTable('wwmgca_maribondo_ativos.remuneracao')
+    return knex.schema.dropTable('wwmgca_cliente_ativos.remuneracao')
 };
