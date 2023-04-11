@@ -6,7 +6,7 @@ import { appName } from "@/global"
 <template>
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
         <div class="flex flex-column align-items-center justify-content-center">
-            <img src="/assets/images/logo-app.png" :alt="`${appName} logo`" class="mb-5 w-6rem flex-shrink-0" />
+            <img src="/assets/images/logo-app.svg" :alt="`${appName} logo`" class="mb-5 w-6rem flex-shrink-0" />
             <div
                 style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, rgba(33, 150, 243, 0.4) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div class="w-full surface-card py-8 px-5 sm:px-8 flex flex-column align-items-center"
@@ -14,7 +14,7 @@ import { appName } from "@/global"
                     <span class="text-blue-500 font-bold text-3xl">404</span>
                     <h1 class="text-900 font-bold text-3xl lg:text-5xl mb-2">Não Encontrado&nbsp;<i
                             class="pi pi-cog pi-spin" style="font-size: 2rem"></i></h1>
-                    <div class="text-600 mb-5">O recurso solicitado não está disponível.</div>
+                    <div class="text-600 mb-5">O recurso solicitado não está disponível</div>
                     <router-link to="/" class="w-full flex align-items-center py-5 border-300 border-bottom-1">
                         <span class="flex justify-content-center align-items-center bg-cyan-400 border-round"
                             style="height: 3.5rem; width: 3.5rem">
@@ -22,7 +22,7 @@ import { appName } from "@/global"
                         </span>
                         <span class="ml-4 flex flex-column">
                             <span class="text-900 lg:text-xl font-medium mb-0 block">Perguntas frequentes</span>
-                            <span class="text-600 lg:text-xl">Encontre as respostas mais acessadas.</span>
+                            <span class="text-600 lg:text-xl">Encontre as respostas mais acessadas</span>
                         </span>
                     </router-link>
                     <router-link to="/" class="w-full flex align-items-center py-5 border-300 border-bottom-1">
@@ -32,7 +32,7 @@ import { appName } from "@/global"
                         </span>
                         <span class="ml-4 flex flex-column">
                             <span class="text-900 lg:text-xl font-medium mb-0">Central de soluções</span>
-                            <span class="text-600 lg:text-xl">Solicite suporte.</span>
+                            <span class="text-600 lg:text-xl">Solicite suporte</span>
                         </span>
                     </router-link>
                     <router-link to="/" class="w-full flex align-items-center mb-5 py-5 border-300 border-bottom-1">
@@ -46,7 +46,7 @@ import { appName } from "@/global"
                         </span>
                     </router-link>
 
-                    <Button @click="this.$router.push('/')" link class="lg:text-xl font-medium mb-0"><i class="pi pi-backward"></i>&nbsp;Voltar</Button>
+                    <Button @click="this.$router.push('/')" link class="lg:text-xl font-medium mb-0"><i class="pi pi-backward"></i>&nbsp;Início</Button>
                 </div>
             </div>
         </div>

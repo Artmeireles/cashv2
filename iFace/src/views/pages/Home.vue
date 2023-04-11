@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
     <div class="grid grid-nogutter surface-section text-800">
         <div class="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center ">
@@ -8,30 +9,40 @@
                 <div class="text-6xl text-primary font-bold mb-3">Folhas de Pagamento e Consignados</div>
                 <p class="mt-0 mb-4 text-700 line-height-3">Mega Assessoria e Tecnologia &copy; 2001 - {{ getYear() }}</p>
 
-                <Button label="SignIn" @click="this.$router.push('/signin')"
-                    class="p-button-text p-button-rounded border-none font-light line-height-2 text-blue-500"
-                    icon="pi-sign-in">
-                    SignIn&nbsp;<i class="pi pi-sign-in"></i>
+                <Button label="Sign In" @click="this.$router.push('/signin')" v-if="!store.userStore.id"
+                    class="p-button-text p-button-rounded border-none font-light line-height-2 text-blue-500">
+                    Sign In&nbsp;<i class="pi pi-sign-in"></i>
                 </Button>
-                <Button @click="this.$router.push('/signup')"
+                <Button label="Sign Out" @click="logout" v-else
                     class="p-button-rounded border-none ml-5 font-light text-white line-height-2 bg-blue-500">
-                    SignUp&nbsp;<i class="pi pi-user-plus"></i>
+                    <i class="pi pi-sign-out"></i>&nbsp;Sair
+                </Button>
+                <Button @click="this.$router.push('/signup')" v-if="!store.userStore.id"
+                    class="p-button-rounded border-none ml-5 font-light text-white line-height-2 bg-blue-500">
+                    Sign Up&nbsp;<i class="pi pi-user-plus"></i>
                 </Button>
 
             </section>
         </div>
         <div class="col-12 md:col-6 overflow-hidden">
-            <img src="/assets/images/logo.png" alt="Image" class="imgApp align-items-center" style="imgApp">
+            <img src="/assets/images/logo-app.svg" alt="Image" class="imgApp align-items-center" style="imgApp">
         </div>
     </div>
 </template>
 
 <script setup>
 import { appName } from "@/global"
+import { useUserStore } from "@/stores/user"
+
+const store = useUserStore()
 
 const getYear = () => {
     const date = new Date()
     return date.getFullYear()
+}
+
+const logout = () => {
+    useUserStore().logout()
 }
 </script>
 

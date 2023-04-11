@@ -46,6 +46,7 @@ router.beforeEach((to, from, next) => {
     paths.push(element.path)
   });
   if (!paths.includes(to.path)) next({ path: '/not-found' })
+  else if ((user && user.id) && to.path == '/signin') next({ path: '/' })
   else {
     if (!['/', '/signin', '/not-found'].includes(to.path) && !(user && user.id)) next({ path: '/signin' })
     else next()

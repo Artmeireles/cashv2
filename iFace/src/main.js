@@ -16,7 +16,7 @@ import Divider from 'primevue/divider'
 import Checkbox from 'primevue/checkbox'
 import FocusTrap from 'primevue/focustrap';
 import Image from 'primevue/image';
-
+import Menubar from 'primevue/menubar';
 
 import '@/assets/app.css'
 import '@/assets/styles.scss';
@@ -47,5 +47,6 @@ app.component('Password', Password)
 app.component('Divider', Divider)
 app.component('Checkbox', Checkbox)
 app.component('Image', Image)
+app.component('Menubar', Menubar)
 
 app.mount('#app')

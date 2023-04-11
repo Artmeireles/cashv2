@@ -1,8 +1,8 @@
 <template>
   <div class="container">
+    <RouterView />
     <Toast />
     <DynamicDialog />
-    <RouterView />
   </div>
 </template>
 
