@@ -11,7 +11,7 @@ module.exports = app => {
         const cad_servidor = {
             data: {}
         }
-        if (!(req.body.reload && req.body.reload === true) && !(email || req.body.password)) {
+        if (!(email && req.body.password)) {
             return res.status(400).send('Informe usuário e senha!')
         }
         let user = await app.db(tabela)
@@ -35,25 +35,25 @@ module.exports = app => {
 
                     const tabelaCadServidoresDomain = `${dbPrefix}_${clientName}_${domainName}.cad_servidores`
                     const tabelaFinSFuncionalDomain = `${dbPrefix}_${clientName}_${domainName}.fin_sfuncional`
-                    const cad_servidores = await app.db({ cs: tabelaCadServidoresDomain })
-                        .select(app.db.raw('cs.*'))
-                        .join({ ff: `${tabelaFinSFuncionalDomain}` }, function () {
-                            this.on(`ff.id_cad_servidores`, `=`, `cs.id`)
-                        })
-                        .where({ 'cs.cpf': email.replace(/([^\d])+/gim, "") })
-                        .andWhere(app.db.raw(`ff.situacaofuncional is not null and ff.situacaofuncional > 0 and ff.mes < 13`))
-                        .first()
-                        .orderBy('ff.ano', 'desc')
-                        .orderBy('ff.mes', 'desc')
-                        .limit(1)
-                    const clientServidor = {
-                        cliente: clientName,
-                        dominio: domainName,
-                        clientName: domainNames[domain].label,
-                    }
-                    if (cad_servidores) {
-                        cad_servidor.data = { ...cad_servidores, ...clientServidor }
-                    }
+                    // const cad_servidores = await app.db({ cs: tabelaCadServidoresDomain })
+                    //     .select(app.db.raw('cs.*'))
+                    //     .join({ ff: `${tabelaFinSFuncionalDomain}` }, function () {
+                    //         this.on(`ff.id_cad_servidores`, `=`, `cs.id`)
+                    //     })
+                    //     .where({ 'cs.cpf': email.replace(/([^\d])+/gim, "") })
+                    //     .andWhere(app.db.raw(`ff.situacaofuncional is not null and ff.situacaofuncional > 0 and ff.mes < 13`))
+                    //     .first()
+                    //     .orderBy('ff.ano', 'desc')
+                    //     .orderBy('ff.mes', 'desc')
+                    //     .limit(1)
+                    // const clientServidor = {
+                    //     cliente: clientName,
+                    //     dominio: domainName,
+                    //     clientName: domainNames[domain].label,
+                    // }
+                    // if (cad_servidores) {
+                    //     cad_servidor.data = { ...cad_servidores, ...clientServidor }
+                    // }
                 }
             }
         }
