@@ -20,14 +20,14 @@ serv_afastamento (
             "created_at": "0",
             "updated_at": "0",
             "id_serv_vinc": "1",
-            "id_par_mtv_af":"1",
+            "id_par_mtv_af":"738",
             "dt_inicio":"05/04/2023", 
             "dt_fim":"05/04/2023",
             "info_mesmo_mtv":"12",
-            "id_par_tp_acid":"1",
-            "id_par_onus":"1",
+            "id_par_tp_acid":"740",
+            "id_par_onus":"743",
             "cnpj_onus":"200",
-            "id_par_tp_af":"1",
+            "id_par_tp_af":"746",
             "ind_remun_cargo":"1",
             "obs":"200"
             

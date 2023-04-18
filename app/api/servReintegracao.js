@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'serv_reintegracao'
     const STATUS_ACTIVE = 10
@@ -30,13 +30,17 @@ module.exports = app => {
         try {
             //existsOrError(body.id_serv_vinc, 'Vinculo não informado')
             existsOrError(body.id_par_tp_rein, 'Tipo da Reintegração não informado')
+            existsOrError(await isParamOrError('tpReint', body.id_par_tp_rein), 'Tipo da Reintegração selecionado não existe')
             existsOrError(body.nr_proc_jud, 'Número do Processo não informado')
-            existsOrError(body.nr_lei_anistia, 'Número da Anistia não informada')
+            if(body.id_par_tp_rein == 786){
+            existsOrError(body.nr_lei_anistia, 'Número da Anistia não informado')
+            }
             existsOrError(body.dt_efet_retorno, 'Data Efetivo Retorno não informada')
             existsOrError(body.dt_i_efeito, 'Data Início dos Efeitos não informada')
             existsOrError(body.obs, 'Observação não informada')
         }
          catch (error) {
+            console.log(body.nr_lei_anistia)
             return res.status(400).send(error)
         }
 

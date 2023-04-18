@@ -3,8 +3,8 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, cpfOrError, 
-    isCityOrError, cnpjOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, cpfOrError,
+    isCityOrError, cnpjOrError, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'remun_ad_fg'
     const STATUS_ACTIVE = 10
@@ -32,6 +32,7 @@ module.exports = app => {
             existsOrError(body.publicacao, 'Publicação não informada')
             existsOrError(body.nr_pub, 'Número da Publicação não informado')
             existsOrError(body.id_param_vei_pub, 'Veículo da Publicação não informado')
+            existsOrError(await isParamOrError('veiPub', body.id_param_vei_pub), 'Veículo da Publicação selecionado não existe')
         }
          catch (error) {
             return res.status(400).send(error)

@@ -10,7 +10,7 @@ exports.up = function(knex) {
         table.string('updated_at')
         table.string('nr_insc', 14).notNull().comment("CPF ou CNPJ")
         table.string('cnpj_efr', 14).notNull().comment("CNPJ do Ente Federativo")
-        table.specificType('class_trib', 'char(2)').notNull().comment("Classificação Tributária")
+        table.integer('id_param_cl_trib').notNull().unsigned().comment("Classificação Tributária")
         table.boolean('ind_opt_reg_eletron').notNull().comment("Opção pelo Registro Eletrônico de Empregados")
         table.string('razao_social', 255).notNull().comment("Razão Social")
         table.integer('id_cidade').notNull().unsigned().comment("Cidade")
@@ -27,6 +27,7 @@ exports.up = function(knex) {
         table.string('codigo_recolhimento', 500).comment("Código de Recolhimento")
         table.specificType('mes_descsindical', 'char(2)').comment("Mês Desconto Sindical")
 
+        table.foreign('id_param_cl_trib').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_cidade').references('id').inTable('wwmgca_api.cidades').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };

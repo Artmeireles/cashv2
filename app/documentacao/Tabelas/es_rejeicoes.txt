@@ -33,3 +33,17 @@ exports.up = function(knex) {
 exports.down = function(knex) {
     return knex.schema.dropTable('wwmgca_cliente_ativos.es_rejeicoes')
 };
+
+
+
+{
+            "status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_es_envio": "1",
+            "rejeicao_id":"354487",
+            "codigo":"021215",
+            "ocorrencia":"Nome diferente"
+           
+}

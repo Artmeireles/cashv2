@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'serv_afastamentos'
     const STATUS_ACTIVE = 10
@@ -30,15 +30,26 @@ module.exports = app => {
         try {
             //existsOrError(body.id_serv_vinc, 'Vinculo não informado')
             existsOrError(body.id_par_mtv_af, 'Motivo do Afastamento não informado')
+            existsOrError(await isParamOrError('mtvAfast', body.id_par_mtv_af), 'Motivo do Afastamento selecionado não existe')
+            existsOrError(body.info_mesmo_mtv, 'Mesmo Motivo não informado')
+            if(body.id_par_mtv_af == 707 || body.id_par_mtv_af == 708){
+            existsOrError(body.id_par_tp_acid, 'Tipo Acidente não informado')
+            existsOrError(await isParamOrError('tpAcid', body.id_par_tp_acid), 'Tipo Acidente selecionado não existe')
+            }
             existsOrError(body.dt_inicio, 'Data Início não informada')
             existsOrError(body.dt_fim, 'Data Fim não informado')
-            existsOrError(body.info_mesmo_mtv, 'Mesmo Motivo não informado')
-            existsOrError(body.id_par_tp_acid, 'Tipo Acidente não informado')
+            if (moment(body.dt_fim, "DD/MM/YYYY").format() < moment(body.dt_inicio, "DD/MM/YYYY").format()) {
+                throw `A data de fim do afastamento (${body.dt_fim}) não pode ser anterior à data de início do afastamento (${body.dt_inicio})`
+            }
             existsOrError(body.id_par_onus, 'Ônus não informado')
+            existsOrError(await isParamOrError('Onus', body.id_par_onus), 'Ônus selecionado não existe')
             //existsOrError(body.cnpj_onus, 'CNPJ Ônus não informado')
             existsOrError(body.id_par_tp_af, 'Tipo Afastamento não informado')
+            existsOrError(await isParamOrError('tpAfast', body.id_par_tp_af), 'Tipo Afastamento selecionado não existe')
             existsOrError(body.ind_remun_cargo, 'Remuneração Cargo Efetivo não informado')
+            if(body.id_par_mtv_af == 722){
             existsOrError(body.obs, 'Observação não informada')
+            }
         }
          catch (error) {
             return res.status(400).send(error)

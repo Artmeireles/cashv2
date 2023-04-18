@@ -1,0 +1,14 @@
+es_envios (
+    id_es_params        INTEGER NOT NULL,
+    es_lote          VARCHAR(255),
+    es_idevento        VARCHAR(255),
+    es_evento           VARCHAR(255) NOT NULL,
+    es_recibo VARCHAR(255),
+    es_status           INTEGER NOT NULL,
+    exercicio        VARCHAR(7),
+    tabela           VARCHAR(255),
+    tbl_field     VARCHAR(25),
+    tbl_id        VARCHAR(500),
+    ambiente         boolean,
+    ver_process  VARCHAR(255) default('S.01.01.00')
+);

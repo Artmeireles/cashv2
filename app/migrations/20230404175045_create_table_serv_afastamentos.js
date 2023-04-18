@@ -13,7 +13,7 @@ exports.up = function(knex) {
         table.specificType('dt_inicio', 'char(10)').comment("Data Início")
         table.specificType('dt_fim', 'char(10)').comment("Data Fim")
         table.boolean('info_mesmo_mtv').notNull().comment("Mesmo Motivo")
-        table.integer('id_par_tp_acid').notNull().unsigned().comment("1-Atropelamento;2-Colisão;3-Outros")
+        table.integer('id_par_tp_acid').unsigned().comment("1-Atropelamento;2-Colisão;3-Outros")
         table.integer('id_par_onus').notNull().unsigned().comment("1-Ônus do cedente;2-Ônus do cessionário;3-Ônus do cedente e cessionário")
         table.string('cnpj_onus').comment("CNPJ do Ônus")
         table.integer('id_par_tp_af').notNull().unsigned().comment("1-Temporário;2-Definitivo")

@@ -38,6 +38,9 @@ module.exports = app => {
             existsOrError(body.ind_apur_ir, 'Indicativo de Apuração não informado')
             existsOrError(body.prazo_i, 'Prazo Inicial não informado')
             existsOrError(body.prazo_f, 'Prazo Final não informado')
+            if (moment(body.prazo_f, "DD/MM/YYYY").format() < moment(body.prazo_i, "DD/MM/YYYY").format()) {
+                throw `O prazo inicial (${body.prazo_f}) não pode ser anterior à data do prazo final (${body.prazo_i})`
+            }
         }
          catch (error) {
             return res.status(400).send(error)

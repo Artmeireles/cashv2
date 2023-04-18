@@ -31,6 +31,9 @@ module.exports = app => {
             //existsOrError(body.id_serv_vinc, 'Vinculo não informado')
             existsOrError(body.dt_i_aquisicao, 'Data Início da Aquisição não informada')
             existsOrError(body.dt_f_aquisicao, 'Data Fim da Aquisição não informada')
+            if (moment(body.dt_f_aquisicao, "DD/MM/YYYY").format() < moment(body.dt_i_aquisicao, "DD/MM/YYYY").format()) {
+                throw `A data fim da aquisição (${body.dt_f_aquisicao}) não pode ser anterior à data de início da aquisição (${body.dt_i_aquisicao})`
+            }
             existsOrError(body.dt_inicio, 'Data Início das Férias não informada')
             existsOrError(body.periodo, 'Período não informado')
             existsOrError(body.obs, 'Observação não informada')

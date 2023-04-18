@@ -57,3 +57,29 @@ exports.up = function(knex) {
 exports.down = function(knex) {
     return knex.schema.dropTable('wwmgca_cliente_ativos._orgao')
 };
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "nr_insc":"35324376000136", 
+            "cnpj_efr":"02707341000127",
+            "id_param_cl_trib":"807",
+            "ind_opt_reg_eletron":"1",
+            "razao_social":"Empresa",
+            "id_cidade":"1",
+            "cep":"41700000",
+            "bairro":"Bairro",
+            "logradouro":"Log",
+            "nr":"221",
+            "complemento":"comp",
+            "email":"emp@gmail.com",
+            "telefone":"7130303030",
+            "codigo_fpas":"1",
+            "codigo_gps":"2",
+            "codigo_cnae":"3",
+            "codigo_recolhimento":"0101",
+            "mes_descsindical":"04"
+}

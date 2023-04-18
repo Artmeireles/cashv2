@@ -11,7 +11,7 @@ exports.up = function(knex) {
         table.integer('id_serv_vinc').notNull().unsigned().comment("Vinculos")
         table.integer('id_par_tp_rein').notNull().unsigned().comment("Tipo da Reintegração")
         table.string('nr_proc_jud', 20).notNull().comment("Número do Processo")
-        table.string('nr_lei_anistia', 13).notNull().comment("Número da Anistia")
+        table.string('nr_lei_anistia', 13).comment("Número da Anistia")
         table.specificType('dt_efet_retorno', 'char(10)').notNull().comment("Data Efetivo Retorno")
         table.specificType('dt_i_efeito', 'char(10)').notNull().comment("Data Início dos Efeitos")
         table.string('obs', 255).comment("Observação")

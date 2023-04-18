@@ -4,7 +4,15 @@ siap_publicacoes
     id_param_vei_publi
 	
 	
-	
+	{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "data_pub":"18/04/2023", 
+            "nr_pub":"01101",
+            "id_param_v_pub":"665"
+}
 	
 	
 	
@@ -33,5 +41,4 @@ id_par_tp_acid
 id_par_onus
 id_par_tp_af
 id_par_tp_rein
-
-FALTA - id_par_mt_dlg - Tabela 19 Motivos de Desligamento
+id_par_mtv_deslig

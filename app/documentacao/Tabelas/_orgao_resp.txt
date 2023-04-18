@@ -46,3 +46,24 @@ exports.up = function(knex) {
 exports.down = function(knex) {
     return knex.schema.dropTable('wwmgca_cliente_ativos._orgao_resp')
 };
+
+
+
+{
+            "status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_emp": "1",
+            "id_local_params_tipo":"1",
+            "nr_insc":"30152244000150",
+            "crc":"CRC",
+            "nome":"EMP RESP",
+            "id_cidade":"10",
+            "cep":"41000000",
+            "bairro":"Nome bairro",
+            "logradouro":"log",
+            "nr":"10",
+            "complemento":"0",
+            "d_nascimento":"18/04/2023"           
+}

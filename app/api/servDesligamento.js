@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'serv_desligamentos'
     const STATUS_ACTIVE = 10
@@ -30,6 +30,7 @@ module.exports = app => {
         try {
             //existsOrError(body.id_serv_vinc, 'Vinculo não informado')
             existsOrError(body.id_par_mt_dlg, 'Motivo do Desligamento não informado')
+            existsOrError(await isParamOrError('mtvDeslig', body.id_par_mt_dlg), 'Motivo do Desligamento selecionado não existe')
             existsOrError(body.dt_deslig, 'Data do Desligamento não informada')
             existsOrError(body.ind_pagto_ap, 'Pagamento de Aviso Prévio Indenizado não informado')
             existsOrError(body.obs, 'Observação não informada')

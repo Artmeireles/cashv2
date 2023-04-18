@@ -11,9 +11,9 @@ remun_oe ( "outros entes"
             "evento": 1538,
             "created_at": "0",
             "updated_at": "0",
-            "id_param_ind_mv": "1",
-            "nr_insc":"0668",
-            "id_param_cod_categ":"100", 
+            "id_param_ind_mv": "672",
+            "nr_insc":"0101",
+            "id_param_cod_categ":"613", 
             "vlr_remun_oe":"200"
             
 }

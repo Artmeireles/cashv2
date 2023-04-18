@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, cpfOrError, 
+    const { existsOrError, notExistsOrError, equalsOrError, isParamOrError, isMatchOrError, noAccessMsg, cpfOrError, 
     isCityOrError, cnpjOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'empresa'
@@ -33,7 +33,8 @@ module.exports = app => {
             else throw 'Documento (CNPJ ou CPF) inválido. Favor verificar'
             existsOrError(body.cnpj_efr, 'CNPJ do Ente Federativo não informado')
             cnpjOrError(body.cnpj_efr, 'CNPJ do Ente Federativo inválido')
-            existsOrError(body.class_trib, 'Classificação Tributária não informada')
+            existsOrError(body.id_param_cl_trib, 'Classificação Tributária não informada')
+            existsOrError(await isParamOrError('classTrib', body.id_param_cl_trib), 'Classificação Tributária selecionada não existe')
             existsOrError(body.ind_opt_reg_eletron, 'Opção pelo Registro Eletrônico de Empregados não informado')
             existsOrError(body.razao_social, 'Razão Social não informada')
             existsOrError(body.id_cidade, 'Cidade não informada')

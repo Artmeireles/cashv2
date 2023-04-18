@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'remun_oe'  //OUTROS ENTES
     const STATUS_ACTIVE = 10
@@ -30,8 +30,10 @@ module.exports = app => {
         try {
             //existsOrError(body.id_serv_vinc, 'Vinculo não informado')
             existsOrError(body.id_param_ind_mv, 'Indicador de Desconto não informado')
+            existsOrError(await isParamOrError('indMov', body.id_param_ind_mv), 'Indicador de Desconto selecionado não existe')
             existsOrError(body.nr_insc, 'CPF ou CNPJ não informado')
             existsOrError(body.id_param_cod_categ, 'Código da Categoria não informado')
+            existsOrError(await isParamOrError('codCatg', body.id_param_cod_categ), 'Código da Categoria selecionado não existe')
             existsOrError(body.vlr_remun_oe, 'Valor da Remuneração não informado')
         }
          catch (error) {
