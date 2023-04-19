@@ -3,17 +3,17 @@ import { userKey } from '../global'
 import AppLayout from '@/layout/AppLayout.vue'
 
 const routes = [
-  // {
-  //   path: '/',
-  //   component: AppLayout,
-  //   children: [
-  //     {
-  //       path: '/',
-  //       name: 'home',
-  //       component: () => import('@/components/HomeView.vue')
-  //     },
-  //   ]
-  // },
+  {
+    path: '/app',
+    component: AppLayout,
+    children: [
+      {
+        path: '/',
+        name: 'home',
+        component: () => import('@/components/HomeView.vue')
+      },
+    ]
+  },
   {
     path: '/',
     name: 'home',

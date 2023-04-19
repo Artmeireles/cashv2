@@ -32,7 +32,7 @@ module.exports = app => {
             existsOrError(body.id_par_mtv_af, 'Motivo do Afastamento não informado')
             existsOrError(await isParamOrError('mtvAfast', body.id_par_mtv_af), 'Motivo do Afastamento selecionado não existe')
             existsOrError(body.info_mesmo_mtv, 'Mesmo Motivo não informado')
-            if(body.id_par_mtv_af == 707 || body.id_par_mtv_af == 708){
+            if(body.id_par_mtv_af == '707' || body.id_par_mtv_af == '708'){
             existsOrError(body.id_par_tp_acid, 'Tipo Acidente não informado')
             existsOrError(await isParamOrError('tpAcid', body.id_par_tp_acid), 'Tipo Acidente selecionado não existe')
             }
@@ -47,7 +47,7 @@ module.exports = app => {
             existsOrError(body.id_par_tp_af, 'Tipo Afastamento não informado')
             existsOrError(await isParamOrError('tpAfast', body.id_par_tp_af), 'Tipo Afastamento selecionado não existe')
             existsOrError(body.ind_remun_cargo, 'Remuneração Cargo Efetivo não informado')
-            if(body.id_par_mtv_af == 722){
+            if(body.id_par_mtv_af == '722'){
             existsOrError(body.obs, 'Observação não informada')
             }
         }

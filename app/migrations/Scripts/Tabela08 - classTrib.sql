@@ -11,8 +11,6 @@ values
 (0,10,1,now(),null,'root','classTrib','11','Associação desportiva que mantém clube de futebol profissional'),
 (0,10,1,now(),null,'root','classTrib','13','Banco, caixa econômica, sociedade de crédito, financiamento e investimento e demais empresas relacionadas no parágrafo 1º do art. 22 da Lei 8.212/1991'),
 (0,10,1,now(),null,'root','classTrib','14','Sindicatos em geral, exceto aquele classificado no código [10]'),
-(0,10,1,now(),null,'root','classTrib','21','Pessoa Física, exceto segurado especial'),
-(0,10,1,now(),null,'root','classTrib','22','Segurado especial, inclusive quando for empregador doméstico'),
 (0,10,1,now(),null,'root','classTrib','60','Missão diplomática ou repartição consular de carreira estrangeira'),
 (0,10,1,now(),null,'root','classTrib','70','Empresa de que trata o Decreto 5.436/2005'),
 (0,10,1,now(),null,'root','classTrib','80','Entidade beneficente de assistência social isenta de contribuições sociais'),
