@@ -9,9 +9,9 @@
                 <div class="text-6xl text-primary font-bold mb-3">Folhas de Pagamento e Consignados</div>
                 <p class="mt-0 mb-4 text-700 line-height-3">Mega Assessoria e Tecnologia &copy; 2001 - {{ getYear() }}</p>
 
-                <Button label="Sign In" @click="this.$router.push('/signin')" v-if="!store.userStore.id"
+                <Button @click="this.$router.push('/signin')" v-if="!store.userStore.id"
                     class="p-button-text p-button-rounded border-none font-light line-height-2 text-blue-500">
-                    Sign In&nbsp;<i class="pi pi-sign-in"></i>
+                    Entrar&nbsp;<i class="pi pi-sign-in"></i>
                 </Button>
                 <Button label="Sign Out" @click="logout" v-else
                     class="p-button-rounded border-none ml-5 font-light text-white line-height-2 bg-blue-500">
@@ -19,13 +19,13 @@
                 </Button>
                 <Button @click="this.$router.push('/signup')" v-if="!store.userStore.id"
                     class="p-button-rounded border-none ml-5 font-light text-white line-height-2 bg-blue-500">
-                    Sign Up&nbsp;<i class="pi pi-user-plus"></i>
+                    Inscrever-se&nbsp;<i class="pi pi-user-plus"></i>
                 </Button>
 
             </section>
         </div>
         <div class="col-12 md:col-6 overflow-hidden">
-            <img src="/assets/images/logo-app.svg" alt="Image" class="imgApp align-items-center" style="imgApp">
+            <img src="/assets/images/logo-app.svg" alt="Image" class="imgApp align-items-center">
         </div>
     </div>
 </template>
@@ -49,7 +49,7 @@ const logout = () => {
 <style scope>
 .imgApp {
     clip-path: polygon(0% 0, 100% 0%, 100% 100%, 0 100%);
-    width: 100%;
+    width: 70%;
     padding: 2rem;
 }
 </style>
