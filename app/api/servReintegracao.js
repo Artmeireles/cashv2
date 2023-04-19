@@ -32,7 +32,7 @@ module.exports = app => {
             existsOrError(body.id_par_tp_rein, 'Tipo da Reintegração não informado')
             existsOrError(await isParamOrError('tpReint', body.id_par_tp_rein), 'Tipo da Reintegração selecionado não existe')
             existsOrError(body.nr_proc_jud, 'Número do Processo não informado')
-            if(body.id_par_tp_rein == 786){
+            if(body.id_par_tp_rein == '786'){
             existsOrError(body.nr_lei_anistia, 'Número da Anistia não informado')
             }
             existsOrError(body.dt_efet_retorno, 'Data Efetivo Retorno não informada')
