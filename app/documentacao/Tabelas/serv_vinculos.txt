@@ -6,7 +6,7 @@ serv_vinculo (
 	tpRegPrev comment('1=RGPS; 2=RPPS') 
 	id_params_tpProv comment(Vinculo trabalhista)
 	dtExercicio 144=2022-01-03
-	tpPlanRP_145
+	tpPlanRP
 	indTetoRGPS_222=
 	indAbonoPerm_223=
 	dtIniAbono_224=

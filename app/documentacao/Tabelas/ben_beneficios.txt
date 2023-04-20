@@ -1,0 +1,18 @@
+ben_beneficios(		1207
+	id_emp 	FK
+	id_ben_vinc FK 
+	id_rubrica FK
+	ide_dm_dev "demonstrativo valores devidos" (data)
+)
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_emp": "1",
+            "id_ben_vinc":"1",
+            "id_rub":"1", 
+            "ide_dm_dev":"20/04/2023"
+}

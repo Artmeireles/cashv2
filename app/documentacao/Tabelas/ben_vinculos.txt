@@ -1,0 +1,25 @@
+ben_vinculos (		2410
+	id_benef	FK
+	nr_beneficio (20)
+	dt_ini_benef
+	id_param_tp_benef
+	tpPlanRP (default 0) 
+	tpPenMorte_22 boolean
+	cpf_inst
+	dt_inst
+)
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_benef": "1",
+            "nr_beneficio":"10203112",
+            "id_param_tp_benef":"866", 
+            "tp_plan_rp":"0", 
+            "tp_pen_morte":"1", 
+            "cpf_inst":"44684604071", 
+            "dt_inst":"20/04/2023"
+}

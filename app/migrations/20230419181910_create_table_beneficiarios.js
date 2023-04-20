@@ -1,0 +1,40 @@
+exports.up = function(knex) {
+    return knex.schema.createTable('wwmgca_cliente_ativos.beneficiarios', table => {
+        table.engine('InnoDB')
+        table.charset('utf8mb4')
+        table.collate('utf8mb4_general_ci')
+        table.increments('id').primary()
+        table.integer('status').notNull().default(10)
+        table.integer('evento').notNull()
+        table.string('created_at').notNull()
+        table.string('updated_at')
+        table.integer('id_emp').notNull().unsigned().comment("Órgão")
+        table.string('cpf_benef', 14).notNull().comment("CPF")
+        table.string('nome', 70).notNull().comment("Nome do Trabalhador")
+        table.specificType('dt_nascto', 'char(10)').notNull().comment("Data de Nascimento")
+        table.specificType('dt_inicio', 'char(10)').notNull().comment("Data início do cadastro do benef")
+        table.integer('id_param_sexo').notNull().unsigned().comment("Sexo")
+        table.integer('id_param_raca_cor').notNull().unsigned().comment("Raça/ Cor")
+        table.integer('id_param_est_civ').notNull().unsigned().comment("Estado Civil")
+        table.boolean('inc_fis_men').notNull().comment("Doença incapacitante")
+        table.specificType('dt_inc_fis', 'char(10)').comment("Data reconhecimento da incapacidade")
+        table.integer('id_param_tplograd').notNull().unsigned().comment("Tipo de Logradouro")
+        table.integer('id_cidade').notNull().unsigned().comment("Cidade")
+        table.string('cep', 10).notNull().comment("CEP")
+        table.string('bairro', 255).notNull().comment("Bairro")
+        table.string('logradouro', 100).notNull().comment("Logradouro")
+        table.string('nr', 255).notNull().comment("Número")
+        table.string('complemento', 255).comment("Complemento")
+
+        table.foreign('id_emp').references('id').inTable('empresa').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_sexo').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_raca_cor').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_est_civ').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tplograd').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_cidade').references('id').inTable('wwmgca_api.cidades').onUpdate('CASCADE').onDelete('NO ACTION')
+    })
+};
+
+exports.down = function(knex) {
+    return knex.schema.dropTable('wwmgca_cliente_ativos.beneficiarios')
+};

@@ -1,0 +1,19 @@
+beneficiarios( 2400
+	id_emp
+	cpf_benef
+	nome
+	dt_nascto
+	dt_inicio
+	id_param_sexo
+	id_param_raca_cor
+	id_param_est_civ
+	inc_fis_men
+	dt_inc_fis
+	id_param_tplograd
+	id_cidade
+	cep
+	bairro
+	logradouro
+	nr
+	complemento
+)

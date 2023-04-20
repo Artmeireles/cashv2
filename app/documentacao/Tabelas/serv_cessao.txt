@@ -1,0 +1,22 @@
+serv_cessao (
+	id_serv_vinc
+	dtIniCessao 
+	cnpjCess 	CNPJ do empregador/órgão público
+	respRemun  boolean
+	dtTermCessao	término da cessão/exercício
+)
+
+
+
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+            "id_serv_vinc": "3",
+            "dt_inicio":"05/04/2023",
+            "cnpj":"15568833000120", 
+            "dt_fim":"05/04/2023",
+            "resp_remun":"1"
+            
+}
