@@ -260,11 +260,11 @@ module.exports = app => {
         .get(app.api.remuneracao.getById)
         .delete(app.api.remuneracao.remove)
 
-    app.route('/serv-afastamento/:id_serv_vinc')
+    app.route('/serv-afastamentos/:id_serv_vinc')
         .all(app.config.passport.authenticate())
         .post(app.api.servAfastamento.save)
         .get(app.api.servAfastamento.get)
-    app.route('/serv-afastamento/:id_serv_vinc/:id')
+    app.route('/serv-afastamentos/:id_serv_vinc/:id')
         .all(app.config.passport.authenticate())
         .put(app.api.servAfastamento.save)
         .get(app.api.servAfastamento.getById)
