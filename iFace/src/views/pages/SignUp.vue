@@ -10,45 +10,49 @@ const toast = useToast();
 const router = useRouter()
 
 const email = ref('');
+const telefone = ref('');
 const password = ref('');
+const confirmPassword = ref('');
 
 const logoUrl = computed(() => {
     return `assets/images/logo-app.svg`;
 });
 
 const signin = async () => {
-    const store = useUserStore()
-    await store.registerUser(email.value, password.value)
-    if (store.userStore && store.userStore.id) {
-        router.push({ path: "/" });
-        toast.add({ severity: 'success', detail: `Seja bem vindo ${store.userStore.name}!`, life: 3000 });
-    } else {
-        toast.add({ severity: 'error', detail: `Combinação de usuário e senha não localizado!`, life: 3000 });
+    if (email.value && password.value) {
+        const store = useUserStore()
+        await store.registerUser(email.value, password.value)
+        if (store.userStore && store.userStore.id) {
+            router.push({ path: "/" });
+            toast.add({ severity: 'success', detail: `Seja bem vindo ${store.userStore.name}!`, life: 3000 });
+        } else {
+            toast.add({ severity: 'error', detail: `Combinação de usuário e senha não localizado!`, life: 3000 });
+        }
     }
 }
 </script>
 
 <template>
-    <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
+    <div class="align-items-center justify-content-center ">
         <div class="flex flex-column align-items-center justify-content-center">
-            <img :src="logoUrl" :alt="`${appName} logo`" class="mb-5 w-6rem flex-shrink-0" />
             <div
                 style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-                <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
-                    <div class="text-center mb-5">
+                <div class="w-full surface-card py-5 px-5" style="border-radius: 53px">
+                    <div class="text-center mb-2">
+                        <img :src="logoUrl" :alt="`${appName} logo`" class="mb-2 w-4rem flex-shrink-0" />
                         <div class="text-900 text-3xl font-medium mb-3">
                             Bem vindo ao {{ appName }}<small><sup>&copy;</sup></small>
                         </div>
-                        <span class="text-600 font-medium">Faça login para continuar</span>
+                        <span class="text-600 font-medium">Informe os dados abaixo para se registrar</span>
                     </div>
 
                     <div>
                         <label for="email1" class="block text-900 text-xl font-medium mb-2">Email ou CPF</label>
-                        <InputText id="email1" type="text" placeholder="Email address" class="w-full md:w-30rem mb-5"
+                        <InputText id="email1" type="text" placeholder="Seu email ou CPF" class="w-full md:w-30rem mb-5"
                             style="padding: 1rem" v-model="email" />
 
-                        <label for="password1" class="block text-900 font-medium text-xl mb-2">Senha</label>
-                        <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true"
+                        <label for="password1" class="block text-900 text-xl font-medium mb-2">Senha</label>
+                        <Password id="password1" v-model="password" placeholder="Sua senha" :toggleMask="true"
                             class="w-full mb-3" inputClass="w-full"></Password>
 
                         <div class="flex align-items-center justify-content-between mb-5 gap-5">
@@ -62,7 +66,8 @@ const signin = async () => {
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
                                 @click="this.$router.push('/forgot')">Esqueceu a senha?</Button>
                         </div>
-                        <Button label="Acessar" @click="signin" class="w-full p-3 text-xl"></Button>
+                        <Button rounded label="Acessar" icon="pi pi-sign-in" :disabled="!(email && password)" @click="signin"
+                            class="w-full p-3 text-xl"></Button>
                     </div>
                 </div>
             </div>

@@ -13,6 +13,15 @@ export const useUserStore = defineStore('users', {
     userStore(state) {
       return state.user
     },
+    userTimeToLogOut(state) {
+      setInterval(() => {
+        state.timeToLogOut--
+        let timeTo = state.user.timeLogged + state.timeToLogOut
+        console.log(timeTo);
+        return timeTo
+      }, 1000);
+
+    },
   },
   actions: {
     async registerUser(email, password) {
@@ -21,8 +30,9 @@ export const useUserStore = defineStore('users', {
         .post(url, { email, password })
         .then((res) => {
           this.user = res.data;
-          console.log(this.user);
           if (this.user.id) {
+            this.user.timeLogged = Math.floor(Date.now() / 1000)
+
             axios.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`
             localStorage.setItem(userKey, JSON.stringify(res.data));
           } else {
@@ -31,6 +41,17 @@ export const useUserStore = defineStore('users', {
             localStorage.removeItem(userKey);
           }
           return this.user
+        })
+        .catch(error => {
+          return { data: error }
+        });
+    },
+    async findUser(email) {
+      const url = `${baseApiUrl}/signin`
+      await axios
+        .post(url, { email: email })
+        .then((res) => {
+          this.user = res.data;
         })
         .catch(error => {
           return { data: error }
@@ -46,11 +67,7 @@ export const useUserStore = defineStore('users', {
             this.user = userData
             axios.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`
             this.timeToLogOut = 600
-            // return true
-          } //else return false
-          // else {
-          //   this.logout()
-          // }
+          }
         })
         .catch(error => {
           console.log(error);
@@ -64,31 +81,3 @@ export const useUserStore = defineStore('users', {
   },
 
 })
-
-
-// import { defineStore } from 'pinia'
-// import axios from 'axios'
-
-// export const useUsers = defineStore('users', {
-//   state: () => ({
-//     userData: null,
-//   }),
-
-//   actions: {
-//     async registerUser(email, password) {
-//       const url = `${baseApiUrl}/signin`
-//       axios
-//         .post(url, { email, password })
-//         .then((res) => {
-//           this.userData = res.data;
-//           console.log(this.userData);
-//           showTooltip(`Welcome back ${this.userData.name}!`)
-//           localStorage.setItem(userKey, JSON.stringify(res.data));
-//         })
-//         .catch(error => {
-//           console.log(error); showTooltip(error)
-//         });
-//     },
-//   },
-// })
-

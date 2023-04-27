@@ -5,21 +5,35 @@ const { dbPrefix, jasperServerUrl, jasperServerU, jasperServerK } = require("../
 
 module.exports = app => {
     const tabela = 'users'
+    const { existsOrError } = app.api.validation
     const tabelaParams = 'params'
     const signin = async (req, res) => {
         const email = req.body.email || req.body.cpf
+        try{
+            existsOrError(email, 'E-mail ou CPF precisam ser informados')
+        } catch (error) {
+            return res.status(400).send(error)
+        }
         const cad_servidor = {
             data: {}
         }
-        if (!(email && req.body.password)) {
-            return res.status(400).send('Informe usuário e senha!')
-        }
+
+
         let user = await app.db(tabela)
             .select('users.*')
             .orWhere({ email: email })
             .orWhere({ name: email })
             .orWhere({ cpf: email.replace(/([^\d])+/gim, "") })
             .first()
+        if (user && !req.body.password) {
+            return res.status(200).send(user)
+        // } else {
+        //     return res.status(200).send('E-mail ou CPF não localizado!')
+        }
+
+        if (!(email && req.body.password)) {
+            return res.status(400).send('Informe usuário e senha!')
+        }
 
         if (!user) {
             const clientNames = await app.db(tabelaParams)

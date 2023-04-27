@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div :class="userStore.id ? formatClass : 'container'">
     <RouterView />
     <Toast />
     <DynamicDialog />
@@ -15,7 +15,10 @@ export default {
   name: "App",
   components: {},
   data: function () {
-    return {}
+    return {
+      // formatClass: "container desktopBgn"
+      formatClass: "container"
+    }
   },
   methods: {
     logout() {
@@ -29,11 +32,18 @@ export default {
       const store = useUserStore()
       await store.validateToken(userData)
     },
+    getMainClass() {
+      // if (isMobileOnly) this.formatClass = "content mobileBgn";
+      // else 
+      this.formatClass = "content desktopBgn";
+    },
   },
   computed: {
     ...mapState(useUserStore, ['userStore']),
+    ...mapState(useCounterStore, ['userTimeToLogOut']),
   },
   watch: {
+    userStore() { }
     userStore() { }
   },
   created() {
@@ -42,11 +52,23 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  background-color: var(--red-900);
+}
+.desktopBgn {
+  background-image: url("/assets/images/wallpaper.jpg");
+  /* Center and scale the image nicely */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.mobileBgn {
+  background-image: url("/assets/images/wallpaperMbl.jpg");
 }
 </style>
