@@ -37,6 +37,11 @@ module.exports = app => {
             existsOrError(await isParamOrError('tpAcid', body.id_par_tp_acid), 'Tipo Acidente selecionado não existe')
             }
             existsOrError(body.dt_inicio, 'Data Início não informada')
+            // if (body.id_par_mtv_af !== '716')   
+            if (moment(body.dt_inicio, "DD/MM/YYYY").format() > moment((new Date()), "DD/MM/YYYY").format()){
+                throw `A data de início do afastamento (${body.dt_inicio}) não pode ser posterior à data atual (${new Date()})`
+            }
+            
             existsOrError(body.dt_fim, 'Data Fim não informado')
             if (moment(body.dt_fim, "DD/MM/YYYY").format() < moment(body.dt_inicio, "DD/MM/YYYY").format()) {
                 throw `A data de fim do afastamento (${body.dt_fim}) não pode ser anterior à data de início do afastamento (${body.dt_inicio})`
@@ -52,6 +57,7 @@ module.exports = app => {
             }
         }
          catch (error) {
+            console.log(error)
             return res.status(400).send(error)
         }
 
