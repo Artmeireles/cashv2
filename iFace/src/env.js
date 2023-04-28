@@ -1,2 +1,2 @@
-export const baseApiUrl = 'http://localhost:3000' // local
+export const baseApiUrl = 'https://api.tom2526.c41.integrator.host/'
 export default { baseApiUrl }
