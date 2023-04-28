@@ -40,10 +40,8 @@ export default {
   },
   computed: {
     ...mapState(useUserStore, ['userStore']),
-    ...mapState(useCounterStore, ['userTimeToLogOut']),
   },
   watch: {
-    userStore() { }
     userStore() { }
   },
   created() {

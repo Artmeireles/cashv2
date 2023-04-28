@@ -24,8 +24,8 @@
                         class="p-button-rounded border-none ml-5 font-light text-white line-height-2 bg-blue-500">
                         Inscrever-se&nbsp;<i class="pi pi-user-plus"></i>
                     </Button>
-                    <p>Time on: {{ store.userStore.timeLogged }}</p>
-                    <p>Time out: {{ store.userStore.timeToLogOut }}</p>
+                    <!-- <p>Time on: {{ store.userStore.timeLogged }}</p>
+                    <p>Time out: {{ store.userStore.timeToLogOut }}</p> -->
                 </section>
             </div>
             <div class="col-12 md:col-6 overflow-hidden">
