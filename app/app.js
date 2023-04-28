@@ -8,7 +8,7 @@ const path = require('path')
 const logsDir = 'logs'
 const moment = require('moment')
 const assets = path.join(__dirname, "../../public_html/assets/")
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 55595
 
 app.use(express.static(assets))
 app.use(cors())
