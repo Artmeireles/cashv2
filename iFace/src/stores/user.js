@@ -57,6 +57,17 @@ export const useUserStore = defineStore('users', {
           return { data: error }
         });
     },
+    async findUserSignUp(cpf) {
+      const url = `${baseApiUrl}/signup`
+      await axios
+        .post(url, { cpf: cpf })
+        .then((res) => {
+          this.user = res.data;
+        })
+        .catch(error => {
+          return { data: error }
+        });
+    },
     async validateToken(userData) {
       const url = `${baseApiUrl}/validateToken`
       return await axios

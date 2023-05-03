@@ -10,9 +10,10 @@
                             Bem vindo ao {{ appName }}<small><sup>&copy;</sup></small>
                         </div>
                         <span class="text-600 font-medium" v-if="!store.userStore.id">Informe seu CPF para começar</span>
-                        <code class="text-center mb-2"
-          v-if="showSignup">Para sua segurança, seus dados pessoais devem ser confirmados no RH/DP de seu município</code>
                     </div>
+                    <span class="text-center mb-2" style="color: brown;">
+                        Os dados pessoais só podem ser alterados no RH/DP de seu município
+                    </span>
 
                     <form @submit.prevent="signup">
                         <div class="text-center mb-2">
@@ -67,18 +68,20 @@ const store = useUserStore()
 const toast = useToast();
 const router = useRouter()
 
-const email = ref('');
 const cpf = ref('');
+const name = ref('');
+const email = ref('');
 const telefone = ref('');
 const password = ref('');
-const password = ref('');
+const confirmPassword = ref('');
+const userFound = false;
 
 const logoUrl = computed(() => {
     return `assets/images/logo-app.svg`;
 });
 
 const signup = async () => {
-    if (email.value && password.value) {
+    if (cpf.value) {
         await store.registerUser(email.value, password.value)
         if (store.userStore && store.userStore.id) {
             router.push({ path: "/" });
