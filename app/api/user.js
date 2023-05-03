@@ -33,12 +33,11 @@ module.exports = app => {
         if (!req.originalUrl.startsWith('/users')) user.gestor = false
 
         const sql = app.db(tabela)
-        if (user.email)
+        if (user.email || user.cpf)
             sql.where({ email: user.email })
                 .orWhere({ cpf: user.cpf })
-        else
-            sql.where({ cpf: user.cpf })
-        const userFromDB = await sql.first()
+        const userFromDB = await sql.where({ email: user.email })
+            .orWhere({ cpf: user.cpf }).first()
 
         try {
             // Apenas gestores podem selecionar outros admins, gestores e se o usuário pode ser multiCliente
