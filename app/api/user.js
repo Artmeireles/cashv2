@@ -8,7 +8,8 @@ const moment = require('moment')
 const { Stats } = require('fs')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, cpfOrError } = app.api.validation
+    const { titleCase } = app.api.facilities
     const { transporter } = app.api.mailer
     const tabela = `users`
     const tabelaParams = 'params'
@@ -33,47 +34,43 @@ module.exports = app => {
         if (!req.originalUrl.startsWith('/users')) user.gestor = false
 
         const sql = app.db(tabela)
-        if (user.email || user.cpf)
-            sql.where({ email: user.email })
-                .orWhere({ cpf: user.cpf })
-        const userFromDB = await sql.where({ email: user.email })
-            .orWhere({ cpf: user.cpf }).first()
+        if (user.cpf)
 
-        try {
-            // Apenas gestores podem selecionar outros admins, gestores e se o usuário pode ser multiCliente
-            if (user.id && !req.user.gestor >= 1 && (user.admin >= 1 || user.gestor >= 1 || user.multiCliente >= 1)) {
-                delete user.admin
-                delete user.gestor
-                delete user.multiCliente
-            }
-            // Apenas gestores e admins podem selecionar alçadas de usuários
-            if (user.id && !(req.user.gestor >= 1) &&
-                (
-                    user.consignatario >= 1 ||
-                    user.tipoUsuario >= 1 ||
-                    user.cad_servidores >= 1 ||
-                    user.financeiro >= 1 ||
-                    user.con_contratos >= 1
-                )) return res.status(401).send('Unauthorized')
-            existsOrError(user.name, 'Nome não informado')
-            existsOrError(user.cpf, 'CPF não informado')
-            // existsOrError(user.email, 'E-mail não informado')
-            existsOrError(user.telefone, 'Telefone não informado')
-            if ((user.password || user.confirmPassword) && user.password != user.confirmPassword) {
-                existsOrError(user.password, 'Senha não informada')
-                existsOrError(user.confirmPassword, 'Confirmação de Senha inválida')
-                equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
-            } else if (!user.password) {
-                delete user.password
-            }
+            try {
+                // Apenas gestores podem selecionar outros admins, gestores e se o usuário pode ser multiCliente
+                if (user.id && !req.user.gestor >= 1 && (user.admin >= 1 || user.gestor >= 1 || user.multiCliente >= 1)) {
+                    delete user.admin
+                    delete user.gestor
+                    delete user.multiCliente
+                }
+                // Apenas gestores e admins podem selecionar alçadas de usuários
+                if (user.id && !(req.user.gestor >= 1) &&
+                    (
+                        user.consignatario >= 1 ||
+                        user.tipoUsuario >= 1 ||
+                        user.cad_servidores >= 1 ||
+                        user.financeiro >= 1 ||
+                        user.con_contratos >= 1
+                    )) return res.status(401).send('Unauthorized')
+                existsOrError(user.name, 'Nome não informado')
+                existsOrError(user.cpf, 'CPF não informado')
+                // existsOrError(user.email, 'E-mail não informado')
+                existsOrError(user.telefone, 'Telefone não informado')
+                if ((user.password || user.confirmPassword) && user.password != user.confirmPassword) {
+                    existsOrError(user.password, 'Senha não informada')
+                    existsOrError(user.confirmPassword, 'Confirmação de Senha inválida')
+                    equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
+                } else if (!user.password) {
+                    delete user.password
+                }
 
-            if (!user.id) {
-                notExistsOrError(userFromDB, 'Email ou CPF já registrado')
+                if (!user.id) {
+                    notExistsOrError(userFromDB, 'Email ou CPF já registrado')
+                }
+            } catch (error) {
+                console.log(error);
+                return res.status(400).send(error)
             }
-        } catch (error) {
-            console.log(error);
-            return res.status(400).send(error)
-        }
 
         if (user.email && user.email.trim.length == 0)
             delete user.email
@@ -180,6 +177,150 @@ module.exports = app => {
                 })
         }
     }
+
+    const signup = async (req, res) => {
+        const body = { ...req.body }
+        try {
+            existsOrError(body.cpf, 'CPF não informado')
+            cpfOrError(body.cpf, 'CPF inválido')
+            if (body.email) if (!emailOrError(body.email)) throw 'Email informado está num formato inválido'
+        } catch (error) {
+            return res.status(400).send(error)
+        }
+        // Primeiro verifica se o usuário informou todos os dados obrigatórios para o registro
+        if (body.client && body.domain && body.id && body.celular) {
+            // Dados necessários localizados
+            // Criação de um novo registro
+            const nextEventID = await app.db('sis_events').select(app.db.raw('count(*) as count')).first()
+
+            body.evento = nextEventID.count + 1
+            // Variáveis da criação de um novo registro
+            body.status = STATUS_INACTIVE
+            body.created_at = new Date()
+            body.f_ano = body.created_at.getFullYear()
+            body.f_mes = body.created_at.getMonth().toString().padStart(2, "0")
+            body.f_complementar = '000'
+            body.name = body.nome
+            body.telefone = body.celular
+            body.cliente = body.client
+            body.dominio = body.domain
+            if (!emailOrError(body.email)) delete body.email
+            delete body.id
+            delete body.nome
+            delete body.celular
+            delete body.client
+            delete body.domain
+            delete body.clientName
+            const expiresIn = Math.floor(Date.now() / 1000) + 300
+            body.sms_token = `${crypto.randomBytes(3).toString('hex')}_${expiresIn}`
+            app.db(tabela)
+                .insert(body)
+                .then(async (ret) => {
+                    mailyNew(body)
+                    body.id = ret[0]
+                    req.body = body
+                    smsToken(req)
+                    // registrar o evento na tabela de eventos
+                    const { createEventIns } = app.api.sisEvents
+                    createEventIns({
+                        "notTo": ['created_at', 'password', 'password_reset_token', 'evento'],
+                        "next": body,
+                        "request": req,
+                        "evento": {
+                            "evento": `Novo perfil de usuário`,
+                            "tabela_bd": "user",
+                        }
+                    })
+
+                    app.api.logger.logInfo({ log: { line: `Novo de perfil de usuário! Usuário: ${body.name}`, sConsole: true } })
+                    return res.json(body)
+                })
+                .catch(error => {
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
+                })
+        } else {
+            // Caso os dados obrigatórios não tenha sido dados então vai para a localização e validação
+            const cad_servidor = {
+                data: {}
+            }
+            const clientServidor = {}
+            body.cpf = body.cpf.replace(/([^\d])+/gim, "")
+            const userFromDB = await app.db(tabela)
+                .select('id', 'email', 'name', 'cpf')
+                .where({ cpf: body.cpf }).first()
+
+            // Se o usuário já estiver registrado
+            if (userFromDB && userFromDB.id) {
+                return res.status(200).send({
+                    registred: true, msg: `O CPF informado já se encontra registrado. Por favor prossiga para o login ou se esqueceu sua senha então poderá recuperá-la`,
+                    data: userFromDB
+                })
+            }
+            // Se o usuário não estiver registrado
+            if (!userFromDB) {
+                const clientNames = await app.db(tabelaParams)
+                    .where({ dominio: 'root', meta: 'clientName', status: 10 })
+                    .whereNot({ value: 'root' })
+                for (let client = 0; client < clientNames.length; client++) {
+                    const clientName = clientNames[client].value;
+                    const domainNames = await app.db(tabelaParams)
+                        .where({ dominio: clientName, meta: 'domainName', status: 10 })
+                        .whereNot({ value: 'root' })
+                    for (let domain = 0; domain < domainNames.length; domain++) {
+                        const domainName = domainNames[domain].value;
+                        const tabelaCadServidoresDomain = `${dbPrefix}_${clientName}_${domainName}.cad_servidores`
+                        const tabelaFinSFuncionalDomain = `${dbPrefix}_${clientName}_${domainName}.fin_sfuncional`
+                        const cad_servidores = await app.db({ cs: tabelaCadServidoresDomain })
+                            .select('cs.id', 'cs.cpf', 'cs.nome', 'cs.email', 'cs.celular')
+                            .join({ ff: `${tabelaFinSFuncionalDomain}` }, function () {
+                                this.on(`ff.id_cad_servidores`, `=`, `cs.id`)
+                            })
+                            .where({ 'cs.cpf': body.cpf.replace(/([^\d])+/gim, "") })
+                            .andWhere(app.db.raw(`ff.situacaofuncional is not null and ff.situacaofuncional > 0 and ff.mes < 13`))
+                            .first()
+                            .orderBy('ff.ano', 'desc')
+                            .orderBy('ff.mes', 'desc')
+                            .limit(1)
+                        clientServidor.client = clientName
+                        clientServidor.domain = domainName
+                        clientServidor.clientName = domainNames[domain].label
+
+                        if (cad_servidores) {
+                            cad_servidor.data = { ...cad_servidores, ...clientServidor }
+                            break
+                        }
+                    }
+                    if (cad_servidor.data.id) {
+                        if (cad_servidor.data.celular.replace(/([^\d])+/gim, "").length == 11)
+                            return res.json(cad_servidor.data)
+                        else
+                            return res.json({ msg: `O servidor ${titleCase(cad_servidor.data.nome)} foi localizado nos registro do município de ${clientServidor.clientName}, mas não tem um telefone registrado. Antes de prosseguir com o registro será necessário procurar o RH/DP de sua fonte pagadora para regularizar seu registro` })
+                    }
+                }
+
+
+                try {
+                    existsOrError(body.name, 'Nome não informado')
+                    existsOrError(body.email, 'E-mail não informado')
+                    existsOrError(body.telefone, 'Telefone não informado')
+                    if ((body.password || body.confirmPassword) && body.password != body.confirmPassword) {
+                        existsOrError(body.password, 'Senha não informada')
+                        existsOrError(body.confirmPassword, 'Confirmação de Senha inválida')
+                        equalsOrError(body.password, body.confirmPassword, 'Senhas não conferem')
+                    }
+                } catch (error) {
+                    console.log(error);
+                    return res.status(400).send(error)
+                }
+
+                if (!cad_servidor.data.id) {
+                    return res.json({ found: false, data: "Não foi encontrado um servidor com esse CPF em nossos registros! Por favor, informe os dados a seguir inclusive o seu email corporativo" })
+                }
+            }
+        }
+    }
+
 
     const unlock = async (req, res) => {
         const user = {}
@@ -782,7 +923,7 @@ module.exports = app => {
     }
 
     return {
-        save, get, getById, getByCpf, getByToken, smsToken, mailyNew, remove, getByFunction,
+        signup, save, get, getById, getByCpf, getByToken, smsToken, mailyNew, remove, getByFunction,
         requestPasswordReset, passwordReset, unlock, getDeskUser, locateServidorOnClient
     }
 }

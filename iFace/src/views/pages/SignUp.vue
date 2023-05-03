@@ -11,7 +11,7 @@
                         </div>
                         <span class="text-600 font-medium" v-if="!store.userStore.id">Informe seu CPF para começar</span>
                     </div>
-                    <span class="text-center mb-2" style="color: brown;">
+                    <span class="text-center mb-2" style="color: chocolate; text-decoration: underline; ">
                         Os dados pessoais só podem ser alterados no RH/DP de seu município
                     </span>
 

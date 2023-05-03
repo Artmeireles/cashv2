@@ -5,7 +5,7 @@ module.exports = app => {
 
     function titleCase(str) {
         let splitStr = str.toLowerCase().split(' ');
-        const pular = ['de', 'da', '']
+        const pular = ['de', 'da', 'do', '']
         for (var i = 0; i < splitStr.length; i++) {
             if (!(pular.includes(splitStr[i])))
                 splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);

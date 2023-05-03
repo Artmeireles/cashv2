@@ -80,5 +80,5 @@ export function titleCase(str) {
 export default {
   userKey, appName, dbPrefix, noPermissAccess,
   emailOrError, highlight, removeMark, downloadFile,
-  setValidCep, titleCase, titleCase
+  setValidCep, titleCase
 }
