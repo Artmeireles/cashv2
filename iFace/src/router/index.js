@@ -1,25 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { userKey } from '../global'
-import AppLayout from '@/layout/AppLayout.vue'
+// import AppLayout from '@/layout/AppLayout.vue'
 
 const routes = [
   {
-    path: '/app',
-    component: AppLayout,
-    children: [
-      {
-        path: '/',
-        name: 'home',
-        component: () => import('@/components/HomeView.vue')
-      },
-    ]
-  },
-  {
     path: '/',
     name: 'home',
-    // component: () => import('@/views/pages/Empty.vue')
-    // component: () => import('@/views/pages/Landing.vue')
     component: () => import('@/views/pages/Home.vue')
+  },
+  {
+    path: '/landing',
+    name: 'landing',
+    component: () => import('@/views/pages/Landing.vue')
   },
   {
     path: '/signin',

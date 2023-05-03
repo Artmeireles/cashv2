@@ -1,37 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
-<script setup>
-import { ref, computed } from 'vue';
-import { appName } from "@/global"
-import { useUserStore } from "@/stores/user"
-import { useToast } from "primevue/usetoast"
-import { useRouter } from 'vue-router'
-
-const toast = useToast();
-const router = useRouter()
-
-const email = ref('');
-const telefone = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-
-const logoUrl = computed(() => {
-    return `assets/images/logo-app.svg`;
-});
-
-const signin = async () => {
-    if (email.value && password.value) {
-        const store = useUserStore()
-        await store.registerUser(email.value, password.value)
-        if (store.userStore && store.userStore.id) {
-            router.push({ path: "/" });
-            toast.add({ severity: 'success', detail: `Seja bem vindo ${store.userStore.name}!`, life: 3000 });
-        } else {
-            toast.add({ severity: 'error', detail: `Combinação de usuário e senha não localizado!`, life: 3000 });
-        }
-    }
-}
-</script>
-
 <template>
     <div class="align-items-center justify-content-center ">
         <div class="flex flex-column align-items-center justify-content-center">
@@ -43,17 +9,30 @@ const signin = async () => {
                         <div class="text-900 text-3xl font-medium mb-3">
                             Bem vindo ao {{ appName }}<small><sup>&copy;</sup></small>
                         </div>
-                        <span class="text-600 font-medium">Informe os dados abaixo para se registrar</span>
+                        <span class="text-600 font-medium" v-if="!store.userStore.id">Informe seu CPF para começar</span>
+                        <code class="text-center mb-2"
+          v-if="showSignup">Para sua segurança, seus dados pessoais devem ser confirmados no RH/DP de seu município</code>
                     </div>
 
-                    <div>
-                        <label for="email1" class="block text-900 text-xl font-medium mb-2">Email ou CPF</label>
-                        <InputText id="email1" type="text" placeholder="Seu email ou CPF" class="w-full md:w-30rem mb-5"
-                            style="padding: 1rem" v-model="email" />
-
-                        <label for="password1" class="block text-900 text-xl font-medium mb-2">Senha</label>
-                        <Password id="password1" v-model="password" placeholder="Sua senha" :toggleMask="true"
-                            class="w-full mb-3" inputClass="w-full"></Password>
+                    <form @submit.prevent="signup">
+                        <div class="text-center mb-2">
+                            <h2 v-if="store.userStore.name">Olá {{ store.userStore.name }}</h2>
+                            <span class="text-600 font-medium" v-if="store.userStore.id">Agora digite sua senha para
+                                acessar</span>
+                        </div>
+                        <div v-if="!store.userStore.id" class="flex flex-column gap-2 mb-5">
+                            <label for="email1" class="block text-900 text-xl font-medium mb-2">CPF</label>
+                            <InputText id="email1" type="text" placeholder="Seu CPF" class="w-full md:w-30rem "
+                                style="padding: 1rem" v-model="email" />
+                            <small id="username-help">Informe seu CPF para começar.</small>
+                        </div>
+                        <div v-else class="flex flex-column gap-2 mb-3">
+                            <!-- <Password id="password1" v-model="password" placeholder="Sua senha" :toggleMask="true"
+                                class="w-full" inputClass="w-full"></Password> -->
+                            <InputText id="password1" type="password" placeholder="Sua senha" class="w-full md:w-30rem "
+                                style="padding: 1rem" v-model="password" />
+                            <small id="username-help">Informe sua senha e clique em Acessar.</small>
+                        </div>
 
                         <div class="flex align-items-center justify-content-between mb-5 gap-5">
                             <Button link style="color: var(--primary-color)"
@@ -66,15 +45,59 @@ const signin = async () => {
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
                                 @click="this.$router.push('/forgot')">Esqueceu a senha?</Button>
                         </div>
-                        <Button rounded label="Acessar" icon="pi pi-sign-in" :disabled="!(email && password)" @click="signin"
+                        <Button rounded label="Acessar" icon="pi pi-sign-in" :disabled="!(email)" type="submit"
                             class="w-full p-3 text-xl"></Button>
-                    </div>
+                        <!-- </div> -->
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </template>
+               
+<!-- eslint-disable vue/multi-word-component-names -->
+<script setup>
+import { ref, computed } from 'vue';
+import { appName } from "@/global"
+import { useUserStore } from "@/stores/user"
+import { useToast } from "primevue/usetoast"
+import { useRouter } from 'vue-router'
+const store = useUserStore()
 
+const toast = useToast();
+const router = useRouter()
+
+const email = ref('');
+const cpf = ref('');
+const telefone = ref('');
+const password = ref('');
+const password = ref('');
+
+const logoUrl = computed(() => {
+    return `assets/images/logo-app.svg`;
+});
+
+const signup = async () => {
+    if (email.value && password.value) {
+        await store.registerUser(email.value, password.value)
+        if (store.userStore && store.userStore.id) {
+            router.push({ path: "/" });
+            toast.add({ severity: 'success', detail: `Seja bem vindo ${store.userStore.name}!`, life: 3000 });
+        } else {
+            toast.add({ severity: 'error', detail: `Combinação de usuário e senha não localizado!`, life: 3000 });
+        }
+    } else {
+        await store.findUser(email.value)
+        if (store.userStore && store.userStore.id) {
+            email.value = store.userStore.email
+        } else {
+            // email.value = undefined
+            toast.add({ severity: 'warn', detail: `Não localizamos o e-mail ou CPF informado`, life: 5000 });
+        }
+    }
+}
+</script>
+                            
 <style scoped>
 .pi-eye {
     transform: scale(1.6);
@@ -86,3 +109,4 @@ const signin = async () => {
     margin-right: 1rem;
 }
 </style>
+                            

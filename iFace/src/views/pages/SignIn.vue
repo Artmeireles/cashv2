@@ -25,8 +25,10 @@
                             <small id="username-help">Informe seu e-mail ou CPF para acessar.</small>
                         </div>
                         <div v-else class="flex flex-column gap-2 mb-3">
-                            <Password id="password1" v-model="password" placeholder="Sua senha" :toggleMask="true"
-                                class="w-full" inputClass="w-full"></Password>
+                            <!-- <Password id="password1" v-model="password" placeholder="Sua senha" :toggleMask="true"
+                                class="w-full" inputClass="w-full"></Password> -->
+                            <InputText id="password1" type="password" placeholder="Sua senha" class="w-full md:w-30rem "
+                                style="padding: 1rem" v-model="password" />
                             <small id="username-help">Informe sua senha e clique em Acessar.</small>
                         </div>
 
@@ -53,7 +55,7 @@
                
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, } from 'vue';
 import { appName } from "@/global"
 import { useUserStore } from "@/stores/user"
 import { useToast } from "primevue/usetoast"

@@ -1,2 +1,2 @@
-export const baseApiUrl = 'https://api.tom2526.c41.integrator.host'
+export const baseApiUrl = 'http://localhost:55595' // dev
 export default { baseApiUrl }
