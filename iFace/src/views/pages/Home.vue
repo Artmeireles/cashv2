@@ -12,7 +12,7 @@
                     <p class="mt-0 mb-4 text-700 line-height-3">Mega Assessoria e Tecnologia &copy; 2001 - {{ getYear() }}
                     </p>
 
-                    <Button @click="this.$router.push('/signin')" v-if="!store.userStore.id"
+                    <Button @click="router.push('/signin')" v-if="!store.userStore.id"
                         class="p-button-text p-button-rounded border-none font-light line-height-2 text-blue-500">
                         Entrar&nbsp;<i class="pi pi-sign-in"></i>
                     </Button>
@@ -20,7 +20,7 @@
                         class="p-button-rounded border-none ml-5 font-light text-white line-height-2 bg-blue-500">
                         <i class="pi pi-sign-out"></i>&nbsp;Sair
                     </Button>
-                    <Button @click="this.$router.push('/signup')" v-if="!store.userStore.id"
+                    <Button @click="router.push('/signup')" v-if="!store.userStore.id"
                         class="p-button-rounded border-none ml-5 font-light text-white line-height-2 bg-blue-500">
                         Inscrever-se&nbsp;<i class="pi pi-user-plus"></i>
                     </Button>
@@ -38,6 +38,9 @@
 <script setup>
 import { appName } from "@/global"
 import { useUserStore } from "@/stores/user"
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const store = useUserStore()
 

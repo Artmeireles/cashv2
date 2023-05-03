@@ -35,13 +35,13 @@
                         <div class="flex align-items-center justify-content-between mb-5 gap-5">
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
-                                @click="this.$router.push('/signup')">Novo por aqui?</Button>
+                                @click="router.push('/signup')">Novo por aqui?</Button>
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
-                                @click="this.$router.push('/')"><i class="pi pi-backward"></i>&nbsp;Início</Button>
+                                @click="router.push('/')"><i class="pi pi-backward"></i>&nbsp;Início</Button>
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
-                                @click="this.$router.push('/forgot')">Esqueceu a senha?</Button>
+                                @click="router.push('/forgot')">Esqueceu a senha?</Button>
                         </div>
                         <Button rounded label="Acessar" icon="pi pi-sign-in" :disabled="!(email)" type="submit"
                             class="w-full p-3 text-xl"></Button>

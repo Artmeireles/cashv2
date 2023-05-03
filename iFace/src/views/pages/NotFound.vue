@@ -1,6 +1,8 @@
 <script setup>
 import AppConfig from '@/layout/AppConfig.vue';
 import { appName } from "@/global"
+import { useRouter } from 'vue-router';
+const router = useRouter()
 </script>
 
 <template>
@@ -46,7 +48,7 @@ import { appName } from "@/global"
                         </span>
                     </router-link>
 
-                    <Button @click="this.$router.push('/')" link class="lg:text-xl font-medium mb-0"><i class="pi pi-backward"></i>&nbsp;Início</Button>
+                    <Button @click="router.push('/')" link class="lg:text-xl font-medium mb-0"><i class="pi pi-backward"></i>&nbsp;Início</Button>
                 </div>
             </div>
         </div>

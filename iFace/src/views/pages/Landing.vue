@@ -2,6 +2,8 @@
 import { useLayout } from '@/layout/composables/layout';
 import { computed } from 'vue';
 import AppConfig from '@/layout/AppConfig.vue';
+import { useRouter } from 'vue-router';
+const router = useRouter()
 
 const { layoutConfig } = useLayout();
 
@@ -59,9 +61,9 @@ const logoUrl = computed(() => {
                     </ul>
                     <div
                         class="flex justify-content-between lg:block border-top-1 lg:border-top-none surface-border py-3 lg:py-0 mt-3 lg:mt-0">
-                        <Button label="SignIn" @click="this.$router.push('/signin')"
+                        <Button label="SignIn" @click="router.push('/signin')"
                             class="p-button-text p-button-rounded border-none font-light line-height-2 text-blue-500"></Button>
-                        <Button label="SignUp" @click="this.$router.push('/signup')"
+                        <Button label="SignUp" @click="router.push('/signup')"
                             class="p-button-rounded border-none ml-5 font-light text-white line-height-2 bg-blue-500"></Button>
                     </div>
                 </div>
