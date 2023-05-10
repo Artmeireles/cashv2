@@ -1,9 +1,0 @@
-es_params (
-    ambiente            boolean,
-    cnpj_sh             varchar(14) not null,
-    token_sh            varchar(255) not null,
-    ver_process  		varchar(255) not null,
-    id_orgao		    int not null,
-    cnpj_transmissor    varchar(14) not null,
-    cnpj_efr 			varchar(14) not null
-);

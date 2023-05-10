@@ -20,6 +20,7 @@ import Menubar from 'primevue/menubar';
 
 import '@/assets/app.css'
 import '@/assets/styles.scss';
+import 'primeflex/primeflex.scss';
 import "primevue/resources/primevue.min.css"
 import "primeicons/primeicons.css"
 

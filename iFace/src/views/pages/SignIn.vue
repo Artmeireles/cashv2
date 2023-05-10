@@ -19,7 +19,7 @@
                                 acessar</span>
                         </div>
                         <div v-if="!store.userStore.id" class="flex flex-column gap-2 mb-5">
-                            <label for="email1" class="block text-900 text-xl font-medium mb-2">Email ou CPF</label>
+                            <label for="email1" class="block text-900 text-xl font-medium mb-2">E-mail ou CPF</label>
                             <InputText id="email1" type="text" placeholder="Seu email ou CPF" class="w-full md:w-30rem "
                                 style="padding: 1rem" v-model="email" />
                             <small id="username-help">Informe seu e-mail ou CPF para acessar.</small>

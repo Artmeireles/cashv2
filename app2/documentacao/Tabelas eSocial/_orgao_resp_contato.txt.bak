@@ -1,5 +1,0 @@
-_orgao_resp_contato (
-	id_orgao_resp 	int not null
-	tipo 			boolean not null comment('1-Telefone, 2-email, 3-Rede Social, 4-Site')
-	contato 		varchar(255)
-)

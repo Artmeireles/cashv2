@@ -4,7 +4,7 @@ export const appName = 'Cash'
 export const dbPrefix = 'wwmgca'
 export const noPermissAccess = 'Ops!!! Parece que seu perfil não dá acesso a essa operação'
 
-export function emailOrError(email) {
+export function isValidEmail(email) {
   const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   return emailRegexp.test(email)
 }
@@ -79,6 +79,6 @@ export function titleCase(str) {
 
 export default {
   userKey, appName, dbPrefix, noPermissAccess,
-  emailOrError, highlight, removeMark, downloadFile,
+  isValidEmail, highlight, removeMark, downloadFile,
   setValidCep, titleCase
 }
