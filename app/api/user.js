@@ -8,7 +8,7 @@ const moment = require('moment')
 const { Stats } = require('fs')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, cpfOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isEmailOrError, isCelPhoneOrError, cpfOrError, isValue } = app.api.validation
     const { titleCase } = app.api.facilities
     const { transporter } = app.api.mailer
     const tabela = `users`
@@ -22,6 +22,208 @@ module.exports = app => {
     const encryptPassword = password => {
         const salt = bcrypt.genSaltSync(10)
         return bcrypt.hashSync(password, salt)
+    }
+
+    const signup = async (req, res) => {
+        /**
+         * Esta função vai tratar as seguintes situações de signup
+         * 
+         * #1 - Se o solicitante já tem perfil, então deve redirecionar para a tela de login
+         * #2 - Se não tem perfil tenta localizar nos schemas dos clientes e se localizado:
+         *      I - Se não tem um telefone válido deve informar que deve corrigir isso antes de prosseguir
+         *      II - Se tiver um telefone válido informado
+         *          a) Deve localizar entre os schemas dos clientes e devolver os dados para então prosseguir com a criação da senha
+         *          b) Se não tem um email válidop deve sugerir a inclusão
+         * #3 - Se não tem perfil e não é localizado nos schemas dos clientes todos os dados tornam-se obrigatórios
+         */
+        const body = { ...req.body }
+        let registred = false;
+        try {
+            existsOrError(body.cpf, 'CPF não informado')
+            body.cpf = body.cpf.replace(/([^\d])+/gim, "")
+            cpfOrError(body.cpf, 'CPF inválido')
+        } catch (error) {
+            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+            return res.status(400).send(error)
+        }
+
+        /**
+         * Se o e-mail for informado vazio exclui do body
+         */
+        if (!(!!body.email)) delete body.email
+
+        /**
+         * Tenta localizar o usuário a partir do cpf informado
+         */
+        const userFromDB = await app.db(tabela)
+            .select('id', 'email', 'name', 'cpf', 'status')
+            .where({ cpf: body.cpf }).first()
+        const isStatusActive = (userFromDB && userFromDB.status == STATUS_ACTIVE) || false
+
+        /**
+         * #1 - Se o solicitante já tem perfil:
+         *      a) Se é um usuário ativo então deve redirecionar para a tela de login
+         *      b) Se ainda necessita confirmar o token de acesso deve ser informado
+         */
+        if (userFromDB && userFromDB.id) {
+            registred = true
+            let msg = `O CPF informado já se encontra registrado. `
+            if (isStatusActive)
+                msg += `Por favor prossiga para o login ou se esqueceu sua senha então poderá recuperá-la.`
+            else
+                msg += `Mas o sistema ainda não recebeu o seu token de confirmação.`
+            return res.status(200).send({
+                registred: registred,
+                isStatusActive: isStatusActive,
+                msg: msg,
+                data: userFromDB
+            })
+        }
+
+        /**
+         * Se for informado um e-mail, faz a validação e 
+         * bloqueia a duplicidade de e-mails
+         */
+        if (body.email)
+            try {
+                isEmailOrError(body.email, 'E-mail informado está num formato inválido')
+                const userEmail = await app.db(tabela).where({ email: body.email }).first()
+                if (userEmail && !isStatusActive) notExistsOrError(userEmail.email, 'E-mail já registrado')
+            } catch (error) {
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+                return res.status(400).send(error)
+            }
+
+        /**
+         * #2 - Se não tem perfil e já informou os dados necessários para a criação do perfil:
+         */
+        if (body.client && body.domain && body.celular && body.cpf) {
+            /**
+             * Se body.id NÃO for informado então não é servidor. Nesse caso body.email torna-se obrigatório
+             */
+            if (!(!!(body.id || body.email))) {
+                try {
+                    existsOrError(body.email, 'E-mail obrigatório não informado')
+                } catch (error) {
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+                    return res.status(400).send(error)
+                }
+            } else {
+                /**
+                 * Bloqueia a duplicidade de celulares
+                 */
+                if (body.celular)
+                    try {
+                        isCelPhoneOrError(body.celular, 'Número de celular informado é inválido')
+                        const userCelPhone = await app.db(tabela).select('telefone').where({ telefone: body.celular }).first()
+                        if (userCelPhone) notExistsOrError(userCelPhone.telefone, 'Celular já registrado')
+                    } catch (error) {
+                        app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+                        return res.status(400).send(error)
+                    }
+
+                // Dados necessários agrupados
+                // Criação de um novo registro
+                const nextEventID = await app.db('sis_events').select(app.db.raw('count(*) as count')).first()
+
+                body.evento = nextEventID.count + 1
+                // Variáveis da criação de um novo registro
+                body.status = STATUS_INACTIVE
+                body.created_at = new Date()
+                body.f_ano = body.created_at.getFullYear()
+                body.f_mes = body.created_at.getMonth().toString().padStart(2, "0")
+                body.f_complementar = '000'
+                body.id_cadas = body.id
+                body.name = body.nome
+                body.telefone = body.celular
+                body.cliente = body.client
+                body.dominio = body.domain
+
+                delete body.id
+                delete body.nome
+                delete body.celular
+                delete body.client
+                delete body.domain
+                delete body.clientName
+                const expiresIn = Math.floor(Date.now() / 1000) + 300
+                body.sms_token = `${crypto.randomBytes(3).toString('hex')}_${expiresIn}`
+                app.db(tabela)
+                    .insert(body)
+                    .then(async (ret) => {
+                        mailyNew(body)
+                        body.id = ret[0]
+                        req.body = body
+                        smsToken(req)
+                        // registrar o evento na tabela de eventos
+                        const { createEventIns } = app.api.sisEvents
+                        createEventIns({
+                            "notTo": ['created_at', 'password', 'password_reset_token', 'evento'],
+                            "next": body,
+                            "request": req,
+                            "evento": {
+                                "evento": `Novo perfil de usuário`,
+                                "tabela_bd": "user",
+                            }
+                        })
+
+                        app.api.logger.logInfo({ log: { line: `Novo de perfil de usuário! Usuário: ${body.name}`, sConsole: true } })
+                        return res.json(body)
+                    })
+                    .catch(error => {
+                        app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+                        return res.status(500).send(error)
+                    })
+            }
+        }
+        /**
+         * #2 - Se não tem perfil e não informou os dados necessários para a criação do perfil:
+         *      a) vai para a localização dos dados nos schemas dos clientes
+        */
+        else {
+            const cad_servidor = {
+                data: {}
+            }
+            const clientServidor = {}
+            const clientNames = await app.db(tabelaParams)
+                .where({ dominio: 'root', meta: 'clientName', status: 10 })
+                .whereNot({ value: 'root' })
+            for (let client = 0; client < clientNames.length; client++) {
+                const clientName = clientNames[client].value;
+                const domainNames = await app.db(tabelaParams)
+                    .where({ dominio: clientName, meta: 'domainName', status: 10 })
+                    .whereNot({ value: 'root' })
+                for (let domain = 0; domain < domainNames.length; domain++) {
+                    const domainName = domainNames[domain].value;
+                    const tabelaCadServidoresDomain = `${dbPrefix}_${clientName}_${domainName}.cad_servidores`
+                    const tabelaFinSFuncionalDomain = `${dbPrefix}_${clientName}_${domainName}.fin_sfuncional`
+                    const cad_servidores = await app.db({ cs: tabelaCadServidoresDomain })
+                        .select('cs.id', 'cs.cpf', 'cs.nome', 'cs.email', 'cs.celular')
+                        .join({ ff: `${tabelaFinSFuncionalDomain}` }, function () {
+                            this.on(`ff.id_cad_servidores`, `=`, `cs.id`)
+                        })
+                        .where({ 'cs.cpf': body.cpf.replace(/([^\d])+/gim, "") })
+                        .andWhere(app.db.raw(`ff.situacaofuncional is not null and ff.situacaofuncional > 0 and ff.mes < 13`))
+                        .first()
+                        .orderBy('ff.ano', 'desc')
+                        .orderBy('ff.mes', 'desc')
+                        .limit(1)
+                    clientServidor.client = clientName
+                    clientServidor.domain = domainName
+                    clientServidor.clientName = domainNames[domain].label
+
+                    if (cad_servidores) {
+                        cad_servidor.data = { ...cad_servidores, ...clientServidor }
+                        break
+                    }
+                }
+                if (cad_servidor.data.id) {
+                    if (cad_servidor.data.celular.replace(/([^\d])+/gim, "").length == 11)
+                        return res.json(cad_servidor.data)
+                    else
+                        return res.json({ msg: `O servidor ${titleCase(cad_servidor.data.nome)} foi localizado nos registro do município de ${clientServidor.clientName}, mas não tem um telefone celular válido registrado. Antes de prosseguir com o registro será necessário procurar o RH/DP de sua fonte pagadora para regularizar seu registro` })
+                }
+            }
+        }
     }
 
     const save = async (req, res) => {
@@ -65,7 +267,7 @@ module.exports = app => {
                 }
 
                 if (!user.id) {
-                    notExistsOrError(userFromDB, 'Email ou CPF já registrado')
+                    notExistsOrError(userFromDB, 'E-mail ou CPF já registrado')
                 }
             } catch (error) {
                 console.log(error);
@@ -75,7 +277,7 @@ module.exports = app => {
         if (user.email && user.email.trim.length == 0)
             delete user.email
 
-        if (user.email && !emailOrError(user.email))
+        if (user.email && !isValidEmail(user.email))
             return res.status(400).send('E-mail inválido')
 
         if (user.password && user.confirmPassword)
@@ -177,150 +379,6 @@ module.exports = app => {
                 })
         }
     }
-
-    const signup = async (req, res) => {
-        const body = { ...req.body }
-        try {
-            existsOrError(body.cpf, 'CPF não informado')
-            cpfOrError(body.cpf, 'CPF inválido')
-            if (body.email) if (!emailOrError(body.email)) throw 'Email informado está num formato inválido'
-        } catch (error) {
-            return res.status(400).send(error)
-        }
-        // Primeiro verifica se o usuário informou todos os dados obrigatórios para o registro
-        if (body.client && body.domain && body.id && body.celular) {
-            // Dados necessários localizados
-            // Criação de um novo registro
-            const nextEventID = await app.db('sis_events').select(app.db.raw('count(*) as count')).first()
-
-            body.evento = nextEventID.count + 1
-            // Variáveis da criação de um novo registro
-            body.status = STATUS_INACTIVE
-            body.created_at = new Date()
-            body.f_ano = body.created_at.getFullYear()
-            body.f_mes = body.created_at.getMonth().toString().padStart(2, "0")
-            body.f_complementar = '000'
-            body.name = body.nome
-            body.telefone = body.celular
-            body.cliente = body.client
-            body.dominio = body.domain
-            if (!emailOrError(body.email)) delete body.email
-            delete body.id
-            delete body.nome
-            delete body.celular
-            delete body.client
-            delete body.domain
-            delete body.clientName
-            const expiresIn = Math.floor(Date.now() / 1000) + 300
-            body.sms_token = `${crypto.randomBytes(3).toString('hex')}_${expiresIn}`
-            app.db(tabela)
-                .insert(body)
-                .then(async (ret) => {
-                    mailyNew(body)
-                    body.id = ret[0]
-                    req.body = body
-                    smsToken(req)
-                    // registrar o evento na tabela de eventos
-                    const { createEventIns } = app.api.sisEvents
-                    createEventIns({
-                        "notTo": ['created_at', 'password', 'password_reset_token', 'evento'],
-                        "next": body,
-                        "request": req,
-                        "evento": {
-                            "evento": `Novo perfil de usuário`,
-                            "tabela_bd": "user",
-                        }
-                    })
-
-                    app.api.logger.logInfo({ log: { line: `Novo de perfil de usuário! Usuário: ${body.name}`, sConsole: true } })
-                    return res.json(body)
-                })
-                .catch(error => {
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
-                })
-        } else {
-            // Caso os dados obrigatórios não tenha sido dados então vai para a localização e validação
-            const cad_servidor = {
-                data: {}
-            }
-            const clientServidor = {}
-            body.cpf = body.cpf.replace(/([^\d])+/gim, "")
-            const userFromDB = await app.db(tabela)
-                .select('id', 'email', 'name', 'cpf')
-                .where({ cpf: body.cpf }).first()
-
-            // Se o usuário já estiver registrado
-            if (userFromDB && userFromDB.id) {
-                return res.status(200).send({
-                    registred: true, msg: `O CPF informado já se encontra registrado. Por favor prossiga para o login ou se esqueceu sua senha então poderá recuperá-la`,
-                    data: userFromDB
-                })
-            }
-            // Se o usuário não estiver registrado
-            if (!userFromDB) {
-                const clientNames = await app.db(tabelaParams)
-                    .where({ dominio: 'root', meta: 'clientName', status: 10 })
-                    .whereNot({ value: 'root' })
-                for (let client = 0; client < clientNames.length; client++) {
-                    const clientName = clientNames[client].value;
-                    const domainNames = await app.db(tabelaParams)
-                        .where({ dominio: clientName, meta: 'domainName', status: 10 })
-                        .whereNot({ value: 'root' })
-                    for (let domain = 0; domain < domainNames.length; domain++) {
-                        const domainName = domainNames[domain].value;
-                        const tabelaCadServidoresDomain = `${dbPrefix}_${clientName}_${domainName}.cad_servidores`
-                        const tabelaFinSFuncionalDomain = `${dbPrefix}_${clientName}_${domainName}.fin_sfuncional`
-                        const cad_servidores = await app.db({ cs: tabelaCadServidoresDomain })
-                            .select('cs.id', 'cs.cpf', 'cs.nome', 'cs.email', 'cs.celular')
-                            .join({ ff: `${tabelaFinSFuncionalDomain}` }, function () {
-                                this.on(`ff.id_cad_servidores`, `=`, `cs.id`)
-                            })
-                            .where({ 'cs.cpf': body.cpf.replace(/([^\d])+/gim, "") })
-                            .andWhere(app.db.raw(`ff.situacaofuncional is not null and ff.situacaofuncional > 0 and ff.mes < 13`))
-                            .first()
-                            .orderBy('ff.ano', 'desc')
-                            .orderBy('ff.mes', 'desc')
-                            .limit(1)
-                        clientServidor.client = clientName
-                        clientServidor.domain = domainName
-                        clientServidor.clientName = domainNames[domain].label
-
-                        if (cad_servidores) {
-                            cad_servidor.data = { ...cad_servidores, ...clientServidor }
-                            break
-                        }
-                    }
-                    if (cad_servidor.data.id) {
-                        if (cad_servidor.data.celular.replace(/([^\d])+/gim, "").length == 11)
-                            return res.json(cad_servidor.data)
-                        else
-                            return res.json({ msg: `O servidor ${titleCase(cad_servidor.data.nome)} foi localizado nos registro do município de ${clientServidor.clientName}, mas não tem um telefone registrado. Antes de prosseguir com o registro será necessário procurar o RH/DP de sua fonte pagadora para regularizar seu registro` })
-                    }
-                }
-
-
-                try {
-                    existsOrError(body.name, 'Nome não informado')
-                    existsOrError(body.email, 'E-mail não informado')
-                    existsOrError(body.telefone, 'Telefone não informado')
-                    if ((body.password || body.confirmPassword) && body.password != body.confirmPassword) {
-                        existsOrError(body.password, 'Senha não informada')
-                        existsOrError(body.confirmPassword, 'Confirmação de Senha inválida')
-                        equalsOrError(body.password, body.confirmPassword, 'Senhas não conferem')
-                    }
-                } catch (error) {
-                    console.log(error);
-                    return res.status(400).send(error)
-                }
-
-                if (!cad_servidor.data.id) {
-                    return res.json({ found: false, data: "Não foi encontrado um servidor com esse CPF em nossos registros! Por favor, informe os dados a seguir inclusive o seu email corporativo" })
-                }
-            }
-        }
-    }
-
 
     const unlock = async (req, res) => {
         const user = {}
@@ -588,13 +646,14 @@ module.exports = app => {
 
     const getByCpf = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
-        if (req.user.id != req.params.id && uParams.cadastros < 1) return res.status(401).send('Unauthorized')
+        try {
+            cpfOrError()
+        } catch (error) {
+
+        }
         app.db(tabela)
-            // .select('users.id', 'users.status', 'users.evento', 'users.created_at', 'users.updated_at', 'dominio', 'cliente', 'email', 'telefone',
-            //     'name', 'cpf', 'admin', 'gestor', 'tipoUsuario', 'multiCliente')
-            .where(app.db.raw(`users.cpf = ${req.params.cpf}`))
-            .where(app.db.raw(`users.status = ${STATUS_ACTIVE}`))
+            .select('dominio', 'cliente', 'email', 'telefone', 'name', 'cpf')
+            .where({ cpf: req.params.cpf, status: STATUS_ACTIVE })
             .first()
             .then(users => {
                 return res.json(users)
@@ -751,7 +810,7 @@ module.exports = app => {
                 <p>Atenciosamente,</p>
                 <p><b>Time ${appName}</b></p>`,
             }).then(_ => {
-                if (body.sendRes && body.sendRes == 1) res.send("Email enviado com sucesso! Por favor verifique sua caixa de entrada.")
+                if (body.sendRes && body.sendRes == 1) res.send("E-mail enviado com sucesso! Por favor verifique sua caixa de entrada.")
             })
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } });

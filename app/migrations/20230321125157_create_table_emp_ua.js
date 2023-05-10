@@ -20,7 +20,7 @@ exports.up = function(knex) {
         table.string('nr', 255).notNull().comment("Número")
         table.string('complemento', 255).notNull().comment("Complemento")
         table.integer('id_emp_resp').notNull().unsigned().comment("Orgão Responsável")        
-        table.string('email', 255).comment("Email")
+        table.string('email', 255).comment("E-mail")
         table.string('telefone', 255).comment("Telefone")  
 
         table.foreign('id_emp').references('id').inTable('empresa').onUpdate('CASCADE').onDelete('NO ACTION')

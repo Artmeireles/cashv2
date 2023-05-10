@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, cnpjOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg, cnpjOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'es_params'
     const STATUS_ACTIVE = 10

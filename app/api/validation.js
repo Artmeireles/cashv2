@@ -2,6 +2,9 @@ const { cpf, cnpj } = require('cpf-cnpj-validator')
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
+
+    const noAccessMsg = 'Ops!!! Parece que seu perfil não dá acesso a essa operação'
+
     function cpfOrError(value, msg) {
         if (!cpf.isValid(value)) throw msg ? msg : "CPF inválido"
     }
@@ -16,8 +19,8 @@ module.exports = app => {
 
     function existsOrError(value, msg) {
         if (!value) throw msg
+        if (typeof value === 'string' && !value.trim().length > 0) throw msg
         if (Array.isArray(value) && value.length === 0) throw msg
-        if (typeof value === 'string' && !value.trim()) throw msg
     }
 
     function booleanOrError(value, msg) {
@@ -53,16 +56,18 @@ module.exports = app => {
         if (valueA == valueB) throw msg
     }
 
-    function isMatchOrError(valueMatch, msg) {
-        if (!valueMatch) throw msg
+    function isMatchOrError(value, msg) {
+        if (!value) throw msg
     }
 
-    function emailOrError(valueA) {
+    function isValidEmail(value) {
         const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-        return emailRegexp.test(valueA)
+        return emailRegexp.test(value)
     }
 
-    const noAccessMsg = 'Ops!!! Parece que seu perfil não dá acesso a essa operação'
+    function isEmailOrError(value, msg) {
+        if (!isValidEmail(value)) throw msg
+    }
 
     async function isParamOrError(meta, id) {
         const param = await app.db(`${dbPrefix}_api.params`)
@@ -71,14 +76,23 @@ module.exports = app => {
     }
 
     async function isCityOrError(id) {
-        const param = await app.db(`${dbPrefix}_api.cidades`) 
+        const param = await app.db(`${dbPrefix}_api.cidades`)
             .where({ 'status': 10, 'id': id }).first()
         if (param && param.id > 0) return true
     }
 
+    function isValidCelPhone(value) {
+        celular = value.replace(/([^\d])+/gim, "");
+        return celular.match(/^([14689][0-9]|2[12478]|3([1-5]|[7-8])|5([13-5])|7[193-7])9[0-9]{8}$/)
+    }
+
+    function isCelPhoneOrError(value, msg) {
+        if (!isValidCelPhone(value)) throw msg
+    }
+
     return {
-        cpfOrError, cnpjOrError, lengthOrError, existsOrError, booleanOrError,
-        valueOrError, valueMinorOrError, notExistsOrError, equalsOrError, diffOrError,
-        isMatchOrError, emailOrError, noAccessMsg, isParamOrError, isCityOrError
+        noAccessMsg, cpfOrError, cnpjOrError, lengthOrError, existsOrError, booleanOrError, valueOrError,
+        valueMinorOrError, notExistsOrError, equalsOrError, diffOrError, isMatchOrError,
+        isValidEmail, isEmailOrError, isParamOrError, isCityOrError, isValidCelPhone, isCelPhoneOrError
     }
 }

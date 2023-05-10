@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, cnpjOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg, cnpjOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'emp_ua'
     const STATUS_ACTIVE = 10
@@ -41,7 +41,7 @@ module.exports = app => {
             existsOrError(body.nr, 'Número não informado')
             existsOrError(body.complemento, 'Complemento não informado')
             existsOrError(body.id_emp_resp, 'Órgão Responsável não informado')
-            // existsOrError(body.email, 'Email não informado')
+            // existsOrError(body.email, 'E-mail não informado')
             // existsOrError(body.telefone, 'telefone não informado')
             if (body.cnpj) {
                 const dataFromDB = await app.db(tabelaDomain)

@@ -3,7 +3,7 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, emailOrError, isMatchOrError, noAccessMsg, cpfOrError, 
+    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg, cpfOrError, 
     isCityOrError, cnpjOrError, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const tabela = 'siap_publicacoes'

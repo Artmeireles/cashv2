@@ -44,7 +44,7 @@ module.exports = app => {
             existsOrError(body.logradouro, 'Logradouro não informado')
             existsOrError(body.nr, 'Número não informado')
             // existsOrError(body.complemento, 'Complemento não informado')
-            // existsOrError(body.email, 'Email não informado')
+            // existsOrError(body.email, 'E-mail não informado')
             // existsOrError(body.telefone, 'telefone não informado')
             // existsOrError(body.codigo_fpas, 'Código FPAS não informado')
             // existsOrError(body.codigo_gps, 'Código GPS não informado')

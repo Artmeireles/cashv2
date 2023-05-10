@@ -1,7 +1,7 @@
 const { appName } = require("../config/params")
 
 module.exports = app => {
-    const { existsOrError, emailOrError, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, isValidEmail, isMatchOrError, noAccessMsg } = app.api.validation
     const { transporter } = app.api.mailer
     const mailyCliSender = async(req, res) => {
         let mailBody = req.mail
@@ -10,9 +10,9 @@ module.exports = app => {
 
         try {
             existsOrError(mailBody.from, 'Remetente não informado')
-            emailOrError(mailBody.from, 'Remetente inválido')
+            isValidEmail(mailBody.from, 'Remetente inválido')
             existsOrError(mailBody.to, 'Destinatário não informado')
-            emailOrError(mailBody.to, 'Destinatário inválido')
+            isValidEmail(mailBody.to, 'Destinatário inválido')
             existsOrError(mailBody.subject, 'Assunto não informado')
             existsOrError(mailBody.message, 'Mensagem não informada')
         } catch (error) {
@@ -53,7 +53,7 @@ module.exports = app => {
             if (batch)
                 mailWork.then()
             else
-                mailWork.then(res.status(200).send('Email enviado.'))
+                mailWork.then(res.status(200).send('E-mail enviado.'))
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } });
             res.status(400).send(error)

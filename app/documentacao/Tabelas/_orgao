@@ -42,7 +42,7 @@ exports.up = function(knex) {
         table.string('logradouro', 255).notNull().comment("Logradouro")
         table.string('nr', 255).notNull().comment("Número")
         table.string('complemento', 255).comment("Complemento")
-        table.string('email', 255).comment("Email")
+        table.string('email', 255).comment("E-mail")
         table.string('telefone', 255).comment("Telefone")
         table.string('codigo_fpas', 40).comment("Códigos e Alíquotas de FPAS")
         table.string('codigo_gps', 40).comment("Códigos ?")
