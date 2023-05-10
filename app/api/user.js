@@ -33,8 +33,8 @@ module.exports = app => {
          *      I - Se não tem um telefone válido deve informar que deve corrigir isso antes de prosseguir
          *      II - Se tiver um telefone válido informado
          *          a) Deve localizar entre os schemas dos clientes e devolver os dados para então prosseguir com a criação da senha
-         *          b) Se não tem um email válidop deve sugerir a inclusão
-         * #3 - Se não tem perfil e não é localizado nos schemas dos clientes todos os dados tornam-se obrigatórios
+         *          b) Se não tem um email válido deve sugerir a inclusão. Isso deve ocorrer no frontend
+         * #3 - Se não tem perfil e não é localizado nos schemas dos clientes todos os dados tornam-se obrigatórios exceto o id
          */
         const body = { ...req.body }
         let registred = false;
