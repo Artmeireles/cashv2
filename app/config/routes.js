@@ -21,15 +21,19 @@ module.exports = app => {
     /**
      * Rotas de usuários
      */
+    // Solocitação de tokens de reset
     app.route('/request-password-reset').post(app.api.user.requestPasswordReset)
-    app.route('/password-reset/:token').put(app.api.user.passwordReset)
-    app.route('/user-unlock/:token')
+    // Entrega do token de reset e desbloqueio
+    app.route('/password-reset/:id').put(app.api.user.passwordReset)
+    // Desbloqueio de usuário por token 
+    app.route('/user-unlock/:id')
         .get(app.api.user.unlock)
         .post(app.api.user.unlock)
-    // Rota utilizada para reenvio do token por SMS
-    app.route('/user-sms-unlock').post(app.api.user.smsToken)
+    // Rotas utilizadas para envio do token por SMS e email
+    app.route('/user-sms-unlock').patch(app.api.user.smsToken)
+    app.route('/user-mail-unlock').patch(app.api.user.mailyToken)
+
     app.route('/user-token/:token').get(app.api.user.getByToken)
-    app.post('/user-resend-unlock', app.api.user.mailyToken)
     app.route('/desk-users').get(app.api.user.getDeskUser)
     app.route('/users/f-a/:func')
         .all(app.config.passport.authenticate())

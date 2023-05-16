@@ -30,6 +30,11 @@ module.exports = app => {
             .orWhere({ 'u.name': email })
             .orWhere({ 'u.cpf': email.replace(/([^\d])+/gim, "") })
             .first()
+        try {
+            existsOrError(user, await showRandomMessage())
+        } catch (error) {
+            return res.status(400).send(error)
+        }            
 
         /**
          * Prazo de expiração da senha

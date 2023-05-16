@@ -294,7 +294,6 @@ module.exports = app => {
         const evento = await createEvent({
             "request": req,
             "evento": {
-                "ip": req.ip,
                 "id_user": thisUser.id,
                 "evento": `Criação de token de troca de senha de usuário`,
                 "classevento": `requestPasswordReset`,
@@ -342,15 +341,22 @@ module.exports = app => {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
             return res.status(400).send(error)
         }
-
-        // Localiza o token no banco de dados
-        const userFromDB = await app.db({ u: tabela })
-            .where({ password_reset_token: req.params.token }).first()
-        if (!userFromDB) return res.status(400).send('Token inválido!')
+        if (!(req.query.tkn || (req.body && req.body.token)))
+            return res.status(400).send(await showRandomMessage() || 'Token ausente, inválido ou não corresponde a nenhuma conta em nosso sistema')
+        const token = req.query.tkn || req.body.token
+        const userFromDB = await app.db(tabela)
+            .select('id', 'status', 'email', 'sms_token', 'password_reset_token', 'name')
+            .where({ id: req.params.id })
+            .where(function () {
+                this.where({ password_reset_token: token })
+                    .orWhere(app.db.raw(`sms_token like "${token}%"`))
+            }).first()
+        if (!(userFromDB))
+            return res.status(400).send(await showRandomMessage() || 'Token informado é inválido ou não correspondem a nenhuma conta em nosso sistema')
 
         // verifica se o token é válido em relação ao tempo de criação
         const now = Math.floor(Date.now() / 1000)
-        if (userFromDB.password_reset_token.substring(28, 10) < now)
+        if (userFromDB.password_reset_token.split('_')[1] < now)
             return res.status(400).send('Token expirado!')
 
         // Localiza as últimas 
@@ -393,7 +399,6 @@ module.exports = app => {
         const evento = await createEvent({
             "request": req,
             "evento": {
-                "ip": req.ip,
                 "id_user": userFromDB.id,
                 "evento": `Nova de senha do usuário ${userFromDB.id} ${userFromDB.email}`,
                 "classevento": `password-reset`,
@@ -438,25 +443,24 @@ module.exports = app => {
      * @returns 
      */
     const unlock = async (req, res) => {
-        console.log(req.body, req.params);
-        // Utilizado para autorizar o usuário
+        if (!(req.query.tkn || (req.body && req.body.token)))
+            return res.status(400).send(await showRandomMessage() || 'Token ausente, inválido ou não corresponde a nenhuma conta em nosso sistema')
+        const token = req.query.tkn || req.body.token
         const userFromDB = await app.db(tabela)
             .select('id', 'status', 'email', 'sms_token', 'name')
+            .where({ id: req.params.id })
             .where(function () {
-                if (req.body && req.body.token)
-                    this.where({ password_reset_token: req.params.token })
-                        .orWhere({ sms_token: req.params.token })
-                        .orWhere({ sms_token: req.body.token.split('_')[0] })
-                else
-                    this.where({ password_reset_token: req.params.token })
-                        .orWhere({ sms_token: req.params.token })
+                this.where({ password_reset_token: token })
+                    .orWhere(app.db.raw(`sms_token like "${token}%"`))
             }).first()
+        // console.log(userFromDB.toString());
+        // console.log(userFromDB);
 
         if (!(userFromDB))
             return res.status(400).send(await showRandomMessage() || 'Token informado é inválido ou não correspondem a nenhuma conta em nosso sistema')
 
         const now = Math.floor(Date.now() / 1000)
-        let expirationTimOk = Number(req.params.token.split('_')[1]) > now
+        let expirationTimOk = Number(userFromDB.sms_token.split('_')[1]) > now
 
         if (!expirationTimOk)
             return res.status(200).send('O token informado é inválido ou já foi utilizado')
@@ -495,6 +499,198 @@ module.exports = app => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(500).send(error)
             })
+    }
+
+    /**
+     * Função utilizada para envio/reenvio do token por SMS
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
+    const smsToken = async (req, res) => {
+        const body = { ...req.body }
+        const now = Math.floor(Date.now() / 1000)
+
+        const userFromDB = await app.db('users')
+            .where(function () {
+                if (body.id) this.where({ id: body.id })
+                else this.orWhere({ email: body.email })
+                    .orWhere({ cpf: body.email })
+            }).first()
+        if (!(userFromDB))
+            return res.status(400).send(await showRandomMessage() || 'Dados informados não correspondem a nenhuma conta em nosso sistema')
+        const expired = !userFromDB.sms_token || userFromDB.sms_token.split('_')[1] < now
+
+        if (!expired) body.sms_token = userFromDB.sms_token
+        else body.sms_token = randomstring.generate(8) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+        token = body.sms_token.split('_')[0]
+        try {
+            const url = "https://sms.comtele.com.br/api/v2/send"
+            moment().locale('pt-br')
+            const data = {
+                "Sender": "MGCash.app.br",
+                "Receivers": userFromDB.telefone,
+                "Content": `Para liberar seu acesso ao mgcash.app.br, utilize o código: ${token}${userFromDB.email ? ' ou o link que também foi enviado para o email de registro' : ''}`
+            }
+            const config = {
+                headers: {
+                    'content-type': 'application/json',
+                    'auth-key': '7bc83b13-030f-4700-b56a-7352590d5a8c'
+                },
+            }
+            const response = await axios.post(url, data, config)
+            // const responseData = response.data;
+            if (expired) {
+                const bodyRes = userFromDB
+                bodyRes.sms_token = body.sms_token
+                const { createEventUpd } = app.api.sisEvents
+                const evento = await createEventUpd({
+                    "notTo": ['created_at'],
+                    "last": userFromDB,
+                    "next": bodyRes,
+                    "request": req,
+                    "evento": {
+                        "classevento": "smsToken",
+                        "evento": `Geração e envio de token SMS`,
+                        "tabela_bd": "user",
+                    }
+                })
+                bodyRes.evento = evento
+                app.db('users').update(bodyRes).where({ id: bodyRes.id }).then()
+            }
+            if (req.method === 'PATCH') res.send(`SMS enviado com sucesso para o celular ${userFromDB.telefone}`)
+            else return token
+        } catch (error) {
+            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+            return res.status(400).send(error)
+        }
+    }
+
+    /**
+     * Função utilizada para envio/reenvio do token por email
+     * @param {*} req 
+     * @param {*} res 
+     */
+    const mailyToken = async (req, res) => {
+        const body = req.method && req.method === 'PATCH' ? { ...req.body } : req
+        try {
+            const userFromDB = await app.db('users')
+                .where(function () {
+                    if (body.id) this.where({ id: body.id })
+                    else this.orWhere({ email: body.email })
+                        .orWhere({ cpf: body.email })
+                }).first()
+            existsOrError(userFromDB, await showRandomMessage())
+            token = userFromDB.password_reset_token
+            if (userFromDB.email)
+                await transporter.sendMail({
+                    from: `"${appName}" <contato@mgcash.app.br>`, // sender address
+                    to: `${userFromDB.email}`, // list of receivers
+                    subject: `Bem-vindo ao ${appName}`, // Subject line
+                    text: `Olá ${userFromDB.name}!\n
+                Estamos confirmando sua inscrição✔
+                Para liberar seu acesso, por favor acesse o link abaixo ou utilize o código ${userFromDB.sms_token.split('_')[0]} na tela de login.\n
+                ${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${token}\n
+                Atenciosamente,\nTime ${appName}`,
+                    html: `<p><b>Olá ${userFromDB.name}!</b></p>
+                <p>Estamos confirmando sua inscrição✔</p>
+                <p>Para liberar seu acesso utilize uma das seguinte opções:</p>
+                <ul>
+                <li>Clique <a href="${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${token}">aqui</a></li>
+                <li>Acesse o link ${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${token}</li>
+                <li>Ou utilize o código <strong><code>${userFromDB.sms_token.split('_')[0]}</code></strong> na tela de login</li>
+                </ul>
+                <p>Atenciosamente,</p>
+                <p><b>Time ${appName}</b></p>`,
+                }).then(_ => {
+                })
+            transporter.sendMail({
+                from: `"${appName}" <contato@mgcash.app.br>`, // sender address
+                to: `${emailAdmin}`, // list of receivers
+                subject: `Novo usuário ${appName}`, // Subject line
+                text: `Estamos confirmando a inscrição de um novo usuário\n
+                ${userFromDB.name}: ${userFromDB.email ? userFromDB.email : 'Não informado'}✔\n
+                Atenciosamente,\n
+                Time ${appName}`,
+                html: `<p>Estamos confirmando a inscrição de um novo usuário</p>
+                <p>${userFromDB.name}✔</p>
+                <p>Atenciosamente,</p>
+                <p><b>Time ${appName}</b></p>`,
+            }).then(_ => {
+                if (req.method === 'PATCH') res.send(`E-mail enviado com sucesso para ${userFromDB.email}! Por favor verifique sua caixa de entrada`)
+                else return userFromDB.password_reset_token
+            })
+        } catch (error) {
+            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+            return res.status(400).send(error)
+        }
+    }
+
+    /**
+     * Função utilizada para envio de email de atualização de senha
+     * @param {*} req 
+     * @param {*} res 
+     */
+    const mailyPasswordReset = async (req, res) => {
+        try {
+            const user = await app.db(tabela)
+                .where({ email: req.email }).first()
+            existsOrError(user, await showRandomMessage())
+            await transporter.sendMail({
+                from: `"${appName}" <contato@mgcash.app.br>`, // sender address
+                to: `${user.email}`, // list of receivers
+                subject: `Alteração de senha ${appName}`, // Subject line
+                text: `Olá ${user.name}!\n
+                Para atualizar/criar sua senha, por favor acesse o link abaixo.\n
+                Lembre-se de que esse link tem validade de ${TOKEN_VALIDE_MINUTES} minutos.\n
+                ${baseFrontendUrl}/password-reset/${user.id}?tkn=${user.password_reset_token}\n
+                Atenciosamente,\nTime ${appName}`,
+                html: `<p><b>Olá ${user.name}!</b></p>
+                <p>Para atualizar/criar sua senha, por favor acesse o link abaixo.</p>
+                <p>Lembre-se de que esse link tem validade de ${TOKEN_VALIDE_MINUTES} minutos.</p>
+                ${user.sms_token ? `<p>Você necessitará informar o token a seguir para liberar sua nova senha: <strong>${user.sms_token.split('_')[0]}</strong></p>` : ''}
+                <a href="${baseFrontendUrl}/password-reset/${user.id}?tkn=${user.password_reset_token}">${baseFrontendUrl}/password-reset/${user.id}?tkn=${user.password_reset_token}</a>
+                <p>Atenciosamente,</p>
+                <p><b>Time ${appName}</b></p>`,
+            }).then(_ => {
+            })
+        } catch (error) {
+            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+            res.status(400).send(error)
+        }
+    }
+
+    /**
+     * Função utilizada para enviar email de confirmação de novo usuário
+     * @param {*} req 
+     * @param {*} res 
+     */
+    const mailyUnlocked = async (req, res) => {
+        try {
+            const user = await app.db(tabela)
+                .where({ email: req.email }).first()
+            existsOrError(user, await showRandomMessage())
+            await transporter.sendMail({
+                from: `"${appName}" <contato@mgcash.app.br>`, // sender address
+                to: `${user.email}`, // list of receivers
+                subject: `Usuário liberado`, // Subject line
+                text: `Olá ${user.name}!\n
+                Estamos felizes que conseguiu liberar seu acesso.\n
+                A partir de agora poderá acessar e utilizar o sistema.\n
+                Caso seja necessário, por favor, solicite ao seu administrador para liberar acesso aos dados.\n
+                Atenciosamente,\nTime ${appName}`,
+                html: `<p><b>Olá ${user.name}!</b></p>
+                <p>Estamos felizes que conseguiu liberar seu acesso.</p>
+                <p>A partir de agora poderá acessar e utilizar o sistema.</p>
+                <p>Caso seja necessário, por favor, solicite ao seu administrador para liberar acesso aos dados.</p>
+                <p>Atenciosamente,</p>
+                <p><b>Time ${appName}</b></p>`,
+            }).then(_ => {
+            })
+        } catch (error) {
+            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+            res.status(400).send(error)
+        }
     }
 
     const save = async (req, res) => {
@@ -651,7 +847,6 @@ module.exports = app => {
         }
     }
 
-
     const limit = 20 // usado para paginação
     const get = async (req, res) => {
         let user = req.user
@@ -805,188 +1000,6 @@ module.exports = app => {
             existsOrError(rowsUpdated, 'Usuário não foi encontrado')
 
             res.status(204).send()
-        } catch (error) {
-            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            res.status(400).send(error)
-        }
-    }
-
-    /**
-     * Função utilizada para envio/reenvio do token por SMS
-     * @param {*} req 
-     * @param {*} res 
-     * @returns 
-     */
-    const smsToken = async (req, res) => {
-        const body = { ...req.body }
-        const now = Math.floor(Date.now() / 1000)
-
-        const user = await app.db('users').where({ id: body.id }).first()
-        const expired = !user.sms_token || user.sms_token.split('_')[1] < now
-
-        if (!expired) body.sms_token = user.sms_token
-        else body.sms_token = randomstring.generate(8) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-        token = body.sms_token.split('_')[0]
-        try {
-            const url = "https://sms.comtele.com.br/api/v2/send"
-            moment().locale('pt-br')
-            const data = {
-                "Sender": "MGCash.app.br", "Receivers": body.celular || body.telefone,
-                "Content": `Para liberar seu acesso ao mgcash.app.br, utilize o código: ${token} ou o endereço ${baseFrontendUrl}/password-reset/${user.sms_token}${user.email ? ' que também foi enviado para o email ' + user.email : ''}`
-            }
-            const config = {
-                headers: {
-                    'content-type': 'application/json',
-                    'auth-key': '7bc83b13-030f-4700-b56a-7352590d5a8c'
-                },
-                // timeout: 1000,
-            }
-            const response = await axios.post(url, data, config)
-            const responseData = response.data;
-            if (expired) {
-                const bodyRes = user
-                bodyRes.sms_token = body.sms_token
-                const { createEventUpd } = app.api.sisEvents
-                const evento = await createEventUpd({
-                    "notTo": ['created_at'],
-                    "last": user,
-                    "next": bodyRes,
-                    "request": req,
-                    "evento": {
-                        "classevento": "smsToken",
-                        "evento": `Geração e envio de token SMS`,
-                        "tabela_bd": "user",
-                    }
-                })
-                bodyRes.evento = evento
-                app.db('users').update(bodyRes).where({ id: body.id }).then()
-            }
-            if (body.sendRes && body.sendRes == 1) res.send('SMS enviado com sucesso')
-            else return token
-        } catch (error) {
-            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            if (axios.isAxiosError(error)) {
-                console.log("Erro axios", error);
-            }
-            res.status(400).send(error)
-        }
-    }
-
-    /**
-     * Função utilizada para envio/reenvio do token por email
-     * @param {*} req 
-     * @param {*} res 
-     */
-    const mailyToken = async (req, res) => {
-        const body = { ...req.body }
-        try {
-            let sqlW = { cpf: body.cpf || req.cpf }
-            const user = await app.db(tabela).where(sqlW).first()
-            existsOrError(user, await showRandomMessage())
-            if (user.email)
-                await transporter.sendMail({
-                    from: `"${appName}" <contato@mgcash.app.br>`, // sender address
-                    to: `${user.email}`, // list of receivers
-                    subject: `Bem-vindo ao ${appName}`, // Subject line
-                    text: `Olá ${user.name}!\n
-                Estamos confirmando sua inscrição✔
-                Para liberar seu acesso, por favor acesse o link abaixo ou utilize o código ${user.sms_token.split('_')[0]} na tela de login.\n
-                ${baseFrontendUrl}/user-unlock/${user.password_reset_token}\n
-                Atenciosamente,\nTime ${appName}`,
-                    html: `<p><b>Olá ${user.name}!</b></p>
-                <p>Estamos confirmando sua inscrição✔</p>
-                <p>Para liberar seu acesso utilize uma das seguinte opções:</p>
-                <ul>
-                <li>Clique <a href="${baseFrontendUrl}/user-unlock/${user.password_reset_token}">aqui</a></li>
-                <li>Acesse o link ${baseFrontendUrl}/user-unlock/${user.password_reset_token}</li>
-                <li>Ou utilize o código <strong><code>${user.sms_token.split('_')[0]}</code></strong> na tela de login</li>
-                </ul>
-                <p>Atenciosamente,</p>
-                <p><b>Time ${appName}</b></p>`,
-                }).then(_ => {
-                })
-            await transporter.sendMail({
-                from: `"${appName}" <contato@mgcash.app.br>`, // sender address
-                to: `${emailAdmin}`, // list of receivers
-                subject: `Novo usuário ${appName}`, // Subject line
-                text: `Estamos confirmando a inscrição de um novo usuário\n
-                ${user.name}: ${user.email}✔\n
-                Atenciosamente,\n
-                Time ${appName}`,
-                html: `<p>Estamos confirmando a inscrição de um novo usuário</p>
-                <p>${user.name}✔</p>
-                <p>Atenciosamente,</p>
-                <p><b>Time ${appName}</b></p>`,
-            }).then(_ => {
-                if (body.sendRes && body.sendRes == 1) res.send("E-mail enviado com sucesso! Por favor verifique sua caixa de entrada.")
-            })
-        } catch (error) {
-            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } });
-            res.status(400).send(error)
-        }
-    }
-
-    /**
-     * Função utilizada para envio de email de atualização de senha
-     * @param {*} req 
-     * @param {*} res 
-     */
-    const mailyPasswordReset = async (req, res) => {
-        try {
-            const user = await app.db(tabela)
-                .where({ email: req.email }).first()
-            existsOrError(user, await showRandomMessage())
-            await transporter.sendMail({
-                from: `"${appName}" <contato@mgcash.app.br>`, // sender address
-                to: `${user.email}`, // list of receivers
-                subject: `Alteração de senha ${appName}`, // Subject line
-                text: `Olá ${user.name}!\n
-                Para atualizar/criar sua senha, por favor acesse o link abaixo.\n
-                Lembre-se de que esse link tem validade de ${TOKEN_VALIDE_MINUTES} minutos.\n
-                ${baseFrontendUrl}/password-reset/${user.password_reset_token}\n
-                Atenciosamente,\nTime ${appName}`,
-                html: `<p><b>Olá ${user.name}!</b></p>
-                <p>Para atualizar/criar sua senha, por favor acesse o link abaixo.</p>
-                <p>Lembre-se de que esse link tem validade de ${TOKEN_VALIDE_MINUTES} minutos.</p>
-                ${user.sms_token ? `<p>Você necessitará informar o token a seguir para liberar sua nova senha: <strong>${user.sms_token.split('_')[0]}</strong></p>` : ''}
-                <a href="${baseFrontendUrl}/password-reset/${user.password_reset_token}">${baseFrontendUrl}/password-reset/${user.password_reset_token}</a>
-                <p>Atenciosamente,</p>
-                <p><b>Time ${appName}</b></p>`,
-            }).then(_ => {
-            })
-        } catch (error) {
-            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            res.status(400).send(error)
-        }
-    }
-
-    /**
-     * Função utilizada para enviar email de confirmação de novo usuário
-     * @param {*} req 
-     * @param {*} res 
-     */
-    const mailyUnlocked = async (req, res) => {
-        try {
-            const user = await app.db(tabela)
-                .where({ email: req.email }).first()
-            existsOrError(user, await showRandomMessage())
-            await transporter.sendMail({
-                from: `"${appName}" <contato@mgcash.app.br>`, // sender address
-                to: `${user.email}`, // list of receivers
-                subject: `Usuário liberado`, // Subject line
-                text: `Olá ${user.name}!\n
-                Estamos felizes que conseguiu liberar seu acesso.\n
-                A partir de agora poderá acessar e utilizar o sistema.\n
-                Caso seja necessário, por favor, solicite ao seu administrador para liberar acesso aos dados.\n
-                Atenciosamente,\nTime ${appName}`,
-                html: `<p><b>Olá ${user.name}!</b></p>
-                <p>Estamos felizes que conseguiu liberar seu acesso.</p>
-                <p>A partir de agora poderá acessar e utilizar o sistema.</p>
-                <p>Caso seja necessário, por favor, solicite ao seu administrador para liberar acesso aos dados.</p>
-                <p>Atenciosamente,</p>
-                <p><b>Time ${appName}</b></p>`,
-            }).then(_ => {
-            })
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
             res.status(400).send(error)

@@ -29,7 +29,7 @@ module.exports = app => {
             evento.classevento = evento.classevento || "Update"
             evento.ip = request.userIp
             evento.geo_lt = request.userGeoLt
-            evento.geo_lg = request.userGeoLg
+            evento.geo_ln = request.userGeoLn
             evento.id_registro = last.id
             evento.created_at = new Date()
             if (request.user && request.user.id) {
@@ -42,6 +42,7 @@ module.exports = app => {
                 const dba = await app.db(tabelaSisEvents).insert(evento)
                 return dba[0]
             } catch (error) {
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 res.status(500).send(error)
             }
         }
@@ -67,7 +68,7 @@ module.exports = app => {
             evento.classevento = evento.classevento || "Insert"
             evento.ip = request.userIp
             evento.geo_lt = request.userGeoLt
-            evento.geo_lg = request.userGeoLg
+            evento.geo_ln = request.userGeoLn
             evento.id_registro = next.id
             evento.created_at = new Date()
             if (request.user && request.user.id) {
@@ -80,6 +81,7 @@ module.exports = app => {
                 const dba = await app.db(tabelaSisEvents).insert(evento)
                 return dba[0]
             } catch (error) {
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 res.status(500).send(error)
             }
         }
@@ -103,7 +105,7 @@ module.exports = app => {
             evento.classevento = evento.classevento || "Remove"
             evento.ip = request.userIp
             evento.geo_lt = request.userGeoLt
-            evento.geo_lg = request.userGeoLg
+            evento.geo_ln = request.userGeoLn
             evento.id_registro = last.id
             evento.created_at = new Date()
             if (request.user && request.user.id) {
@@ -116,6 +118,7 @@ module.exports = app => {
                 const dba = await app.db(tabelaSisEvents).insert(evento)
                 return dba[0]
             } catch (error) {
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 res.status(500).send(error)
             }
         }
@@ -124,10 +127,9 @@ module.exports = app => {
     const createEvent = async (req, res) => {
         const request = req.request
         const evento = req.evento
-        evento.id_user = !(request && request.user && request.user.id) ? last.id : request.user.id
         evento.ip = request.userIp
         evento.geo_lt = request.userGeoLt
-        evento.geo_lg = request.userGeoLg
+        evento.geo_ln = request.userGeoLn
         evento.created_at = new Date()
         if (request.user && request.user.id) {
             const user = await app.db({ u: 'users' }).select('cliente', 'dominio').where({ id: request.user.id }).first()
@@ -138,6 +140,7 @@ module.exports = app => {
             const dba = await app.db(tabelaSisEvents).insert(evento)
             return dba[0]
         } catch (error) {
+            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
             res.status(500).send(error)
         }
     }
