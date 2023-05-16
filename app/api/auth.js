@@ -1,175 +1,152 @@
 const { authSecret } = require('../.env')
 const jwt = require('jwt-simple')
-const bcrypt = require('bcrypt-nodejs')
-const { dbPrefix, jasperServerUrl, jasperServerU, jasperServerK } = require("../.env")
+const { STATUS_PASS_EXPIRED, STATUS_SUSPENDED_BY_TKN, MINIMUM_KEYS_BEFORE_CHANGE } = require("../config/userStatus")
 
 module.exports = app => {
     const tabela = 'users'
+    const tabelaKeys = 'users_keys'
     const { existsOrError } = app.api.validation
-    const tabelaParams = 'params'
+    const { diffInDays, comparePassword } = app.api.facilities
+    const { showRandomMessage, showRandomKeyPassMessage } = app.api.user
+
+    /**
+     * Operações de SignIn
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
     const signin = async (req, res) => {
-        const email = req.body.email || req.body.cpf
-        try{
-            existsOrError(email, 'E-mail ou CPF precisam ser informados')
+        const email = req.body.email || undefined
+        let password = req.body.password || undefined
+        try {
+            existsOrError(email, 'E-mail, nome ou CPF precisam ser informados')
         } catch (error) {
             return res.status(400).send(error)
         }
-        const cad_servidor = {
-            data: {}
-        }
 
-
-        let user = await app.db(tabela)
-            .select('users.*')
-            .orWhere({ email: email })
-            .orWhere({ name: email })
-            .orWhere({ cpf: email.replace(/([^\d])+/gim, "") })
+        let user = await app.db({ 'u': tabela })
+            .select('u.name', 'u.email', 'u.id', 'u.time_to_pas_expires', 'u.status')
+            .orWhere({ 'u.email': email })
+            .orWhere({ 'u.name': email })
+            .orWhere({ 'u.cpf': email.replace(/([^\d])+/gim, "") })
             .first()
-        if (user && !req.body.password) {
+
+        /**
+         * Prazo de expiração da senha
+         */
+        const days = user.time_to_pas_expires;
+
+        /**
+         * Verificar se a senha expirou
+         */
+        if (user && user.status == STATUS_PASS_EXPIRED) {
+            return res.status(400).send({
+                isStatusActive: false,
+                'msg': `Sua senha expirou. As senhas devem ser alteradas a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas 3 senhas utilizadas`
+            })
+        }
+
+        /**
+         * Verificar se foi solicitada a troca de senha
+         */
+        if (user && user.status == STATUS_SUSPENDED_BY_TKN) {
+            return res.status(400).send({
+                isStatusActive: false,
+                'msg': `Foi solicitada a troca de senha. Para sua segurança o seu acesso foi temporariamente suspenso. Por favor, verifique seu email ou SMS no ceular. Mesmo que não tenha solicitado isso, para sua segurança por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
+            })
+        }
+
+        /**
+         * Se o usuário está no primeiro estágio da operação ele apenas coloca o e-mail, cpf ou nome de usuário
+         * e o sistema retorna o email confirmando que pode seguir para a autenticação por senha
+         */
+        if (user && !password) {
             return res.status(200).send(user)
-        // } else {
-        //     return res.status(200).send('E-mail ou CPF não localizado!')
         }
 
-        if (!(email && req.body.password)) {
-            return res.status(400).send('Informe usuário e senha!')
-        }
-
+        /**
+         * Se não foi localizado um usuário com o dados informados, retorna a mensagem
+         */
         if (!user) {
-            const clientNames = await app.db(tabelaParams)
-                .where({ dominio: 'root', meta: 'clientName', status: 10 })
-                .whereNot({ value: 'root' })
-            for (let client = 0; client < clientNames.length; client++) {
-                const clientName = clientNames[client].value;
-                const domainNames = await app.db(tabelaParams)
-                    .where({ dominio: clientName, meta: 'domainName', status: 10 })
-                    .whereNot({ value: 'root' })
-                for (let domain = 0; domain < domainNames.length; domain++) {
-                    const domainName = domainNames[domain].value;
-
-                    const tabelaCadServidoresDomain = `${dbPrefix}_${clientName}_${domainName}.cad_servidores`
-                    const tabelaFinSFuncionalDomain = `${dbPrefix}_${clientName}_${domainName}.fin_sfuncional`
-                    // const cad_servidores = await app.db({ cs: tabelaCadServidoresDomain })
-                    //     .select(app.db.raw('cs.*'))
-                    //     .join({ ff: `${tabelaFinSFuncionalDomain}` }, function () {
-                    //         this.on(`ff.id_cad_servidores`, `=`, `cs.id`)
-                    //     })
-                    //     .where({ 'cs.cpf': email.replace(/([^\d])+/gim, "") })
-                    //     .andWhere(app.db.raw(`ff.situacaofuncional is not null and ff.situacaofuncional > 0 and ff.mes < 13`))
-                    //     .first()
-                    //     .orderBy('ff.ano', 'desc')
-                    //     .orderBy('ff.mes', 'desc')
-                    //     .limit(1)
-                    // const clientServidor = {
-                    //     cliente: clientName,
-                    //     dominio: domainName,
-                    //     clientName: domainNames[domain].label,
-                    // }
-                    // if (cad_servidores) {
-                    //     cad_servidor.data = { ...cad_servidores, ...clientServidor }
-                    // }
-                }
-            }
-        }
-        const servidor = cad_servidor.data
-
-        if (!(req.body.reload && req.body.reload === true)) { //typeof servidor.cpf === 'string'
-            if (!(user || (servidor && servidor.cpf))) return res.status(400).send('Servidor ou usuário não encontrado!')
-            if (user && user.status === 0) return res.status(201).send({ user: user, msg: 'Usuário aguardando liberação!' })
-            if (user && !req.body.password) return res.status(200).send({ id: user.id, cpf: user.cpf, email: user.email, name: user.name, status: user.status })
-            if (servidor && !req.body.password) {
-                // Signup de servidor
-                let newUser = {
-                    idCadas: servidor.id,
-                    id_cadas: servidor.id,
-                    telefone: servidor.celular,
-                    name: servidor.nome,
-                    dominio: servidor.dominio,
-                    cliente: servidor.cliente,
-                    clientName: servidor.clientName,
-                    cpf: servidor.cpf,
-                    telefone: servidor.celular,
-                    status: 0,
-                    tipoUsuario: 0,
-                    averbaOnline: 1
-                }
-                if (servidor.email && servidor.email.trim.length != 0)
-                    newUser = { ...newUser, email: servidor.email }
-                return res.status(200).send(newUser)
-            }
-            let isMatch = false
-            if (user) {
-                isMatch = bcrypt.compareSync(req.body.password, user.password)
-                // Ao acessar o sistema, o exercício liberado para o usuário tipo 0 ou 1 retorna ao último exercício fechado
-                if (isMatch && [0, 1].includes(user.tipoUsuario)) {
-                    const { dbPrefix } = require("../.env")
-                    const tabelaFinParametrosDomain = `${dbPrefix}_${user.cliente}_${user.dominio}.fin_parametros`
-                    lastFinParams = await app.db({ 'fp': tabelaFinParametrosDomain }).select('ano', 'mes')
-                        .where({ 'situacao': '0', 'complementar': '000' })
-                        .orderBy([
-                            { column: 'ano', order: 'desc' },
-                            { column: 'mes', order: 'desc' }
-                        ])
-                        .limit(1)
-                    app.db('users').update({
-                        f_ano: lastFinParams[0].ano,
-                        f_mes: lastFinParams[0].mes
-                    }).where({ id: user.id }).then()
-                    user.f_mes = lastFinParams[0].mes
-                    user.f_ano = lastFinParams[0].ano
-                }
-            }
-            if (!isMatch) return res.status(400).send('Dados inválidos!')
+            return res.status(400).send(await showRandomMessage() || 'Não conseguimos localizar um usuário com os dados informados')
         }
 
-        const now = Math.floor(Date.now() / 1000)
-        const uParams = await app.db('users').where({ id: user.id }).first();
-        const expirationTime = now + (60 * (uParams.admin >= 1 ? (60 * 8) : 60)) // 60 minutos de validade ou oito horas caso seja
-        const payload = {
-            id: user.id,
-            status: user.status,
-            name: user.name,
-            cpf: user.cpf,
-            idCadas: user.idCadas,
-            email: user.email,
-            telefone: user.telefone,
-            admin: user.admin,
-            gestor: user.gestor,
-            multiCliente: user.multiCliente,
-            tipoUsuario: user.tipoUsuario,
-            consignatario: user.consignatario,
-            averbaOnline: user.averbaOnline,
-            cliente: user.cliente,
-            dominio: user.dominio,
-            j_user: jasperServerU,
-            j_paswd: jasperServerK,
-            f_ano: user.f_ano,
-            f_mes: user.f_mes,
-            f_complementar: user.f_complementar,
-            tkn_api: user.tkn_api,
-            iat: now,
-            exp: expirationTime
-        }
+        /**
+         * Por fim, se o usuário foi encontrado e uma senha foi informada então segue para o teste e posterior login ou mensagem de erro de senha
+         */
 
-        res.json({
-            ...payload,
-            token: jwt.encode(payload, authSecret)
-        })
+        let isMatch = false
+        if (user && password) {
+            let userKeyPass = await app.db({ 'ut': tabelaKeys })
+                // .select('ut.password', 'ut.id', 'ut.created_at')
+                .where({ id_users: user.id })
+                .orderBy('ut.created_at', 'desc')
+                .first()
+            isMatch = comparePassword(password, userKeyPass.password)
 
-        app.api.logger.logInfo({ log: { line: `Login bem sucedido: ${user.name}`, sConsole: true } })
+            if (isMatch) {
+                const dateStr = userKeyPass.created_at;
+                /**
+                 * Verifica se o usuário tem controle de tempo de expiração de senha
+                 */
+                if (days > 0) {
+                    /**
+                     * Verifica o tempo da senha
+                    */
+                    if (diffInDays(dateStr, days)) {
+                        const passTime = diffInDays(dateStr) - 1
+                        msg = `Se passaram ${passTime} dias desde que criou sua senha. Ela deve ser alterada a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas 3 senhas utilizadas`
+                        app.api.logger.logInfo({ log: { line: `${user.name}: ${msg}`, sConsole: true } })
+                        await app.db(tabela)
+                            .update({ status: STATUS_PASS_EXPIRED })
+                            .where({ id: user.id })
+                        await app.db(tabelaKeys)
+                            .update({ status: STATUS_PASS_EXPIRED })
+                            .where({ id_users: user.id })
+                        return res.status(400).send({
+                            isStatusActive: false,
+                            'msg': msg
+                        })
+                    }
+                }
+                const now = Math.floor(Date.now() / 1000)
+                const uParams = await app.db('users').where({ id: user.id }).first();
+                const expirationTime = now + (60 * (uParams.admin >= 1 ? (60 * 8) : 60)) // 60 minutos de validade ou oito horas caso seja adm
+                const payload = {
+                    id: user.id,
+                    status: user.status,
+                    cpf: user.cpf,
+                    telefone: user.telefone,
+                    iat: now,
+                    exp: expirationTime
+                }
 
-        // registrar o evento na tabela de eventos
-        const { createEvent } = app.api.sisEvents
-        createEvent({
-            "request": req,
-            "evento": {
-                "ip": req.ip,
-                "id_user": user.id,
-                "evento": `Login no sistema`,
-                "classevento": `signin`,
-                "id_registro": null
+                res.json({
+                    ...payload,
+                    token: jwt.encode(payload, authSecret)
+                })
+
+                app.api.logger.logInfo({ log: { line: `Login bem sucedido: ${user.name}`, sConsole: true } })
+
+                // registrar o evento na tabela de eventos
+                const { createEvent } = app.api.sisEvents
+                createEvent({
+                    "request": req,
+                    "evento": {
+                        "id_user": user.id,
+                        "evento": `Login no sistema`,
+                        "classevento": `signin`,
+                        "id_registro": null
+                    }
+                })
             }
-        })
+            /**
+             * Se a senha digitada for errada
+             */
+            else {
+                return res.status(400).send(await showRandomKeyPassMessage() || 'A senha não está correta. Por favor tente novamente ou se não lembra, tente resetá-la')
+            }
+        }
     }
 
     const validateToken = async (req, res) => {
@@ -178,9 +155,10 @@ module.exports = app => {
             if (userData) {
                 const token = jwt.decode(userData.token, authSecret)
                 if (new Date(token.exp * 1000) > new Date()) {
+                    await
+                        app.api.logger.logInfo({ log: { line: `Token validado com sucesso`, sConsole: true } })
                     return res.send(true)
                 }
-                app.api.logger.logInfo({ log: { line: `Token validado com sucesso`, sConsole: true } })
             }
         } catch (e) {
             // problema com o token

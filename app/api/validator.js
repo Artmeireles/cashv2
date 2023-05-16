@@ -1,9 +1,5 @@
 const moment = require('moment')
-const randomstring = require("randomstring")
-const client = require("basic-ftp")
 const { dbPrefix } = require("../.env")
-const bcrypt = require('bcrypt-nodejs')
-const JSIntegration = require('../config/jSIntegration')
 
 module.exports = app => {
 

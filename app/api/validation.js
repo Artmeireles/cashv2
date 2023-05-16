@@ -90,9 +90,14 @@ module.exports = app => {
         if (!isValidCelPhone(value)) throw msg
     }
 
+    function validatePassword(value) {
+        return value.match(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+={[}\]|:;"'<,>.?/\\])(?!.*['"`])(?!.*\s)(?!.*(.)\1)(?!.*(?:123|234|345|456|567|678|789|890|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz))[A-Za-z\d!@#$%^&*()_+={[}\]|:;"'<,>.?/\\]{8,}$/)
+    }
+
     return {
         noAccessMsg, cpfOrError, cnpjOrError, lengthOrError, existsOrError, booleanOrError, valueOrError,
         valueMinorOrError, notExistsOrError, equalsOrError, diffOrError, isMatchOrError,
-        isValidEmail, isEmailOrError, isParamOrError, isCityOrError, isValidCelPhone, isCelPhoneOrError
+        isValidEmail, isEmailOrError, isParamOrError, isCityOrError, isValidCelPhone, isCelPhoneOrError,
+        validatePassword
     }
 }

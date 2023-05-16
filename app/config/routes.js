@@ -22,12 +22,15 @@ module.exports = app => {
      * Rotas de usuários
      */
     app.route('/request-password-reset').post(app.api.user.requestPasswordReset)
-    app.route('/user-sms-unlock').post(app.api.user.smsToken)
     app.route('/password-reset/:token').put(app.api.user.passwordReset)
+    app.route('/user-unlock/:token')
+        .get(app.api.user.unlock)
+        .post(app.api.user.unlock)
+    // Rota utilizada para reenvio do token por SMS
+    app.route('/user-sms-unlock').post(app.api.user.smsToken)
     app.route('/user-token/:token').get(app.api.user.getByToken)
-    app.get('/user-unlock/:id/:token', app.api.user.unlock)
-    app.post('/user-resend-unlock', app.api.user.mailyNew)
-    app.get('/desk-users', app.api.user.getDeskUser)
+    app.post('/user-resend-unlock', app.api.user.mailyToken)
+    app.route('/desk-users').get(app.api.user.getDeskUser)
     app.route('/users/f-a/:func')
         .all(app.config.passport.authenticate())
         .get(app.api.user.getByFunction)

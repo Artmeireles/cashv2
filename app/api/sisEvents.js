@@ -1,17 +1,14 @@
 const axios = require('axios')
 
 module.exports = app => {
-    const STATUS_ACTIVE = 10
-    const STATUS_TRASH = 20
-    const { envLocalhost, dbPrefix } = require("../.env")
     const tabelaSisEvents = 'sis_events'
 
     const createEventUpd = async (req, res) => {
+        const request = req.request
         const evento = req.evento
         const force = req.force
         const last = req.last
         const next = req.next
-        const request = req.request
         const notTo = req.notTo
         let eventoDescr = '(Antes => Depois) '
         let fields = ''
@@ -25,26 +22,15 @@ module.exports = app => {
             }
         }
         // se campos foram alterados então registra
-        if (force || (fields.length >= 2 && fields.substr(0, fields.length - 2).length > 0)) {
+        if (force || (fields.length >= 2 && fields.substring(0, fields.length - 2).length > 0)) {
             // remove a virgula e espaço inseridos ao final da string
-            evento.evento = force ? `${evento.evento}` : `${evento.evento} ${eventoDescr}: ${fields.substr(0, fields.length - 2)}`
-
+            evento.evento = force ? `${evento.evento}` : `${evento.evento} ${eventoDescr}: ${fields.substring(0, fields.length - 2)}`
             evento.id_user = !(request && request.user && request.user.id) ? last.id : request.user.id
             evento.classevento = evento.classevento || "Update"
-            evento.ip = request.ip
+            evento.ip = request.userIp
+            evento.geo_lt = request.userGeoLt
+            evento.geo_lg = request.userGeoLg
             evento.id_registro = last.id
-            if (envLocalhost) {
-                evento.geo_lt = null
-                evento.geo_ln = null
-            } else {
-                const url = `http://api.ipstack.com/${request.ip}?access_key=73ec9b93dcb973e011c965b8a25f08e4`
-                const ipstack = await axios.get(url).catch(error => {
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
-                })
-                evento.geo_lt = ipstack.data.latitude
-                evento.geo_ln = ipstack.data.longitude
-            }
             evento.created_at = new Date()
             if (request.user && request.user.id) {
                 const user = await app.db({ u: 'users' }).select('cliente', 'dominio').where({ id: request.user.id }).first()
@@ -62,9 +48,9 @@ module.exports = app => {
     }
 
     const createEventIns = async (req, res) => {
+        const request = req.request
         const evento = req.evento
         const next = req.next
-        const request = req.request
         const notTo = req.notTo
         let eventoDescr = ''
         let fields = ''
@@ -72,28 +58,17 @@ module.exports = app => {
             if (notTo.indexOf(newest) < 0)
                 fields += `${newest}: ${next[newest]}, `;
         }
-        if (fields.length >= 2 && fields.substr(0, fields.length - 2).length > 0) {
+        if (fields.length >= 2 && fields.substring(0, fields.length - 2).length > 0) {
             // remove a virgula e espaço inseridos ao final da string
-            eventoDescr += fields.substr(0, fields.length - 2)
+            eventoDescr += fields.substring(0, fields.length - 2)
 
             evento.id_user = !(request && request.user && request.user.id) ? next.id : request.user.id
             evento.evento = `${evento.evento}: ${eventoDescr}`
-            evento.classevento = "Insert"
-            evento.ip = request.ip
+            evento.classevento = evento.classevento || "Insert"
+            evento.ip = request.userIp
+            evento.geo_lt = request.userGeoLt
+            evento.geo_lg = request.userGeoLg
             evento.id_registro = next.id
-
-            if (envLocalhost) {
-                evento.geo_lt = null
-                evento.geo_ln = null
-            } else {
-                const url = `http://api.ipstack.com/${request.ip}?access_key=73ec9b93dcb973e011c965b8a25f08e4`
-                const ipstack = await axios.get(url).catch(error => {
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
-                })
-                evento.geo_lt = ipstack.data.latitude
-                evento.geo_ln = ipstack.data.longitude
-            }
             evento.created_at = new Date()
             if (request.user && request.user.id) {
                 const user = await app.db({ u: 'users' }).select('cliente', 'dominio').where({ id: request.user.id }).first()
@@ -111,35 +86,25 @@ module.exports = app => {
     }
 
     const createEventRemove = async (req, res) => {
+        const request = req.request
         const evento = req.evento
         const last = req.last
-        const request = req.request
         let eventoDescr = '(dados antes da exclusão)'
         let fields = ''
         for (older in last) {
             fields += `${older}: ${last[older]}, `;
         }
         // se campos foram alterados então registra
-        if ((fields.length >= 2 && fields.substr(0, fields.length - 2).length > 0)) {
+        if ((fields.length >= 2 && fields.substring(0, fields.length - 2).length > 0)) {
             // remove a virgula e espaço inseridos ao final da string
-            evento.evento = `${evento.evento} ${eventoDescr}: ${fields.substr(0, fields.length - 2)}`
+            evento.evento = `${evento.evento} ${eventoDescr}: ${fields.substring(0, fields.length - 2)}`
 
             evento.id_user = !(request && request.user && request.user.id) ? last.id : request.user.id
-            evento.classevento = "Remove"
-            evento.ip = request.ip
+            evento.classevento = evento.classevento || "Remove"
+            evento.ip = request.userIp
+            evento.geo_lt = request.userGeoLt
+            evento.geo_lg = request.userGeoLg
             evento.id_registro = last.id
-            if (envLocalhost) {
-                evento.geo_lt = null
-                evento.geo_ln = null
-            } else {
-                const url = `http://api.ipstack.com/${request.ip}?access_key=73ec9b93dcb973e011c965b8a25f08e4`
-                const ipstack = await axios.get(url).catch(error => {
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
-                })
-                evento.geo_lt = ipstack.data.latitude
-                evento.geo_ln = ipstack.data.longitude
-            }
             evento.created_at = new Date()
             if (request.user && request.user.id) {
                 const user = await app.db({ u: 'users' }).select('cliente', 'dominio').where({ id: request.user.id }).first()
@@ -159,27 +124,17 @@ module.exports = app => {
     const createEvent = async (req, res) => {
         const request = req.request
         const evento = req.evento
-        if (envLocalhost) {
-            evento.geo_lt = null
-            evento.geo_ln = null
-        } else {
-            const url = `http://api.ipstack.com/${request.ip}?access_key=379f7af2dcb3b36d1f4c8b9e8d421dfb`
-            const ipstack = await axios.get(url).catch(error => {
-                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
-            })
-            evento.geo_lt = ipstack.data.latitude
-            evento.geo_ln = ipstack.data.longitude
-        }
+        evento.id_user = !(request && request.user && request.user.id) ? last.id : request.user.id
+        evento.ip = request.userIp
+        evento.geo_lt = request.userGeoLt
+        evento.geo_lg = request.userGeoLg
         evento.created_at = new Date()
         if (request.user && request.user.id) {
             const user = await app.db({ u: 'users' }).select('cliente', 'dominio').where({ id: request.user.id }).first()
             evento.cliente = user.cliente
             evento.dominio = user.dominio
         }
-
         try {
-
             const dba = await app.db(tabelaSisEvents).insert(evento)
             return dba[0]
         } catch (error) {

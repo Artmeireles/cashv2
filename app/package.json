@@ -13,7 +13,7 @@
     "dependencies": {
         "axios": "^0.21.1",
         "basic-ftp": "^4.6.2",
-        "bcrypt-nodejs": "0.0.3",
+        "bcrypt": "^5.1.0",
         "body-parser": "^1.20.2",
         "consign": "0.1.6",
         "cors": "^2.8.5",
@@ -35,7 +35,7 @@
         "randomstring": "^1.1.5",
         "remove-accents": "^0.4.2",
         "sharp": "^0.32.0",
-        "string-strip-html": "^5.0.1",
+        "string-strip-html": "^8.4.0",
         "v-money": "^0.8.1"
     },
     "devDependencies": {

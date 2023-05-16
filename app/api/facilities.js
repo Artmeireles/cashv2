@@ -1,4 +1,6 @@
 module.exports = app => {
+    const bcrypt = require('bcrypt')
+
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
@@ -12,7 +14,7 @@ module.exports = app => {
         }
         return splitStr.join(' ');
     }
-    
+
     function numbersOrZero(value) {
         let ret = value || "0"
         ret = ret.toString().replace(/([^\d])+/gim, "")
@@ -46,12 +48,39 @@ module.exports = app => {
             ? String.fromCharCode(objeto.charCodeAt() - 32)
             : objeto
     }
-    
+
     function changeUpperCase(key, value) {
         return key != 'email' && typeof value === 'string'
             ? Array.from(value, uc).join('')
             : value
     }
 
-    return { capitalizeFirstLetter, titleCase, removeAccents, removeAccentsObj, numbersOrZero, changeUpperCase }
+    function diffInDays(dateStr, days) {
+        // Converte a string em uma instância de Date
+        const date = new Date(dateStr);
+
+        // Obtem a diferença de tempo em milissegundos entre as duas datas
+        const diffTime = Math.abs(Date.now() - date.getTime());
+
+        // Converte a diferença de tempo em dias
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        // Retorna `true` se a diferença em dias for maior ou igual a `days` ou apenas a diferença se days não for declarado
+        if (!days) return diffDays;
+        else return diffDays >= days;
+    }
+
+    function encryptPassword(password) {
+        const salt = bcrypt.genSaltSync(10)
+        return bcrypt.hashSync(password, salt)
+    }
+
+    function comparePassword(password, comparePassword) {
+        return bcrypt.compareSync(password, comparePassword)
+    }
+
+    return {
+        capitalizeFirstLetter, titleCase, removeAccents, removeAccentsObj,
+        numbersOrZero, changeUpperCase, diffInDays, encryptPassword, comparePassword
+    }
 }
