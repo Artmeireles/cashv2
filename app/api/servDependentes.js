@@ -5,6 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, cpfOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
+    const { convertESocialTextToJson, getIdParam } = app.api.facilities
     const tabela = 'serv_dependentes'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
@@ -25,44 +26,63 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
+        const contentType = req.headers['content-type']
+        if (contentType == "text/plain") {
+            const bodyRaw = convertESocialTextToJson(req.body)
+            console.log(bodyRaw.INCLUIRDEPENDENTE_91.length > 0);
+            body = []
+            for (let index = 0; index < bodyRaw.INCLUIRDEPENDENTE_91.length; index++) {
+                body.push({
+                    'id_param_tp_dep': getIdParam('sexo', bodyRaw.tpDep_92[index]),
+                    'nome': bodyRaw.nmDep_93[index],
+                    'data_nasc': bodyRaw.dtNascto_251[index],
+                    'cpf': bodyRaw.cpfDep_95[index],
+                    'dep_irrf': bodyRaw.depIRRF_96[index],
+                    'dep_sf': bodyRaw.depSF_97[index],
+                    'inc_trab': bodyRaw.incTrab_99[index]
+                })
+            }
+        }
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
-        try {
-            existsOrError(body.id_param_tp_dep, 'Tipo do Dependente não informado')
-            existsOrError(await isParamOrError('tpDep', body.id_param_tp_dep), 'Tipo do Dependente selecionado não existe')
-            existsOrError(body.nome, 'Nome não informado')
-            existsOrError(body.data_nasc, 'Data de Nascimento não informada')
 
-            if (moment(body.data_nasc, "DD/MM/YYYY") < moment("1890-01-01")){
-            throw `A data de nascimento (${body.data_nasc}) não pode ser anterior à (01/01/1890)`
+        if (contentType == "application/json")
+            try {
+                existsOrError(body.id_param_tp_dep, 'Tipo do Dependente não informado')
+                existsOrError(await isParamOrError('tpDep', body.id_param_tp_dep), 'Tipo do Dependente selecionado não existe')
+                existsOrError(body.nome, 'Nome não informado')
+                existsOrError(body.data_nasc, 'Data de Nascimento não informada')
+
+                if (moment(body.data_nasc, "DD/MM/YYYY") < moment("1890-01-01")) {
+                    throw `A data de nascimento (${body.data_nasc}) não pode ser anterior à (01/01/1890)`
+                }
+                existsOrError(body.id_param_sexo, 'Sexo não informado')
+                existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Sexo selecionado não existe')
+                existsOrError(body.dep_irrf, 'Dedução pelo Imposto de Renda não informado')
+                existsOrError(body.dep_sf, 'Recebimento do Salário Família não informado')
+                existsOrError(body.inc_trab, 'Incapacidade Física ou Mental não informada')
+                existsOrError(body.dt_limite_prev, 'Data Limite Previdência não informada')
+                //existsOrError(body.dt_limite_prev, 'Data Limite Previdência não informada')
+                //existsOrError(body.dt_limite_irpf, 'Data Limite IRPF não informada')
+                // existsOrError(body.certidao, 'Certidão não informada')
+                // existsOrError(body.cert_livro, 'Livro não informada')
+                // existsOrError(body.cert_folha, 'Folha não informada')
+                // existsOrError(body.dt_cert, 'Data da Certidão não informada')
+                // existsOrError(body.cart_vacinacao, 'Cartão de Vacinação não informado')
+                // existsOrError(body.declaracao_escolar, 'Declaração Escolar não informada')
+                if (body.dep_irrf == 1) {
+                    existsOrError(body.cpf, 'Se há Dedução pelo Imposto de Renda(IRRF) o CPF deverá ser informado')
+                    cpfOrError(body.cpf, 'CPF inválido')
+                    const depExists = await app.db(tabelaDomain)
+                        .where({ 'cpf': body.cpf })
+                        .where(app.db.raw(`id_serv != ${body.id_serv}`)).first()
+                    notExistsOrError(depExists, 'CPF de dependente já informado para outro servidor')
+                }
             }
-            existsOrError(body.id_param_sexo, 'Sexo não informado')
-            existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Sexo selecionado não existe')
-            existsOrError(body.dep_irrf, 'Dedução pelo Imposto de Renda não informado')
-            existsOrError(body.dep_sf, 'Recebimento do Salário Família não informado')
-            existsOrError(body.inc_trab, 'Incapacidade Física ou Mental não informada')
-            existsOrError(body.dt_limite_prev, 'Data Limite Previdência não informada')
-            //existsOrError(body.dt_limite_prev, 'Data Limite Previdência não informada')
-            //existsOrError(body.dt_limite_irpf, 'Data Limite IRPF não informada')
-            // existsOrError(body.certidao, 'Certidão não informada')
-            // existsOrError(body.cert_livro, 'Livro não informada')
-            // existsOrError(body.cert_folha, 'Folha não informada')
-            // existsOrError(body.dt_cert, 'Data da Certidão não informada')
-            // existsOrError(body.cart_vacinacao, 'Cartão de Vacinação não informado')
-            // existsOrError(body.declaracao_escolar, 'Declaração Escolar não informada')
-            if(body.dep_irrf == 1){
-                existsOrError(body.cpf, 'Se há Dedução pelo Imposto de Renda(IRRF) o CPF deverá ser informado')
-                cpfOrError(body.cpf, 'CPF inválido')
-            const depExists = await app.db(tabelaDomain)
-                .where({ 'cpf': body.cpf })
-                .where(app.db.raw(`id_serv != ${body.id_serv}`)).first()
-            notExistsOrError(depExists, 'CPF de dependente já informado para outro servidor')
-        }
-    }
-        catch (error) {
-            console.log(error)
-            return res.status(400).send(error)
-        }
+            catch (error) {
+                console.log(error)
+                return res.status(400).send(error)
+            }
 
         delete body.hash
 

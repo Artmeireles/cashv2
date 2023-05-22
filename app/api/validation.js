@@ -80,8 +80,8 @@ module.exports = app => {
     }
 
     async function isCityOrError(id) {
-        const param = await app.db(`${dbPrefix}_api.cidades`)
-            .where({ 'status': 10, 'id': id }).first()
+        const param = await app.db(`${dbPrefix}_api.cad_cidades`)
+            .where({ 'id': id }).first()
         if (param && param.id > 0) return true
     }
 

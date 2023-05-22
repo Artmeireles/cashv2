@@ -1,3 +1,6 @@
+
+const { dbPrefix } = require("../.env")
+
 module.exports = app => {
     const bcrypt = require('bcrypt')
 
@@ -79,8 +82,27 @@ module.exports = app => {
         return bcrypt.compareSync(password, comparePassword)
     }
 
+    function convertESocialTextToJson(body) {
+        const querystring = require('querystring');
+        const jsonData = querystring.parse(body, '\r\n', '=');
+        return JSON.parse(JSON.stringify(jsonData))
+    }
+
+    function getIdParam(meta, value) {
+        const tabelaDomain = `${dbPrefix}_api.params`
+        const param = app.db(tabelaDomain).select('id').where({ 'meta': meta, 'value': value }).first()
+        return param.id || 0
+    }
+
+    function getIdCidade(ibge) {
+        const tabelaDomain = `${dbPrefix}_api.cad_cidades`
+        const param = app.db(tabelaDomain).select('id').where({ 'ibge': ibge }).first()
+        return param.id || 0
+    }
+
     return {
         capitalizeFirstLetter, titleCase, removeAccents, removeAccentsObj,
-        numbersOrZero, changeUpperCase, diffInDays, encryptPassword, comparePassword
+        numbersOrZero, changeUpperCase, diffInDays, encryptPassword, comparePassword,
+        convertESocialTextToJson, getIdParam, getIdCidade
     }
 }

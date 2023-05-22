@@ -3,8 +3,10 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, cpfOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, cpfOrError,
+        isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
+    const { convertESocialTextToJson, getIdParam } = app.api.facilities
     const tabela = 'servidores'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
@@ -22,6 +24,40 @@ module.exports = app => {
             else isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
         } catch (error) {
             return res.status(401).send(error)
+        }
+        const contentType = req.headers['content-type']
+        if (contentType == "text/plain") {
+            const bodyRaw = convertESocialTextToJson(req.body)
+            return res.send(bodyRaw)
+            body = {}
+            body.cpf_trab = bodyRaw.cpfTrab_13
+            body.nome = bodyRaw.nmTrab_15
+            body.id_param_sexo = getIdParam('sexo', bodyRaw.sexo_16)
+            body.id_param_raca_cor = getIdParam('sexo', bodyRaw.racaCor_17)
+            body.id_param_est_civ = getIdParam('sexo', bodyRaw.estCiv_18)
+            body.id_param_grau_instr = getIdParam('sexo', bodyRaw.grauInstr_19)
+            body.dt_nascto = bodyRaw.dtNascto_23
+            body.id_param_p_nascto = getIdParam('sexo', bodyRaw.paisNascto_26)
+            body.id_param_p_nacld = getIdParam('sexo', bodyRaw.paisNac_27)
+            body.id_param_tplograd = getIdParam('sexo', bodyRaw.tpLograd_61)
+            body.id_cidade = getIdCidade(bodyRaw.codMunic_67)
+            body.cep = bodyRaw.cep_66
+            // body.dsc_lograd = bodyRaw.dscLograd_62
+            body.nr = bodyRaw.nrLograd_63
+            body.bairro = bodyRaw.bairro_65
+            body.logradouro = bodyRaw.dscLograd_62
+            body.complemento = bodyRaw.complemento_64
+            body.def_fisica = bodyRaw.defFisica_83
+            body.def_visual = bodyRaw.defVisual_84
+            body.def_auditiva = bodyRaw.defAuditiva_85
+            body.def_mental = bodyRaw.defMental_86
+            body.def_intelectual = bodyRaw.defIntelectual_87
+            body.reab_readap = bodyRaw.reabReadap_88
+            body.telefone = bodyRaw.fonePrinc_103
+            // body.email = bodyRaw.
+            // body.mae = bodyRaw.
+            // body.pai = bodyRaw.
+            // body.naturalidade = bodyRaw.
         }
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
@@ -62,8 +98,8 @@ module.exports = app => {
                     .andWhere(app.db.raw(body.id ? (`id != '${body.id}'`) : '1=1'))
                     .first()
                 notExistsOrError(dataFromDB, 'Combinação de CPF já cadastrado')
-        }
-    } catch (error) {
+            }
+        } catch (error) {
             return res.status(400).send(error)
         }
 
