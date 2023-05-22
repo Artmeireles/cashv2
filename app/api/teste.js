@@ -34,3 +34,9 @@
 // } else {
 //   console.log(`${days} dias ainda não se passaram desde ${dateStr}`);
 // }
+
+// const now = new Date() / 1000
+// console.log(now);
+
+// console.log(Math.floor(now));
+// console.log(Math.ceil(now));

@@ -26,8 +26,10 @@ export const useUserStore = defineStore('users', {
   actions: {
     async registerUser(email, password) {
       const url = `${baseApiUrl}/signin`
+      let ipify = await axios.get("https://api.ipify.org?format=json")
+      ipify = ipify.data.ip || undefined
       await axios
-        .post(url, { email, password })
+        .post(url, { email, password, ipify })
         .then((res) => {
           this.user = res.data;
           if (this.user.id) {

@@ -8,7 +8,7 @@ const crypto = require('crypto')
 const moment = require('moment')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isEmailOrError, isCelPhoneOrError, cpfOrError, isValue } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isEmailOrError, isCelPhoneOrError, cpfOrError, isValue, isBooleanOrError, booleanOrError } = app.api.validation
     const { titleCase, encryptPassword, comparePassword } = app.api.facilities
     const { transporter } = app.api.mailer
     const tabela = `users`
@@ -16,7 +16,7 @@ module.exports = app => {
     const tabelaParams = 'params'
     const tabelaFinParametros = 'fin_parametros'
 
-    /**
+    /** 
      * Esta função vai tratar as seguintes situações de signup
      * 
      * #1 - Se o solicitante já tem perfil, então deve redirecionar para a tela de login
@@ -134,7 +134,7 @@ module.exports = app => {
                 const now = Math.floor(Date.now() / 1000)
                 body.password_reset_token = randomstring.generate(27) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
                 body.sms_token = randomstring.generate(8) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-                body.status = STATUS_INACTIVE
+                body.status = STATUS_WAITING
                 body.created_at = new Date()
                 body.f_ano = body.created_at.getFullYear()
                 body.f_mes = body.created_at.getMonth().toString().padStart(2, "0")
@@ -144,6 +144,17 @@ module.exports = app => {
                 body.telefone = body.celular
                 body.cliente = body.client
                 body.dominio = body.domain
+
+                try {
+                    if (typeof isValidPassword(body.password) === 'string') throw isValidPassword(body.password)
+                } catch (error) {
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+                    return res.status(200).send({
+                        isValidPassword: false,
+                        msg: error
+                    })
+                }
+
                 const password = encryptPassword(body.password)
 
                 delete body.id
@@ -374,15 +385,10 @@ module.exports = app => {
             }
         };
 
-        try {
-            const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+={[}\]|:;"'<,>.?/\\])(?!.*['"`])(?!.*[\s])(?!.*[_-]{2})[A-Za-z\d!@#$%^&*()_+={[}\]|:;"'<,>.?/\\]{8,}$/
+        const passTest = user.password
 
-            if (!regex.test(user.password)) {
-                const msgs = "A senha informada não atende aos requisitos mínimos de segurança. Necessita conter ao menos oito caracteres e ter ao menos uma letra maiúscula, "
-                    + "uma letra minúscula, um dígito numérico, um dos seguintes caracteres especiais !@#$%^&*()_+=, não pode conter aspas simples ou duplas e "
-                    + "não pode conter espaços em branco"
-                throw msgs
-            }
+        try {
+            if (!booleanOrError(isValidPassword(passTest))) throw isValidPassword(passTest)
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
             return res.status(200).send({
@@ -447,20 +453,20 @@ module.exports = app => {
             return res.status(400).send(await showRandomMessage() || 'Token ausente, inválido ou não corresponde a nenhuma conta em nosso sistema')
         const token = req.query.tkn || req.body.token
         const userFromDB = await app.db(tabela)
-            .select('id', 'status', 'email', 'sms_token', 'name')
+            .select('id', 'status', 'email', 'sms_token', 'password_reset_token', 'name')
             .where({ id: req.params.id })
             .where(function () {
                 this.where({ password_reset_token: token })
                     .orWhere(app.db.raw(`sms_token like "${token}%"`))
             }).first()
-        // console.log(userFromDB.toString());
-        // console.log(userFromDB);
 
         if (!(userFromDB))
             return res.status(400).send(await showRandomMessage() || 'Token informado é inválido ou não correspondem a nenhuma conta em nosso sistema')
 
         const now = Math.floor(Date.now() / 1000)
-        let expirationTimOk = Number(userFromDB.sms_token.split('_')[1]) > now
+        let expirationTimOk = false
+        if (userFromDB.sms_token) expirationTimOk = Number(userFromDB.sms_token.split('_')[1]) > now
+        if (userFromDB.password_reset_token) expirationTimOk = Number(userFromDB.password_reset_token.split('_')[1]) > now
 
         if (!expirationTimOk)
             return res.status(200).send('O token informado é inválido ou já foi utilizado')
@@ -486,6 +492,7 @@ module.exports = app => {
         user.updated_at = new Date()
         user.password_reset_token = null
         user.sms_token = null
+        user.tipoUsuario = user.id_cadas ? 0 : 1
         app.db(tabela)
             .update(user)
             .where({ id: user.id })
@@ -522,7 +529,19 @@ module.exports = app => {
         const expired = !userFromDB.sms_token || userFromDB.sms_token.split('_')[1] < now
 
         if (!expired) body.sms_token = userFromDB.sms_token
-        else body.sms_token = randomstring.generate(8) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+        else {
+            body.sms_token = randomstring.generate(8) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+            // Registra o token no BD
+            await app.db(tabela).update({
+                sms_token: body.sms_token,
+                status: STATUS_SUSPENDED_BY_TKN
+            })
+                .where(function () {
+                    if (body.id) this.where({ id: body.id })
+                    else this.orWhere({ email: body.email })
+                        .orWhere({ cpf: body.email })
+                })
+        }
         token = body.sms_token.split('_')[0]
         try {
             const url = "https://sms.comtele.com.br/api/v2/send"
@@ -574,36 +593,49 @@ module.exports = app => {
     const mailyToken = async (req, res) => {
         const body = req.method && req.method === 'PATCH' ? { ...req.body } : req
         try {
-            const userFromDB = await app.db('users')
+            const userFromDB = await app.db(tabela)
                 .where(function () {
                     if (body.id) this.where({ id: body.id })
                     else this.orWhere({ email: body.email })
                         .orWhere({ cpf: body.email })
                 }).first()
             existsOrError(userFromDB, await showRandomMessage())
-            token = userFromDB.password_reset_token
-            if (userFromDB.email)
+            const now = Math.floor(Date.now() / 1000)
+            const password_reset_token = randomstring.generate(27) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+            // Registra o token no BD
+            await app.db(tabela).update({
+                password_reset_token: password_reset_token,
+                status: STATUS_SUSPENDED_BY_TKN
+            }).where(function () {
+                if (body.id) this.where({ id: body.id })
+                else this.orWhere({ email: body.email })
+                    .orWhere({ cpf: body.email })
+            })
+
+            if (userFromDB.email) {
+                let expirationTimOk = userFromDB.sms_token ? Number(userFromDB.sms_token.split('_')[1]) > now : false
                 await transporter.sendMail({
                     from: `"${appName}" <contato@mgcash.app.br>`, // sender address
                     to: `${userFromDB.email}`, // list of receivers
                     subject: `Bem-vindo ao ${appName}`, // Subject line
                     text: `Olá ${userFromDB.name}!\n
                 Estamos confirmando sua inscrição✔
-                Para liberar seu acesso, por favor acesse o link abaixo ou utilize o código ${userFromDB.sms_token.split('_')[0]} na tela de login.\n
-                ${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${token}\n
+                Para liberar seu acesso, por favor acesse o link abaixo${expirationTimOk ? ` ou utilize o código ${userFromDB.sms_token.split('_')[0]} na tela de login` : ''}.\n
+                ${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${password_reset_token}\n
                 Atenciosamente,\nTime ${appName}`,
                     html: `<p><b>Olá ${userFromDB.name}!</b></p>
                 <p>Estamos confirmando sua inscrição✔</p>
                 <p>Para liberar seu acesso utilize uma das seguinte opções:</p>
                 <ul>
-                <li>Clique <a href="${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${token}">aqui</a></li>
-                <li>Acesse o link ${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${token}</li>
-                <li>Ou utilize o código <strong><code>${userFromDB.sms_token.split('_')[0]}</code></strong> na tela de login</li>
+                <li>Clique <a href="${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${password_reset_token}">aqui</a></li>
+                <li>Acesse o link ${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${password_reset_token}</li>
+                ${expirationTimOk ? `<li>Ou utilize o código <strong><code>${userFromDB.sms_token.split('_')[0]}</code></strong> na tela de login</li>` : ''}
                 </ul>
                 <p>Atenciosamente,</p>
                 <p><b>Time ${appName}</b></p>`,
                 }).then(_ => {
                 })
+            }
             transporter.sendMail({
                 from: `"${appName}" <contato@mgcash.app.br>`, // sender address
                 to: `${emailAdmin}`, // list of receivers
@@ -693,6 +725,18 @@ module.exports = app => {
         }
     }
 
+    function isValidPassword(params) {
+        const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+={[}\]|:;"'<,>.?/\\])(?!.*['"`])(?!.*[\s])(?!.*[_-]{2})[A-Za-z\d!@#$%^&*()_+={[}\]|:;"'<,>.?/\\]{8,}$/
+        const teste = regex.test(params)
+        if (!teste) {
+            const msgs = "A senha informada não atende aos requisitos mínimos de segurança. Necessita conter ao menos oito caracteres e ter ao menos uma letra maiúscula, "
+                + "uma letra minúscula, um dígito numérico, um dos seguintes caracteres especiais !@#$%^&*()_+=, não pode conter aspas simples ou duplas e "
+                + "não pode conter espaços em branco"
+            return msgs
+        }
+        return teste
+    }
+
     const save = async (req, res) => {
         let user = { ...req.body }
 
@@ -758,93 +802,52 @@ module.exports = app => {
 
         const f_folha = new Date()
 
-        if (user.id) {
-            const uParams = await app.db('users').where({ id: user.id }).first();
-            // Variáveis da edição de um registro
-            // registrar o evento na tabela de eventos
-            const { createEventUpd } = app.api.sisEvents
-            const evento = await createEventUpd({
-                "notTo": ['created_at', 'password_reset_token', 'evento'],
-                "last": await app.db(tabela).where({ id: user.id }).first(),
-                "next": user,
-                "request": req,
-                "evento": {
-                    "evento": `Alteração de perfil de usuário`,
-                    "tabela_bd": "user",
-                }
+        const uParams = await app.db('users').where({ id: user.id }).first();
+        // Variáveis da edição de um registro
+        // registrar o evento na tabela de eventos
+        const { createEventUpd } = app.api.sisEvents
+        const evento = await createEventUpd({
+            "notTo": ['created_at', 'password_reset_token', 'evento'],
+            "last": await app.db(tabela).where({ id: user.id }).first(),
+            "next": user,
+            "request": req,
+            "evento": {
+                "evento": `Alteração de perfil de usuário`,
+                "tabela_bd": "user",
+            }
+        })
+
+        app.api.logger.logInfo({ log: { line: `Alteração de perfil de usuário! Usuário: ${user.name}`, sConsole: true } })
+
+        const tabelaFinParamsDomain = `${dbPrefix}_${user.cliente}_${user.dominio}.${tabelaFinParametros}`
+        const mesAtual = f_folha.getMonth().toString().padStart(2, "0")
+        let isMonth = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: user.f_mes }).first()
+        if (!isMonth)
+            isMonth = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: mesAtual }).first()
+        if (!isMonth)
+            isMonth = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano }).orderBy('mes', 'complementar').first()
+
+        let isComplementary = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes, complementar: user.f_complementar }).first()
+        if (!isComplementary)
+            isComplementary = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes, complementar: '000' }).first()
+        if (!isComplementary)
+            isComplementary = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes }).orderBy('complementar').first()
+
+        user.f_mes = isMonth.mes
+        user.f_complementar = isComplementary.complementar
+        user.evento = evento
+        user.updated_at = new Date()
+        const rowsUpdated = await app.db(tabela)
+            .update(user)
+            .where({ id: user.id })
+            .then(_ => {
+                return res.json(user)
             })
-
-            app.api.logger.logInfo({ log: { line: `Alteração de perfil de usuário! Usuário: ${user.name}`, sConsole: true } })
-
-            const tabelaFinParamsDomain = `${dbPrefix}_${user.cliente}_${user.dominio}.${tabelaFinParametros}`
-            const mesAtual = f_folha.getMonth().toString().padStart(2, "0")
-            let isMonth = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: user.f_mes }).first()
-            if (!isMonth)
-                isMonth = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: mesAtual }).first()
-            if (!isMonth)
-                isMonth = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano }).orderBy('mes', 'complementar').first()
-
-            let isComplementary = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes, complementar: user.f_complementar }).first()
-            if (!isComplementary)
-                isComplementary = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes, complementar: '000' }).first()
-            if (!isComplementary)
-                isComplementary = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes }).orderBy('complementar').first()
-
-            user.f_mes = isMonth.mes
-            user.f_complementar = isComplementary.complementar
-            user.evento = evento
-            user.updated_at = new Date()
-            const rowsUpdated = await app.db(tabela)
-                .update(user)
-                .where({ id: user.id })
-                .then(_ => {
-                    return res.json(user)
-                })
-                .catch(error => {
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
-                })
-            existsOrError(rowsUpdated, 'Usuário não foi encontrado')
-        } else {
-            // Criação de um novo registro
-            const nextEventID = await app.db('sis_events').select(app.db.raw('count(*) as count')).first()
-
-            user.evento = nextEventID.count + 1
-            // Variáveis da criação de um novo registro
-            user.status = STATUS_INACTIVE
-            user.created_at = new Date()
-            user.f_ano = f_folha.getFullYear()
-            user.f_mes = f_folha.getMonth().toString().padStart(2, "0")
-            user.f_complementar = '000'
-            const now = Math.floor(Date.now() / 1000)
-            body.sms_token = randomstring.generate(8) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-            app.db(tabela)
-                .insert(user)
-                .then(async (ret) => {
-                    mailyToken(user)
-                    user.id = ret[0]
-                    req.body = user
-                    smsToken(req)
-                    // registrar o evento na tabela de eventos
-                    const { createEventIns } = app.api.sisEvents
-                    createEventIns({
-                        "notTo": ['created_at', 'password', 'password_reset_token', 'evento'],
-                        "next": user,
-                        "request": req,
-                        "evento": {
-                            "evento": `Novo perfil de usuário`,
-                            "tabela_bd": "user",
-                        }
-                    })
-
-                    app.api.logger.logInfo({ log: { line: `Novo de perfil de usuário! Usuário: ${user.name}`, sConsole: true } })
-                    return res.json(user)
-                })
-                .catch(error => {
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
-                })
-        }
+            .catch(error => {
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+                return res.status(500).send(error)
+            })
+        existsOrError(rowsUpdated, 'Usuário não foi encontrado')
     }
 
     const limit = 20 // usado para paginação
@@ -1228,9 +1231,46 @@ module.exports = app => {
         }
     }
 
+    const concludeRegistrationMessages = [
+        "Seu perfil de usuário ainda não foi ativado. Por favor, verifique o token enviado via SMS",
+        "Precisamos que você ative seu perfil de usuário. Confira o token que enviamos por SMS",
+        "Seu perfil de usuário aguarda ativação. Verifique o token recebido via SMS",
+        "Lembre-se de ativar seu perfil de usuário utilizando o token enviado por SMS",
+        "O token de ativação enviado via SMS é necessário para ativar seu perfil de usuário",
+        "Verifique o token recebido por SMS para ativar seu perfil de usuário",
+        "Seu perfil de usuário está esperando pela ativação. Utilize o token recebido via SMS",
+        "Para ativar seu perfil de usuário, utilize o token enviado por SMS",
+        "Não se esqueça de inserir o token recebido via SMS para ativar seu perfil de usuário",
+        "O token enviado por SMS é essencial para a ativação do seu perfil de usuário",
+        "Por favor, utilize o token que enviamos via SMS para ativar seu perfil de usuário",
+        "Seu perfil de usuário precisa ser ativado com o token enviado por SMS",
+        "Verifique o token enviado via SMS para ativar seu perfil de usuário",
+        "Não deixe de utilizar o token recebido por SMS para ativar seu perfil de usuário",
+        "Ative seu perfil de usuário com o token que enviamos via SMS",
+        "Utilize o token recebido por SMS para concluir a ativação do seu perfil de usuário",
+        "Verifique sua caixa de mensagens e utilize o token recebido via SMS para ativar seu perfil de usuário",
+        "Lembre-se de inserir o token que enviamos por SMS para ativar seu perfil de usuário",
+        "Seu perfil de usuário ainda não foi ativado. Utilize o token enviado via SMS para concluir o processo",
+        "O token de ativação enviado por SMS é necessário para ativar seu perfil de usuário"
+
+    ]
+
+    let unconcludeRegistrationMessages = concludeRegistrationMessages.slice(); // create a copy of the messages array
+
+    const showUnconcludedRegistrationMessage = async () => {
+        if (unconcludeRegistrationMessages.length > 0) {
+            const randomIndex = Math.floor(Math.random() * unconcludeRegistrationMessages.length);
+            const message = unconcludeRegistrationMessages.splice(randomIndex, 1)[0];
+            return message
+        } else {
+            unconcludeRegistrationMessages = concludeRegistrationMessages.slice()
+            await showUnconcludedRegistrationMessage()
+        }
+    }
+
     return {
         signup, requestPasswordReset, passwordReset, TOKEN_VALIDE_MINUTES, showRandomMessage, showRandomKeyPassMessage,
-        save, get, getById, getByCpf, getByToken, smsToken, mailyToken, remove, getByFunction,
+        showUnconcludedRegistrationMessage, save, get, getById, getByCpf, getByToken, smsToken, mailyToken, remove, getByFunction,
         unlock, getDeskUser, locateServidorOnClient,
     }
 }

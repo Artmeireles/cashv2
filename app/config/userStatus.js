@@ -4,6 +4,7 @@
  */
 module.exports = {
     STATUS_INACTIVE: 0,
+    STATUS_WAITING: 1,
     STATUS_SUSPENDED_BY_TKN: 8,
     STATUS_SUSPENDED: 9,
     STATUS_ACTIVE: 10,

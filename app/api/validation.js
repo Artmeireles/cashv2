@@ -23,8 +23,12 @@ module.exports = app => {
         if (Array.isArray(value) && value.length === 0) throw msg
     }
 
+    function isBooleanOrError(value) {
+        return (typeof value === 'boolean' && !(value === true || value === false))
+    }
+
     function booleanOrError(value, msg) {
-        if (typeof value === 'boolean' && !(value === true || value === false)) throw msg
+        if (!isBooleanOrError) throw msg
     }
 
     function valueOrError(value, msg) {
@@ -95,7 +99,7 @@ module.exports = app => {
     }
 
     return {
-        noAccessMsg, cpfOrError, cnpjOrError, lengthOrError, existsOrError, booleanOrError, valueOrError,
+        noAccessMsg, cpfOrError, cnpjOrError, lengthOrError, existsOrError, isBooleanOrError, booleanOrError, valueOrError,
         valueMinorOrError, notExistsOrError, equalsOrError, diffOrError, isMatchOrError,
         isValidEmail, isEmailOrError, isParamOrError, isCityOrError, isValidCelPhone, isCelPhoneOrError,
         validatePassword

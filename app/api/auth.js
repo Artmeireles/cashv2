@@ -1,13 +1,13 @@
 const { authSecret } = require('../.env')
 const jwt = require('jwt-simple')
-const { STATUS_PASS_EXPIRED, STATUS_SUSPENDED_BY_TKN, MINIMUM_KEYS_BEFORE_CHANGE } = require("../config/userStatus")
+const { STATUS_PASS_EXPIRED, STATUS_SUSPENDED_BY_TKN, MINIMUM_KEYS_BEFORE_CHANGE, STATUS_INACTIVE, STATUS_WAITING } = require("../config/userStatus")
 
 module.exports = app => {
     const tabela = 'users'
     const tabelaKeys = 'users_keys'
     const { existsOrError } = app.api.validation
     const { diffInDays, comparePassword } = app.api.facilities
-    const { showRandomMessage, showRandomKeyPassMessage } = app.api.user
+    const { showRandomMessage, showRandomKeyPassMessage, showUnconcludedRegistrationMessage } = app.api.user
 
     /**
      * Operações de SignIn
@@ -25,7 +25,7 @@ module.exports = app => {
         }
 
         let user = await app.db({ 'u': tabela })
-            .select('u.name', 'u.email', 'u.id', 'u.time_to_pas_expires', 'u.status')
+            .select('u.name', 'u.cpf', 'u.telefone', 'u.email', 'u.id', 'u.time_to_pas_expires', 'u.status')
             .orWhere({ 'u.email': email })
             .orWhere({ 'u.name': email })
             .orWhere({ 'u.cpf': email.replace(/([^\d])+/gim, "") })
@@ -34,7 +34,7 @@ module.exports = app => {
             existsOrError(user, await showRandomMessage())
         } catch (error) {
             return res.status(400).send(error)
-        }            
+        }
 
         /**
          * Prazo de expiração da senha
@@ -42,12 +42,31 @@ module.exports = app => {
         const days = user.time_to_pas_expires;
 
         /**
+         * Verificar se o usuário foi desativado
+         */
+        if (user && user.status == STATUS_INACTIVE) {
+            return res.status(400).send({
+                isStatusActive: false,
+                'msg': `Seu acesso ao sistema foi suspenso pelo seu administrador. Por favor, entre em contato com o suporte`
+            })
+        }
+        /**
+         * Verificar se o usuário ainda não ativou seu perfil
+         */
+        if (user && user.status == STATUS_WAITING) {
+            return res.status(400).send({
+                isStatusActive: false,
+                'msg': await showUnconcludedRegistrationMessage() || "Confira o token recebido por SMS para ativar seu perfil de usuário"
+            })
+        }
+
+        /**
          * Verificar se a senha expirou
          */
         if (user && user.status == STATUS_PASS_EXPIRED) {
             return res.status(400).send({
                 isStatusActive: false,
-                'msg': `Sua senha expirou. As senhas devem ser alteradas a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas 3 senhas utilizadas`
+                'msg': `Sua senha expirou. As senhas devem ser alteradas a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
             })
         }
 
@@ -100,7 +119,7 @@ module.exports = app => {
                     */
                     if (diffInDays(dateStr, days)) {
                         const passTime = diffInDays(dateStr) - 1
-                        msg = `Se passaram ${passTime} dias desde que criou sua senha. Ela deve ser alterada a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas 3 senhas utilizadas`
+                        msg = `Se passaram ${passTime} dias desde que criou sua senha. Ela deve ser alterada a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
                         app.api.logger.logInfo({ log: { line: `${user.name}: ${msg}`, sConsole: true } })
                         await app.db(tabela)
                             .update({ status: STATUS_PASS_EXPIRED })
@@ -126,11 +145,6 @@ module.exports = app => {
                     exp: expirationTime
                 }
 
-                res.json({
-                    ...payload,
-                    token: jwt.encode(payload, authSecret)
-                })
-
                 app.api.logger.logInfo({ log: { line: `Login bem sucedido: ${user.name}`, sConsole: true } })
 
                 // registrar o evento na tabela de eventos
@@ -143,6 +157,11 @@ module.exports = app => {
                         "classevento": `signin`,
                         "id_registro": null
                     }
+                })
+
+                res.json({
+                    ...payload,
+                    token: jwt.encode(payload, authSecret)
                 })
             }
             /**
