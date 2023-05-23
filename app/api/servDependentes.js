@@ -33,7 +33,7 @@ module.exports = app => {
             body = []
             for (let index = 0; index < bodyRaw.INCLUIRDEPENDENTE_91.length; index++) {
                 body.push({
-                    'id_param_tp_dep': getIdParam('sexo', bodyRaw.tpDep_92[index]),
+                    'id_param_tp_dep': getIdParam('tpDep', bodyRaw.tpDep_92[index]),
                     'nome': bodyRaw.nmDep_93[index],
                     'data_nasc': bodyRaw.dtNascto_251[index],
                     'cpf': bodyRaw.cpfDep_95[index],
@@ -78,9 +78,7 @@ module.exports = app => {
                         .where(app.db.raw(`id_serv != ${body.id_serv}`)).first()
                     notExistsOrError(depExists, 'CPF de dependente já informado para outro servidor')
                 }
-            }
-            catch (error) {
-                console.log(error)
+            } catch (error) {
                 return res.status(400).send(error)
             }
 

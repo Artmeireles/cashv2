@@ -5,6 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
+    const { convertESocialTextToJson, getIdParam } = app.api.facilities
     const tabela = 'serv_vinculos'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
@@ -25,6 +26,50 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
+        // const contentType = req.headers['content-type']
+        // if (contentType == "text/plain") {
+        //     const bodyRaw = convertESocialTextToJson(req.body)
+        //     return res.send(bodyRaw)
+        //     body = {}
+        //     body.cpf_trab = bodyRaw.cpfTrab_13
+        //     body.nome = bodyRaw.nmTrab_15
+        //     body.id_param_sexo = getIdParam('sexo', bodyRaw.sexo_16)
+        //     body.id_serv = bodyRaw.           
+        //     body.id_vinc_principal = bodyRaw.
+        //     body.matricula = bodyRaw.
+        //     body.sit_func = bodyRaw.
+        //     body.tp_reg_prev = bodyRaw.        
+        //     body.id_param_tp_prov = bodyRaw.   
+        //     body.data_exercicio = bodyRaw.     
+        //     body.tp_plan_rp = bodyRaw.         
+        //     body.teto_rgps = bodyRaw.          
+        //     body.abono_perm = bodyRaw.         
+        //     body.d_inicio_abono = bodyRaw.     
+        //     body.d_ing_cargo = bodyRaw.        
+        //     body.id_cargo = bodyRaw.           
+        //     body.acum_cargo = bodyRaw.         
+        //     body.id_param_cod_categ = bodyRaw. 
+        //     body.qtd_hr_sem = bodyRaw.         
+        //     body.id_param_tp_jor = bodyRaw.    
+        //     body.id_param_tmp_parc = bodyRaw.  
+        //     body.hr_noturno = bodyRaw.         
+        //     body.desc_jornd = bodyRaw.         
+        //     body.pis = bodyRaw. 
+        //     body.dt_pis = bodyRaw.           
+        //     body.tempo_servico = bodyRaw.    
+        //     body.tempo_final = bodyRaw.      
+        //     body.titulo = bodyRaw.           
+        //     body.tit_uf = bodyRaw.           
+        //     body.tit_zona = bodyRaw.         
+        //     body.tit_secao = bodyRaw.        
+        //     body.dt_nomeacao = bodyRaw.      
+        //     body.nom_edital = bodyRaw.       
+        //     body.nom_nr_inscr = bodyRaw.     
+        //     body.id_siap_pub = bodyRaw.      
+        //     body.id_param_grau_exp = bodyRaw.
+        
+
+        
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
@@ -66,8 +111,7 @@ module.exports = app => {
             existsOrError(body.id_siap_pub, 'Veículo Publicação não informado')
             existsOrError(body.id_param_grau_exp, 'Grau de Experiência não informado')
         }
-        catch (error) {
-            console.log(error)
+    catch (error) {
             return res.status(400).send(error)
         }
         body.matricula = body.matricula.padStart(8, '0')
