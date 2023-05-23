@@ -42,7 +42,6 @@ module.exports = app => {
             body.id_param_tplograd = getIdParam('tpLograd', bodyRaw.tpLograd_61)
             body.id_cidade = getIdCidade(bodyRaw.codMunic_67)
             body.cep = bodyRaw.cep_66
-            // body.dsc_lograd = bodyRaw.dscLograd_62
             body.nr = bodyRaw.nrLograd_63
             body.bairro = bodyRaw.bairro_65
             body.logradouro = bodyRaw.dscLograd_62

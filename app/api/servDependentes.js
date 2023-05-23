@@ -42,6 +42,23 @@ module.exports = app => {
                     'inc_trab': bodyRaw.incTrab_99[index]
                 })
             }
+            body.id_serv = bodyRaw.     
+            body.id_param_tp_dep = bodyRaw.getIdParam('tpDep', bodyRaw.id_params_tpDep_92)
+            body.nome = bodyRaw.nmDep_93               
+            body.data_nasc = bodyRaw.dtNascto_251          
+            body.cpf = bodyRaw.cpfDep_95                
+            body.id_param_sexo = bodyRaw.getIdParam('sexo', bodyRaw.sexoDep_252)     
+            body.dep_irrf = bodyRaw.depIRRF_96          
+            body.dep_sf = bodyRaw.depSF_97             
+            body.inc_trab = bodyRaw.incTrab_99           
+            // body.dt_limite_prev = bodyRaw.     
+            // body.dt_limite_irpf = bodyRaw.     
+            // body.certidao = bodyRaw.           
+            // body.cert_livro = bodyRaw.         
+            // body.cert_folha = bodyRaw.         
+            // body.dt_cert = bodyRaw.            
+            // body.cart_vacinacao = bodyRaw.     
+            // body.declaracao_escolar = bodyRaw. 
         }
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 

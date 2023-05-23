@@ -100,9 +100,15 @@ module.exports = app => {
         return param.id || 0
     }
 
+    function getIdCargos(nome) {
+        const tabelaDomain = `${dbPrefix}_cliente_ativos.aux_cargos`
+        const param = app.db(tabelaDomain).select('id').where({ 'nome': nome }).first()
+        return param.id || 0
+    }
+
     return {
         capitalizeFirstLetter, titleCase, removeAccents, removeAccentsObj,
         numbersOrZero, changeUpperCase, diffInDays, encryptPassword, comparePassword,
-        convertESocialTextToJson, getIdParam, getIdCidade
+        convertESocialTextToJson, getIdParam, getIdCidade, getIdCargos
     }
 }
