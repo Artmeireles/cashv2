@@ -1,0 +1,56 @@
+[2023-03-21T14:17:47.916Z] : Backend executando na porta 3000
+[2023-03-21T14:17:47.919Z] : Directory photos created successfully!
+[2023-03-21T14:17:47.919Z] : Directory photos created successfully!
+[2023-03-21T14:17:47.925Z] : Directory photos created successfully!
+[2023-03-21T14:17:47.925Z] : Directory photos created successfully!
+[2023-03-21T14:17:47.927Z] : Directory photos created successfully!
+[2023-03-21T14:17:47.927Z] : Directory photos created successfully!
+[2023-03-21T14:25:54.575Z] : Backend executando na porta 3000
+[2023-03-21T14:26:07.137Z] : Backend executando na porta 3000
+[2023-03-21T14:26:21.573Z] : Backend executando na porta 3000
+[2023-03-21T14:26:24.382Z] : Backend executando na porta 3000
+[2023-03-21T14:26:58.169Z] : Backend executando na porta 3000
+[2023-03-21T14:34:03.925Z] : Backend executando na porta 3000
+[2023-03-21T14:34:48.778Z] : Backend executando na porta 3000
+[2023-03-21T14:35:11.745Z] : Backend executando na porta 3000
+[2023-03-21T14:35:19.821Z] : Backend executando na porta 3000
+[2023-03-21T14:35:26.485Z] : Backend executando na porta 3000
+[2023-03-21T14:36:32.196Z] : Backend executando na porta 3000
+[2023-03-21T14:36:46.687Z] : Backend executando na porta 3000
+[2023-03-21T14:37:21.267Z] : Backend executando na porta 3000
+[2023-03-21T14:37:33.045Z] : Backend executando na porta 3000
+[2023-03-21T14:38:05.401Z] : Backend executando na porta 3000
+[2023-03-21T14:38:07.565Z] : Backend executando na porta 3000
+[2023-03-21T14:38:10.116Z] : Backend executando na porta 3000
+[2023-03-21T14:38:27.759Z] : Backend executando na porta 3000
+[2023-03-21T14:38:37.156Z] : Backend executando na porta 3000
+[2023-03-21T14:40:20.296Z] : Backend executando na porta 3000
+[2023-03-21T14:40:36.996Z] : Backend executando na porta 3000
+[2023-03-21T14:41:33.917Z] : Backend executando na porta 3000
+[2023-03-21T14:45:44.833Z] : Backend executando na porta 3000
+[2023-03-21T14:51:22.881Z] : Backend executando na porta 3000
+[2023-03-21T14:53:20.226Z] : Backend executando na porta 3000
+[2023-03-21T14:53:28.561Z] : Backend executando na porta 3000
+[2023-03-21T14:53:32.578Z] : Backend executando na porta 3000
+[2023-03-21T14:53:56.665Z] : Backend executando na porta 3000
+[2023-03-21T14:54:22.257Z] : Backend executando na porta 3000
+[2023-03-21T14:54:35.624Z] : Backend executando na porta 3000
+[2023-03-21T14:55:04.946Z] : Backend executando na porta 3000
+[2023-03-21T14:56:56.747Z] : Login bem sucedido: Tom Mendes Pereira
+[2023-03-21T17:49:49.393Z] : Backend executando na porta 3000
+[2023-03-21T17:50:02.775Z] : Backend executando na porta 3000
+[2023-03-21T18:11:12.176Z] : Backend executando na porta 3000
+[2023-03-21T18:23:41.727Z] : Login bem sucedido: Tom Mendes Pereira
+[2023-03-21T18:25:03.039Z] : Backend executando na porta 3000
+[2023-03-21T18:31:15.393Z] : Backend executando na porta 3000
+[2023-03-21T18:46:28.284Z] : Backend executando na porta 3000
+[2023-03-21T18:49:48.822Z] : Backend executando na porta 3000
+[2023-03-21T18:52:43.913Z] : Backend executando na porta 3000
+[2023-03-22T11:51:15.394Z] : Backend executando na porta 3000
+[2023-03-22T11:51:30.404Z] : Login bem sucedido: Tom Mendes Pereira
+[2023-03-22T11:53:08.787Z] : Backend executando na porta 3000
+[2023-03-22T11:53:24.980Z] : Login bem sucedido: Tom Mendes Pereira
+[2023-03-22T11:59:15.058Z] : Backend executando na porta 3000
+[2023-03-22T12:14:35.501Z] : Backend executando na porta 3000
+[2023-03-22T12:14:40.682Z] : Backend executando na porta 3000
+[2023-03-22T12:15:21.372Z] : Login bem sucedido: Tom Mendes Pereira

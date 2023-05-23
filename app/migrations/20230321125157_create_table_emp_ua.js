@@ -23,7 +23,7 @@ exports.up = function(knex) {
         table.string('email', 255).comment("E-mail")
         table.string('telefone', 255).comment("Telefone")  
 
-        table.foreign('id_emp').references('id').inTable('empresa').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_emp').references('id').inTable('wwmgca_api.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_cidade').references('id').inTable('wwmgca_api.cidades').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_emp_resp').references('id').inTable('emp_resp').onUpdate('CASCADE').onDelete('NO ACTION')
     })

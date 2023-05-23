@@ -60,7 +60,7 @@ module.exports = app => {
             body.mes_descsindical = bodyRaw.mes_descsindical
         }
 
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+        const tabelaDomain = `${dbPrefix}_api.${tabela}`
         try {
             existsOrError(body.nr_insc, 'CPF ou CNPJ não informado')
             if (body.nr_insc && body.nr_insc.length == 11) cpfOrError(body.nr_insc)
@@ -214,7 +214,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+        const tabelaDomain = `${dbPrefix}_api.${tabela}`
 
 
         try {
@@ -326,7 +326,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+        const tabelaDomain = `${dbPrefix}_api.${tabela}`
 
         const page = req.query.page || 1
 
@@ -362,7 +362,7 @@ module.exports = app => {
             return res.status(401).send(error)
         }
 
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+        const tabelaDomain = `${dbPrefix}_api.${tabela}`
         const ret = app.db({ tbl1: tabelaDomain })
             .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
             .where({ id: req.params.id, status: STATUS_ACTIVE }).first()
@@ -384,7 +384,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+        const tabelaDomain = `${dbPrefix}_api.${tabela}`
         const registro = { status: STATUS_DELETE }
         try {
             // registrar o evento na tabela de eventos

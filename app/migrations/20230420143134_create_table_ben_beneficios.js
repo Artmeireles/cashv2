@@ -13,7 +13,7 @@ exports.up = function(knex) {
         table.integer('id_rub').notNull().unsigned().comment("Rúbrica")
         table.specificType('ide_dm_dev', 'char(10)').notNull().comment("Demonstrativo de Valor")
         
-        table.foreign('id_emp').references('id').inTable('empresa').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_emp').references('id').inTable('wwmgca_api.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_ben_vinc').references('id').inTable('ben_vinculos').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_rub').references('id').inTable('fin_rubricas').onUpdate('CASCADE').onDelete('NO ACTION')
     })

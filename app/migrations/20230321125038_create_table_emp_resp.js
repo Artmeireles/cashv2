@@ -21,7 +21,7 @@ exports.up = function(knex) {
         table.string('complemento', 255).notNull().comment("Complemento")
         table.string('d_nascimento', 255).comment("Data de Nascimento") 
         
-        table.foreign('id_emp').references('id').inTable('empresa').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_emp').references('id').inTable('wwmgca_api.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_local_params_tipo').references('id').inTable('es_params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_cidade').references('id').inTable('wwmgca_api.cidades').onUpdate('CASCADE').onDelete('NO ACTION')
     })

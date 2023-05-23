@@ -16,7 +16,7 @@ exports.up = function(knex) {
         table.string('cnpj_transmissor', 14).notNull().comment("CNPJ Transmissor")
         table.string('cnpj_efr', 14).notNull().comment("CNPJ Ente Federativo")
         
-        table.foreign('id_emp').references('id').inTable('empresa').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_emp').references('id').inTable('wwmgca_api.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 
