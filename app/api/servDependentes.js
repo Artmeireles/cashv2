@@ -42,7 +42,7 @@ module.exports = app => {
                     'inc_trab': bodyRaw.incTrab_99[index]
                 })
             }
-            body.id_serv = bodyRaw.     
+            //body.id_serv = bodyRaw.     
             body.id_param_tp_dep = bodyRaw.getIdParam('tpDep', bodyRaw.id_params_tpDep_92)
             body.nome = bodyRaw.nmDep_93               
             body.data_nasc = bodyRaw.dtNascto_251          

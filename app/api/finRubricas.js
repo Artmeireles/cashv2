@@ -35,7 +35,7 @@ module.exports = app => {
             existsOrError(body.id_param_nat_rubr, 'Natureza da Rúbrica não informada')
             existsOrError(await isParamOrError('natRubrica', body.id_param_nat_rubr), 'Natureza da Rúbrica selecionada não existe')
             existsOrError(body.id_param_tipo, 'Tipo da Rúbrica não informado')
-            existsOrError(await isParamOrError('tipoRubrica', body.id_param_tipo), 'Tipo da Rúbrica selecionada não existe')
+            existsOrError(await isParamOrError('tpRubrica', body.id_param_tipo), 'Tipo da Rúbrica selecionada não existe')
             existsOrError(body.id_param_cod_inc_cp, 'Código de Incidência Tributária não informado')
             existsOrError(await isParamOrError('codIncCP', body.id_param_cod_inc_cp), 'Código de Incidência Tributária selecionado não existe')
             existsOrError(body.id_param_cod_inc_irrf, 'Código IRRF não informado')
