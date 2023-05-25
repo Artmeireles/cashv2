@@ -33,7 +33,7 @@ module.exports = app => {
             body = []
             for (let index = 0; index < bodyRaw.INCLUIRDEPENDENTE_91.length; index++) {
                 body.push({
-                    'id_param_tp_dep': getIdParam('sexo', bodyRaw.tpDep_92[index]),
+                    'id_param_tp_dep': getIdParam('tpDep', bodyRaw.tpDep_92[index]),
                     'nome': bodyRaw.nmDep_93[index],
                     'data_nasc': bodyRaw.dtNascto_251[index],
                     'cpf': bodyRaw.cpfDep_95[index],
@@ -42,6 +42,23 @@ module.exports = app => {
                     'inc_trab': bodyRaw.incTrab_99[index]
                 })
             }
+            //body.id_serv = bodyRaw.     
+            body.id_param_tp_dep = bodyRaw.getIdParam('tpDep', bodyRaw.id_params_tpDep_92)
+            body.nome = bodyRaw.nmDep_93               
+            body.data_nasc = bodyRaw.dtNascto_251          
+            body.cpf = bodyRaw.cpfDep_95                
+            body.id_param_sexo = bodyRaw.getIdParam('sexo', bodyRaw.sexoDep_252)     
+            body.dep_irrf = bodyRaw.depIRRF_96          
+            body.dep_sf = bodyRaw.depSF_97             
+            body.inc_trab = bodyRaw.incTrab_99           
+            // body.dt_limite_prev = bodyRaw.     
+            // body.dt_limite_irpf = bodyRaw.     
+            // body.certidao = bodyRaw.           
+            // body.cert_livro = bodyRaw.         
+            // body.cert_folha = bodyRaw.         
+            // body.dt_cert = bodyRaw.            
+            // body.cart_vacinacao = bodyRaw.     
+            // body.declaracao_escolar = bodyRaw. 
         }
         
         return res.send(body)
@@ -80,9 +97,7 @@ module.exports = app => {
                         .where(app.db.raw(`id_serv != ${body.id_serv}`)).first()
                     notExistsOrError(depExists, 'CPF de dependente já informado para outro servidor')
                 }
-            }
-            catch (error) {
-                console.log(error)
+            } catch (error) {
                 return res.status(400).send(error)
             }
 

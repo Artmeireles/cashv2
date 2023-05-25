@@ -32,3 +32,16 @@ serv_afastamento (
             "obs":"200"
             
 }
+
+
+//body.id_serv_vinc = bodyRaw.
+body.id_par_mtv_af = bodyRaw.getIdParam('mtvAfast', bodyRaw.codMotAfast_19)
+body.dt_inicio = bodyRaw.dtIniAfast_18
+body.dt_fim = bodyRaw.dtTermAfast_53
+body.info_mesmo_mtv = bodyRaw.infoMesmoMtv_20
+body.id_par_tp_acid = bodyRaw.getIdParam('tpAcid', bodyRaw.tpAcidTransito_21)
+body.id_par_onus = bodyRaw.getIdParam('Onus', bodyRaw.infOnus_33)
+//body.cnpj_onus = bodyRaw.
+//body.id_par_tp_af = bodyRaw.
+body.ind_remun_cargo = bodyRaw.indRemunCargo_64
+//body.obs = bodyRaw.

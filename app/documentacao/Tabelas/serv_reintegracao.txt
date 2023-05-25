@@ -23,3 +23,11 @@ serv_reintegracao (
             "obs":"Não sei"
             
 }
+
+//body.id_serv_vinc = bodyRaw.
+body.id_par_tp_rein = bodyRaw.getIdParam('tpReint', bodyRaw.tpReint_17)
+body.nr_proc_jud = bodyRaw.nrProcJud_18
+body.nr_lei_anistia = bodyRaw.nrLeiAnistia_19
+body.dt_efet_retorno = bodyRaw.dtEfetRetorno_20
+body.dt_i_efeito = bodyRaw.dtEfeito_22
+//body.obs = bodyRaw.

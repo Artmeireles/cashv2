@@ -5,6 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
+    const { convertESocialTextToJson, getIdParam, getIdCargos } = app.api.facilities
     const tabela = 'serv_vinculos'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
@@ -25,6 +26,46 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
+        const contentType = req.headers['content-type']
+        if (contentType == "text/plain") {
+            const bodyRaw = convertESocialTextToJson(req.body)
+            return res.send(bodyRaw)
+            body = {}
+            // body.id_serv = bodyRaw.           
+            // body.id_vinc_principal = bodyRaw.
+            body.matricula = bodyRaw.matricula_108
+            //body.sit_func = bodyRaw.
+            body.tp_reg_prev = bodyRaw.tpRegPrev_110        
+            body.id_param_tp_prov = bodyRaw.getIdParam('tpProv', bodyRaw.tpProv_141)   
+            body.data_exercicio = bodyRaw.dtExercicio_144    
+            body.tp_plan_rp = bodyRaw.tpPlanRP_145 //obs        
+            body.teto_rgps = bodyRaw.indTetoRGPS_222          
+            body.abono_perm = bodyRaw.indAbonoPerm_223         
+            body.d_inicio_abono = bodyRaw.dtIniAbono_224     
+            body.d_ing_cargo = bodyRaw.dtIngrCargo_227        
+            body.id_cargo = bodyRaw.getIdCargos('nome', bodyRaw.nmCargo_225)           
+            body.acum_cargo = bodyRaw.acumCargo_230        
+            body.id_param_cod_categ = bodyRaw.getIdParam('codCatg', bodyRaw.codCateg_151)
+            body.qtd_hr_sem = bodyRaw.qtdHrsSem_176        
+            body.id_param_tp_jor = bodyRaw.getIdParam('tpJornada', bodyRaw.tpJornada_177)    
+            body.id_param_tmp_parc = bodyRaw.getIdParam('tmpParc', bodyRaw.tmpParc_179)    
+            body.hr_noturno = bodyRaw.horNoturno_241         
+            body.desc_jornd = bodyRaw.dscJorn_242         
+            // body.pis = bodyRaw. 
+            // body.dt_pis = bodyRaw.           
+            // body.tempo_servico = bodyRaw.    
+            // body.tempo_final = bodyRaw.      
+            // body.titulo = bodyRaw.           
+            // body.tit_uf = bodyRaw.           
+            // body.tit_zona = bodyRaw.         
+            // body.tit_secao = bodyRaw.        
+            // body.dt_nomeacao = bodyRaw.      
+            // body.nom_edital = bodyRaw.       
+            // body.nom_nr_inscr = bodyRaw.     
+            // body.id_siap_pub = bodyRaw.      
+            body.id_param_grau_exp = bodyRaw.getIdParam('grauExp', bodyRaw.grauExp_64) 
+    }
+        
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
@@ -66,8 +107,7 @@ module.exports = app => {
             existsOrError(body.id_siap_pub, 'Veículo Publicação não informado')
             existsOrError(body.id_param_grau_exp, 'Grau de Experiência não informado')
         }
-        catch (error) {
-            console.log(error)
+    catch (error) {
             return res.status(400).send(error)
         }
         body.matricula = body.matricula.padStart(8, '0')
