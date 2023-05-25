@@ -1,0 +1,19 @@
+{
+    "schema": "api",
+    "table": "params",
+    "oper": "insert",
+    "data": [
+        {
+            "dominio": "root",
+            "meta": "sexo",
+            "value": "M",
+            "label": "Masculino"
+        },
+        {
+            "dominio": "root",
+            "meta": "sexo",
+            "value": "F",
+            "label": "Feminino"
+        }
+    ]
+}

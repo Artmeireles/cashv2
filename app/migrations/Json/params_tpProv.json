@@ -1,0 +1,68 @@
+[
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "1",
+        "label": "Nomeação em cargo efetivo"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "2",
+        "label": "Nomeação exclusivamente em cargo em comissão"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "3",
+        "label": "Incorporação, matrícula ou nomeação (militar)"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "5",
+        "label": "Redistribuição ou Reforma Administrativa"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "6",
+        "label": "Diplomação"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "7",
+        "label": "Contratação por tempo determinado"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "8",
+        "label": "Remoção (em caso de alteração do órgão declarante)"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "9",
+        "label": "Designação"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "10",
+        "label": "Mudança de CPF"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "11",
+        "label": "Estabilizados - Art. 19 do ADCT"
+    },
+    {
+        "dominio": "root",
+        "meta": "tpProv",
+        "VALUE": "99",
+        "label": "Outros não relacionados acima"
+    }
+]

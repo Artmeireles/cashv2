@@ -43,6 +43,8 @@ module.exports = app => {
                 })
             }
         }
+        
+        return res.send(body)
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
 

@@ -1,0 +1,152 @@
+[
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "00",
+        "label": "Não é base de cálculo"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "01",
+        "label": "Não é base de cálculo em função"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "11",
+        "label": "Mensal"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "12",
+        "label": "13º salário"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "13",
+        "label": "Exclusiva do empregador - Mensal"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "14",
+        "label": "Exclusiva do empregador - 13° salário"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "15",
+        "label": "Exclusiva do segurado - Mensal"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "16",
+        "label": "Exclusiva do segurado - 13° salário"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "21",
+        "label": "Salário-maternidade mensal, pago pelo empregador"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "22",
+        "label": "Salário-maternidade 13º salário, pago pelo empregador"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "25",
+        "label": "Salário-maternidade mensal, pago pelo INSS"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "26",
+        "label": "Salário-maternidade 13° salário, pago pelo INSS"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "31",
+        "label": "Mensal"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "32",
+        "label": "13º salário"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "34",
+        "label": "SEST"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "35",
+        "label": "SENAT"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "51",
+        "label": "Salário-família"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "91",
+        "label": "Mensal"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "92",
+        "label": "13º salário"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "93",
+        "label": "Salário-maternidade"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "94",
+        "label": "Salário-maternidade 13º salário"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "95",
+        "label": "Exclusiva do empregador - Mensal"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "96",
+        "label": "Exclusiva do empregador - 13º salário"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "97",
+        "label": "Exclusiva do empregador - Salário-maternidade"
+    },
+    {
+        "dominio": "root",
+        "meta": "codIncCP",
+        "VALUE": "98",
+        "label": "Exclusiva do empregador - Salário-maternidade 13º salário"
+    }
+]
