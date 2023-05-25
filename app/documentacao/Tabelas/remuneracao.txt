@@ -29,3 +29,11 @@ remuneracao (
             "prazo_f":"200"
             
 }
+
+
+body.qtd_rubr = bodyRaw.qtdRubr_49
+body.fator_rubr = bodyRaw.fatorRubr_50
+body.valor_rubr = bodyRaw.vrRubr_52
+body.ind_apur_ir = bodyRaw.indApurIR_115
+//body.prazo_i = bodyRaw.
+//body.prazo_f = bodyRaw.

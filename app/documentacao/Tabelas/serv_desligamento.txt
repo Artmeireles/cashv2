@@ -20,3 +20,10 @@ serv_desligamento (
             "obs":"Não tem"
             
 }
+
+
+//body.id_serv_vinc = bodyRaw.
+body.id_par_mt_dlg = bodyRaw.getIdParam('mtvDeslig', bodyRaw.mtvDeslig_17)
+body.dt_deslig = bodyRaw.dtDeslig_18
+body.ind_pagto_ap = bodyRaw.indPagtoAPI_19
+//body.obs = bodyRaw.
