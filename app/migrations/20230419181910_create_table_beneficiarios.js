@@ -26,12 +26,12 @@ exports.up = function(knex) {
         table.string('nr', 255).notNull().comment("Número")
         table.string('complemento', 255).comment("Complemento")
 
-        table.foreign('id_emp').references('id').inTable('wwmgca_api.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_sexo').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_raca_cor').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_est_civ').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_tplograd').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_cidade').references('id').inTable('wwmgca_api.cidades').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_emp').references('id').inTable('wwmgca_app.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_sexo').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_raca_cor').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_est_civ').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tplograd').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_cidade').references('id').inTable('wwmgca_app.cidades').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

@@ -40,7 +40,6 @@ module.exports = app => {
             existsOrError(body.obs, 'Observação não informada')
         }
          catch (error) {
-            console.log(body.nr_lei_anistia)
             return res.status(400).send(error)
         }
 

@@ -21,10 +21,10 @@ exports.up = function(knex) {
         table.string('obs').comment("Observação")
 
         table.foreign('id_serv_vinc').references('id').inTable('serv_vinculos').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_par_mtv_af').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_par_tp_acid').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_par_onus').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_par_tp_af').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_par_mtv_af').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_par_tp_acid').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_par_onus').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_par_tp_af').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

@@ -9,6 +9,10 @@ module.exports = app => {
         if (!cpf.isValid(value)) throw msg ? msg : "CPF inválido"
     }
 
+    function cpfOrMsgError(value, msg) {
+        if (!cpf.isValid(value)) return msg ? msg : "CPF inválido, "
+    }
+
     function cnpjOrError(value, msg) {
         if (!cnpj.isValid(value)) throw msg ? msg : "CNPJ inválido"
     }
@@ -21,6 +25,12 @@ module.exports = app => {
         if (!value) throw msg
         if (typeof value === 'string' && !value.trim().length > 0) throw msg
         if (Array.isArray(value) && value.length === 0) throw msg
+    }
+
+    function existsOrMsgError(value, msg) {
+        if (!value) return msg + ', '
+        if (typeof value === 'string' && !value.trim().length > 0) return msg + ', '
+        if (Array.isArray(value) && value.length === 0) return msg + ', '
     }
 
     function isBooleanOrError(value) {
@@ -50,6 +60,14 @@ module.exports = app => {
             return
         }
         throw msg
+    }
+    function notExistsOrMsgError(value, msg) {
+        try {
+            existsOrError(value, msg)
+        } catch (error) {
+            return
+        }
+        return msg + ', '
     }
 
     function equalsOrError(valueA, valueB, msg) {
@@ -99,8 +117,8 @@ module.exports = app => {
     }
 
     return {
-        noAccessMsg, cpfOrError, cnpjOrError, lengthOrError, existsOrError, isBooleanOrError, booleanOrError, valueOrError,
-        valueMinorOrError, notExistsOrError, equalsOrError, diffOrError, isMatchOrError,
+        noAccessMsg, cpfOrError, cpfOrMsgError, cnpjOrError, lengthOrError, existsOrError, existsOrMsgError, isBooleanOrError, booleanOrError, valueOrError,
+        valueMinorOrError, notExistsOrError, notExistsOrMsgError, equalsOrError, diffOrError, isMatchOrError,
         isValidEmail, isEmailOrError, isParamOrError, isCityOrError, isValidCelPhone, isCelPhoneOrError,
         validatePassword
     }

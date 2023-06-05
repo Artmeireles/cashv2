@@ -2,7 +2,6 @@ const { dbPrefix } = require("../.env")
 
 module.exports = app => {
     const { existsOrError, isMatchOrError, noAccessMsg } = app.api.validation
-    const database = 'api'
     const tabela = 'params'
     const STATUS_ACTIVE = 10
     const STATUS_TRASH = 20
@@ -22,7 +21,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${database}.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
 
         try {
             existsOrError(body.dominio, 'Domínio não informado')
@@ -205,7 +204,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${database}.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         const registro = { status: STATUS_DELETE }
         try {
             // registrar o evento na tabela de eventos

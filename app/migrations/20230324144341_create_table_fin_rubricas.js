@@ -23,13 +23,13 @@ exports.up = function(knex) {
         table.boolean('consignavel').notNull().comment("S-Sim, N-Não")
         table.string('observacao', 255).comment("Informações Relacionadas a Rubrica")
         
-        table.foreign('id_emp').references('id').inTable('wwmgca_api.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_nat_rubr').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_tipo').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_cod_inc_cp').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_cod_inc_irrf').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_cod_inc_fgts').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_cod_inc_cprp').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_emp').references('id').inTable('wwmgca_app.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_nat_rubr').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tipo').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_cod_inc_cp').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_cod_inc_irrf').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_cod_inc_fgts').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_cod_inc_cprp').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

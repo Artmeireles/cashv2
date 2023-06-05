@@ -3,7 +3,8 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, cpfOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
+    const { existsOrError, existsOrMsgError, notExistsOrError, notExistsOrMsgError, cpfOrError, cpfOrMsgError,
+        isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
     const { convertESocialTextToJson, getIdParam } = app.api.facilities
     const tabela = 'serv_dependentes'
@@ -29,11 +30,10 @@ module.exports = app => {
         const contentType = req.headers['content-type']
         if (contentType == "text/plain") {
             const bodyRaw = convertESocialTextToJson(req.body)
-            console.log(bodyRaw.INCLUIRDEPENDENTE_91.length > 0);
             body = []
             for (let index = 0; index < bodyRaw.INCLUIRDEPENDENTE_91.length; index++) {
                 body.push({
-                    'id_param_tp_dep': getIdParam('tpDep', bodyRaw.tpDep_92[index]),
+                    'id_param_tp_dep': await getIdParam('tpDep', bodyRaw.tpDep_92[index]),
                     'nome': bodyRaw.nmDep_93[index],
                     'data_nasc': bodyRaw.dtNascto_251[index],
                     'cpf': bodyRaw.cpfDep_95[index],
@@ -42,15 +42,51 @@ module.exports = app => {
                     'inc_trab': bodyRaw.incTrab_99[index]
                 })
             }
-            //body.id_serv = bodyRaw.     
-            body.id_param_tp_dep = bodyRaw.getIdParam('tpDep', bodyRaw.id_params_tpDep_92)
-            body.nome = bodyRaw.nmDep_93               
-            body.data_nasc = bodyRaw.dtNascto_251          
-            body.cpf = bodyRaw.cpfDep_95                
-            body.id_param_sexo = bodyRaw.getIdParam('sexo', bodyRaw.sexoDep_252)     
-            body.dep_irrf = bodyRaw.depIRRF_96          
-            body.dep_sf = bodyRaw.depSF_97             
-            body.inc_trab = bodyRaw.incTrab_99           
+            const respError = []
+            // body.forEach(async element => {
+            for (let index = 0; index < body.length; index++) {
+                existsOrError(element.nome, 'Nome não informado')
+                cpfOrError(element.cpf, 'CPF inválido')
+                let erros = ''
+                const element = body[index];
+
+                erros += existsOrMsgError(element.id_param_tp_dep, 'Tipo do Dependente não informado')
+                erros += existsOrMsgError(await isParamOrError('tpDep', element.id_param_tp_dep), 'Tipo do Dependente selecionado não existe')
+                erros += existsOrMsgError(element.nome, 'Nome não informado')
+                erros += existsOrMsgError(element.data_nasc, 'Data de Nascimento não informada')
+
+                if (moment(element.data_nasc, "DD/MM/YYYY") < moment("1890-01-01")) {
+                    erros += `A data de nascimento (${element.data_nasc}) não pode ser anterior à (01/01/1890)`
+                }
+                erros += existsOrMsgError(element.id_param_sexo, 'Sexo não informado')
+                erros += existsOrMsgError(await isParamOrError('sexo', element.id_param_sexo), 'Sexo selecionado não existe')
+                erros += existsOrMsgError(element.dep_irrf, 'Dedução pelo Imposto de Renda não informado')
+                erros += existsOrMsgError(element.dep_sf, 'Recebimento do Salário Família não informado')
+                erros += existsOrMsgError(element.inc_trab, 'Incapacidade Física ou Mental não informada')
+                erros += existsOrMsgError(element.dt_limite_prev, 'Data Limite Previdência não informada')
+                erros += existsOrMsgError(element.dt_limite_irpf, 'Data Limite IRPF não informada')
+                // erros += existsOrMsgError(element.certidao, 'Certidão não informada')
+                // erros += existsOrMsgError(element.cert_livro, 'Livro não informada')
+                // erros += existsOrMsgError(element.cert_folha, 'Folha não informada')
+                // erros += existsOrMsgError(element.dt_cert, 'Data da Certidão não informada')
+                // erros += existsOrMsgError(element.cart_vacinacao, 'Cartão de Vacinação não informado')
+                // erros += existsOrMsgError(element.declaracao_escolar, 'Declaração Escolar não informada')
+                if (element.dep_irrf == 1) {
+                    erros += existsOrMsgError(element.cpf, 'Se há Dedução pelo Imposto de Renda(IRRF) o CPF deverá ser informado')
+                    erros += cpfOrMsgError(element.cpf, 'CPF inválido')
+                    const depExists = await app.db(tabelaDomain)
+                        .where({ 'cpf': element.cpf })
+                        .where(app.db.raw(`id_serv != ${element.id_serv}`)).first()
+                    erros += notExistsOrMsgError(depExists, 'CPF de dependente já informado para outro servidor')
+                }
+                if (erros.length > 0) {
+                    erros = `Dependente ${element.nome} (CPF: ${element.cpf}): ${erros.substring(0, erros.length.trim - 1)}`
+                    respError.push(erros);
+                    if (index == body.length - 1) {
+                        if (respError.length > 0) return res.status(400).send(respError)
+                    }
+                }
+            }
             // body.dt_limite_prev = bodyRaw.     
             // body.dt_limite_irpf = bodyRaw.     
             // body.certidao = bodyRaw.           
@@ -60,8 +96,8 @@ module.exports = app => {
             // body.cart_vacinacao = bodyRaw.     
             // body.declaracao_escolar = bodyRaw. 
         }
-        
-        return res.send(body)
+
+        // return res.send(body)
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
 
@@ -143,7 +179,7 @@ module.exports = app => {
             body.status = STATUS_ACTIVE
             body.created_at = new Date()
 
-            app.db(tabelaDomain)
+            await app.db(tabelaDomain)
                 .insert(body)
                 .then(ret => {
                     body.id = ret[0]

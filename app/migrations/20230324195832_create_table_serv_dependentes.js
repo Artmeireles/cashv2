@@ -27,8 +27,8 @@ exports.up = function(knex) {
         table.boolean('declaracao_escolar').comment("Declaração Escolar")
 
         table.foreign('id_serv').references('id').inTable('servidores').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_tp_dep').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_sexo').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tp_dep').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_sexo').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

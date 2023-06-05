@@ -22,6 +22,6 @@ remun_oe ( "outros entes"
 //body.id_serv_vinc = bodyRaw.
 //body.id_param_ind_mv = bodyRaw.
 body.nr_insc = bodyRaw.nrInsc_110
-body.id_param_ind_mv = bodyRaw.getIdParam('indMov', bodyRaw.indMV_18)
-body.id_param_cod_categ = bodyRaw.getIdParam('codCatg', bodyRaw.codCateg_22)
+body.id_param_ind_mv = getIdParam('indMov', bodyRaw.indMV_18)
+body.id_param_cod_categ = getIdParam('codCatg', bodyRaw.codCateg_22)
 body.vlr_remun_oe = bodyRaw.vlrRemunOE_23

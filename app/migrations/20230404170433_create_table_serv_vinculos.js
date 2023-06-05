@@ -43,13 +43,13 @@ exports.up = function(knex) {
         table.integer('id_param_grau_exp').notNull().unsigned().comment("Grau de Experiência")
 
         table.foreign('id_serv').references('id').inTable('servidores').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_tp_prov').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tp_prov').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_cargo').references('id').inTable('aux_cargos').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_cod_categ').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_tp_jor').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_tmp_parc').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_cod_categ').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tp_jor').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_tmp_parc').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_siap_pub').references('id').inTable('siap_publicacoes').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_param_grau_exp').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_grau_exp').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

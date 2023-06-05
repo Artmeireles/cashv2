@@ -16,7 +16,8 @@ module.exports = app => {
      * @returns 
      */
     const signin = async (req, res) => {
-        const email = req.body.email || undefined
+        console.log(req.body);
+        const email = req.body.email || req.body.cpf || undefined
         let password = req.body.password || undefined
         try {
             existsOrError(email, 'E-mail, nome ou CPF precisam ser informados')
@@ -33,7 +34,7 @@ module.exports = app => {
         try {
             existsOrError(user, await showRandomMessage())
         } catch (error) {
-            return res.status(400).send(error)
+            return res.status(500).send(error)
         }
 
         /**
@@ -140,6 +141,7 @@ module.exports = app => {
                     id: user.id,
                     status: user.status,
                     cpf: user.cpf,
+                    name: user.name,
                     telefone: user.telefone,
                     iat: now,
                     exp: expirationTime

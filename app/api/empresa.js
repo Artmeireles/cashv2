@@ -40,7 +40,7 @@ module.exports = app => {
             try {
                 if (!(!!class_trib)) throw "Classificação tributária não localizada"
             } catch (error) {
-                return res.status(400).send(error)
+                return res.status(500).send(error)
             }
             body.id_param_cl_trib = class_trib.id
             body.ind_opt_reg_eletron = bodyRaw.indOptRegEletron_21

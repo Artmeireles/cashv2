@@ -25,7 +25,7 @@ serv_reintegracao (
 }
 
 //body.id_serv_vinc = bodyRaw.
-body.id_par_tp_rein = bodyRaw.getIdParam('tpReint', bodyRaw.tpReint_17)
+body.id_par_tp_rein = getIdParam('tpReint', bodyRaw.tpReint_17)
 body.nr_proc_jud = bodyRaw.nrProcJud_18
 body.nr_lei_anistia = bodyRaw.nrLeiAnistia_19
 body.dt_efet_retorno = bodyRaw.dtEfetRetorno_20

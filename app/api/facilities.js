@@ -88,9 +88,9 @@ module.exports = app => {
         return JSON.parse(JSON.stringify(jsonData))
     }
 
-    function getIdParam(meta, value) {
+    const getIdParam = async (meta, value) => {
         const tabelaDomain = `${dbPrefix}_api.params`
-        const param = app.db(tabelaDomain).select('id').where({ 'meta': meta, 'value': value }).first()
+        const param = await app.db(tabelaDomain).select('id').where({ 'meta': meta, 'value': value }).first()
         return param.id || 0
     }
 

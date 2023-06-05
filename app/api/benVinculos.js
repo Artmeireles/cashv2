@@ -43,7 +43,6 @@ module.exports = app => {
                 notExistsOrError(dataFromDB, 'Combinação de CPF já cadastrado')
             }
         } catch (error) {
-            console.log(error)
             return res.status(400).send(error)
         }
         body.nr_beneficio = body.nr_beneficio.padStart(8, '0')

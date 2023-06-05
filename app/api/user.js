@@ -1,10 +1,9 @@
 
 const randomstring = require("randomstring")
 const { baseFrontendUrl, emailAdmin, appName } = require("../config/params")
-const { dbPrefix, jasperServerUrl, jasperServerU, jasperServerK } = require("../.env")
+const { dbPrefix, jasperServerU, jasperServerK } = require("../.env")
 const { STATUS_INACTIVE, STATUS_SUSPENDED, STATUS_SUSPENDED_BY_TKN, STATUS_ACTIVE, STATUS_DELETE, MINIMUM_KEYS_BEFORE_CHANGE, TOKEN_VALIDE_MINUTES } = require("../config/userStatus")
 const axios = require('axios')
-const crypto = require('crypto')
 const moment = require('moment')
 
 module.exports = app => {
@@ -29,7 +28,8 @@ module.exports = app => {
      */
     const signup = async (req, res) => {
         const body = { ...req.body }
-        let registred = false;
+        console.log('0',body);
+        let registered = false;
         try {
             existsOrError(body.cpf, 'CPF não informado')
             body.cpf = body.cpf.replace(/([^\d])+/gim, "")
@@ -41,42 +41,44 @@ module.exports = app => {
 
         /**
          * Se o e-mail for informado vazio exclui do body
-         */
+        */
         if (!(!!body.email)) delete body.email
 
         /**
          * Tenta localizar o usuário a partir do cpf informado
-         */
+        */
         const userFromDB = await app.db(tabela)
             .select('id', 'email', 'name', 'cpf', 'status')
             .where({ cpf: body.cpf }).first()
         const isStatusActive = (userFromDB && userFromDB.status == STATUS_ACTIVE) || false
 
+        console.log('1',body);
         /**
          * #1 - Se o solicitante já tem perfil:
          *      a) Se é um usuário ativo então deve redirecionar para a tela de login
          *      b) Se ainda necessita confirmar o token de acesso deve ser informado
          */
         if (userFromDB && userFromDB.id) {
-            registred = true
+            registered = true
             let msg = `O CPF informado já se encontra registrado. `
             if (isStatusActive)
                 msg += `Por favor prossiga para o login ou se esqueceu sua senha então poderá recuperá-la.`
             else
                 msg += `Mas o sistema ainda não recebeu o seu token de confirmação.`
             return res.status(200).send({
-                registred: registred,
+                registered: registered,
                 isStatusActive: isStatusActive,
                 msg: msg,
                 data: userFromDB
             })
         }
 
+        console.log('2',body);
         /**
          * Se for informado um e-mail, faz a validação e 
          * bloqueia a duplicidade de e-mails
          */
-        if (body.email)
+        if (body.email) {
             try {
                 isEmailOrError(body.email, 'E-mail informado está num formato inválido')
                 const userEmail = await app.db(tabela).where({ email: body.email }).first()
@@ -85,11 +87,13 @@ module.exports = app => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(400).send(error)
             }
-
+        }
         /**
          * #2 - Se não tem perfil e já informou os dados necessários para a criação do perfil:
-         */
-        if (body.client && body.domain && body.celular && body.cpf) {
+        */
+        if ((body.isNewUser || (body.client && body.domain)) && body.celular && body.cpf) {
+            delete body.isNewUser
+            console.log('3',body);
             /**
              * Se body.id NÃO for informado então não é servidor. Nesse caso body.email torna-se obrigatório
              */
@@ -271,6 +275,11 @@ module.exports = app => {
                         return res.json(cad_servidor.data)
                     else
                         return res.json({ msg: `O servidor ${titleCase(cad_servidor.data.nome)} foi localizado nos registro do município de ${clientServidor.clientName}, mas não tem um telefone celular válido registrado. Antes de prosseguir com o registro será necessário procurar o RH/DP de sua fonte pagadora para regularizar seu registro` })
+                } else {
+                    /**
+                     * #3 - Se não tem perfil e não é localizado nos schemas dos clientes todos os dados tornam-se obrigatórios exceto o id
+                    */
+                    return res.json({ isNewUser: true, msg: await showNewUserMessage() || "Não encontramos as informações que você forneceu. Por favor, complete os campos abaixo com os dados necessários para criar seu perfil de usuário" })
                 }
             }
         }
@@ -581,7 +590,7 @@ module.exports = app => {
             else return token
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            return res.status(400).send(error)
+            return res.status(500).send(error)
         }
     }
 
@@ -654,7 +663,7 @@ module.exports = app => {
             })
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            return res.status(400).send(error)
+            return res.status(500).send(error)
         }
     }
 
@@ -1048,7 +1057,7 @@ module.exports = app => {
             existsOrError(req.body.cpf, 'CPF não informado')
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-            return res.status(500).send(error)
+            return res.status(400).send(error)
         }
         const cpf = req.body.cpf.toString().replace(/([^\d])+/gim, "")
         const domainNames = await app.db(tabelaParams)
@@ -1265,6 +1274,43 @@ module.exports = app => {
         } else {
             unconcludeRegistrationMessages = concludeRegistrationMessages.slice()
             await showUnconcludedRegistrationMessage()
+        }
+    }
+
+    const newUserMessages = [
+        "Desculpe, não conseguimos localizar as informações fornecidas. Por favor, preencha os campos a seguir para criar seu perfil de usuário",
+        "As informações fornecidas não foram encontradas. Por favor, informe os dados necessários nos campos abaixo para criar seu perfil de usuário",
+        "Não encontramos as informações que você forneceu. Por favor, preencha os campos a seguir com os dados necessários para criar seu perfil de usuário",
+        "Desculpe, mas não localizamos os dados informados. Por favor, complete os campos abaixo com as informações necessárias para criar seu perfil de usuário",
+        "Não foi possível encontrar os dados fornecidos. Por favor, informe os detalhes nos campos a seguir para criar seu perfil de usuário",
+        "Lamentamos, mas não conseguimos localizar as informações fornecidas. Por favor, forneça os dados necessários nos campos abaixo para criar seu perfil de usuário",
+        "As informações que você inseriu não foram encontradas. Por favor, preencha os campos abaixo com os dados necessários para criar seu perfil de usuário",
+        "Desculpe, não conseguimos localizar os dados informados. Por favor, informe os detalhes necessários nos campos a seguir para criar seu perfil de usuário",
+        "Não encontramos as informações que você forneceu. Por favor, complete os campos abaixo com os dados necessários para criar seu perfil de usuário",
+        "Desculpe, mas não localizamos os dados fornecidos. Por favor, preencha os campos abaixo com as informações necessárias para criar seu perfil de usuário",
+        "Não foi possível encontrar os dados fornecidos. Por favor, informe os detalhes nos campos a seguir para criar seu perfil de usuário",
+        "Lamentamos, mas não conseguimos localizar as informações fornecidas. Por favor, forneça os dados necessários nos campos abaixo para criar seu perfil de usuário",
+        "As informações que você inseriu não foram encontradas. Por favor, preencha os campos abaixo com os dados necessários para criar seu perfil de usuário",
+        "Desculpe, não conseguimos localizar os dados informados. Por favor, informe os detalhes necessários nos campos a seguir para criar seu perfil de usuário",
+        "Não encontramos as informações que você forneceu. Por favor, complete os campos abaixo com os dados necessários para criar seu perfil de usuário",
+        "Desculpe, mas não localizamos os dados fornecidos. Por favor, preencha os campos abaixo com as informações necessárias para criar seu perfil de usuário",
+        "Não foi possível encontrar os dados fornecidos. Por favor, informe os detalhes nos campos a seguir para criar seu perfil de usuário",
+        "Lamentamos, mas não conseguimos localizar as informações fornecidas. Por favor, forneça os dados necessários nos campos abaixo para criar seu perfil de usuário",
+        "As informações que você inseriu não foram encontradas. Por favor, preencha os campos abaixo com os dados necessários para criar seu perfil de usuário",
+        "Desculpe, não conseguimos localizar os dados informados. Por favor, informe os detalhes necessários nos campos a seguir para criar seu perfil de usuário"
+
+    ]
+
+    let unnewUserMessages = newUserMessages.slice(); // create a copy of the messages array
+
+    const showNewUserMessage = async () => {
+        if (unnewUserMessages.length > 0) {
+            const randomIndex = Math.floor(Math.random() * unnewUserMessages.length);
+            const message = unnewUserMessages.splice(randomIndex, 1)[0];
+            return message
+        } else {
+            unnewUserMessages = newUserMessages.slice()
+            await showNewUserMessage()
         }
     }
 

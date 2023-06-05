@@ -1,8 +1,7 @@
 const config = require('../knexfile.js')
 const knex = require('knex')(config)
-
-const fs = require('fs');
-const path = require('path');
+// const fs = require('fs');
+// const path = require('path');
 
 // const sqlFolderPath = './migrations/Json'; // Caminho da pasta com os arquivos SQL
 
@@ -62,7 +61,6 @@ const path = require('path');
 //         }
 //     });
 // });
-
 
 knex.migrate.latest([config])
 module.exports = knex

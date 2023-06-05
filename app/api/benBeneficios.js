@@ -34,7 +34,6 @@ module.exports = app => {
             existsOrError(body.ide_dm_dev, 'Demonstrativo de Valor não informado')
         }
          catch (error) {
-            console.log(error);
             return res.status(400).send(error)
         }
 

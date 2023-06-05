@@ -12,7 +12,7 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                return res.status(400).send(error)
             })
     }
 

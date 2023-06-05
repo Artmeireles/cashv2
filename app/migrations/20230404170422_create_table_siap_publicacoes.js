@@ -12,7 +12,7 @@ exports.up = function(knex) {
         table.string('nr_pub', 14).notNull().comment("Número da Publicação")
         table.integer('id_param_v_pub').notNull().unsigned().comment("Veículo da Publicação")
 
-        table.foreign('id_param_v_pub').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_v_pub').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

@@ -17,7 +17,7 @@ exports.up = function(knex) {
         table.string('obs', 255).comment("Observação")
         
         table.foreign('id_serv_vinc').references('id').inTable('serv_vinculos').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_par_tp_rein').references('id').inTable('wwmgca_api.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_par_tp_rein').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

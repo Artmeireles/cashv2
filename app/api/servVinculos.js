@@ -36,7 +36,7 @@ module.exports = app => {
             body.matricula = bodyRaw.matricula_108
             //body.sit_func = bodyRaw.
             body.tp_reg_prev = bodyRaw.tpRegPrev_110        
-            body.id_param_tp_prov = bodyRaw.getIdParam('tpProv', bodyRaw.tpProv_141)   
+            body.id_param_tp_prov = getIdParam('tpProv', bodyRaw.tpProv_141)   
             body.data_exercicio = bodyRaw.dtExercicio_144    
             body.tp_plan_rp = bodyRaw.tpPlanRP_145 //obs        
             body.teto_rgps = bodyRaw.indTetoRGPS_222          
@@ -45,10 +45,10 @@ module.exports = app => {
             body.d_ing_cargo = bodyRaw.dtIngrCargo_227        
             body.id_cargo = bodyRaw.getIdCargos('nome', bodyRaw.nmCargo_225)           
             body.acum_cargo = bodyRaw.acumCargo_230        
-            body.id_param_cod_categ = bodyRaw.getIdParam('codCatg', bodyRaw.codCateg_151)
+            body.id_param_cod_categ = getIdParam('codCatg', bodyRaw.codCateg_151)
             body.qtd_hr_sem = bodyRaw.qtdHrsSem_176        
-            body.id_param_tp_jor = bodyRaw.getIdParam('tpJornada', bodyRaw.tpJornada_177)    
-            body.id_param_tmp_parc = bodyRaw.getIdParam('tmpParc', bodyRaw.tmpParc_179)    
+            body.id_param_tp_jor = getIdParam('tpJornada', bodyRaw.tpJornada_177)    
+            body.id_param_tmp_parc = getIdParam('tmpParc', bodyRaw.tmpParc_179)    
             body.hr_noturno = bodyRaw.horNoturno_241         
             body.desc_jornd = bodyRaw.dscJorn_242         
             // body.pis = bodyRaw. 
@@ -63,7 +63,7 @@ module.exports = app => {
             // body.nom_edital = bodyRaw.       
             // body.nom_nr_inscr = bodyRaw.     
             // body.id_siap_pub = bodyRaw.      
-            body.id_param_grau_exp = bodyRaw.getIdParam('grauExp', bodyRaw.grauExp_64) 
+            body.id_param_grau_exp = getIdParam('grauExp', bodyRaw.grauExp_64) 
     }
         
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
