@@ -1,10 +1,10 @@
 -- Setar as variáveis da operação
 SET @cliente = 'tapera';
-SET @dominio = 'ativos';
+SET @dominio = 'previdencia';
 SET @ano = '2023';
 SET @mes = '05'; 
-SET @id_consignatario = 2; -- 1=bb,2=cef,3=brad
-SET @id_convenio = 5; -- 1=Mjr;2=MaribBB;3=MaribCef;4=TprBB;5=TprCef;6=TprPrevBB;7=TprPrevCef;9=DRiachosBB;10=DRiachosCef
+SET @id_consignatario = 1; -- 1=bb,2=cef,3=brad
+SET @id_convenio = 6; -- 1=Mjr;2=MaribBB;3=MaribCef;4=TprBB;5=TprCef;6=TprPrevBB;7=TprPrevCef;9=DRiachosBB;10=DRiachosCef
 
 -- Exclui tabela de cópia caso exista
 SET @sql = CONCAT('DROP TABLE IF EXISTS wwmgca_',@cliente,'_',@dominio,'.con_contratos_cn');

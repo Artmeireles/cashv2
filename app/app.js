@@ -88,6 +88,5 @@ app.listen(port, async() => {
         })
     })
     moment().toString()     
-    app.api.logger.logInfo({ log: { line: `Backend executando na porta ${port}`, sConsole: true } })
- 
+    app.api.logger.logInfo({ log: { line: `Backend executando na porta ${port}`, sConsole: true } }) 
 })

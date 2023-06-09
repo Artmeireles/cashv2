@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <RouterView />
-    <Toast />
+    <Toast position="bottom-right" />
     <DynamicDialog />
   </div>
 </template>
@@ -32,7 +32,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: var(--red-900);
+  background-color: var(--orange-700);
 }
 
 .desktopBgn {

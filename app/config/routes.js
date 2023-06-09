@@ -33,23 +33,22 @@ module.exports = app => {
     app.route('/user-sms-unlock').patch(app.api.user.smsToken)
     app.route('/user-mail-unlock').patch(app.api.user.mailyToken)
 
-    app.route('/user-token/:token').get(app.api.user.getByToken)
-    app.route('/desk-users').get(app.api.user.getDeskUser)
-    app.route('/users/f-a/:func')
-        .all(app.config.passport.authenticate())
-        .get(app.api.user.getByFunction)
     app.route('/users')
         .all(app.config.passport.authenticate())
         .post(gestor(app.api.user.save))
         .get(app.api.user.get)
-    app.route('/users-cpf/:cpf')
-        .all(app.config.passport.authenticate())
-        .get(app.api.user.getByCpf)
     app.route('/users/:id')
         .all(app.config.passport.authenticate())
         .put(app.api.user.save)
         .get(app.api.user.getById)
         .delete(gestor(app.api.user.remove))
+    app.route('/user-token/:token').get(app.api.user.getByToken)
+    app.route('/users/f-a/:func')
+        .all(app.config.passport.authenticate())
+        .get(app.api.user.getByFunction)
+    app.route('/users-cpf/:cpf')
+        .all(app.config.passport.authenticate())
+        .get(app.api.user.getByCpf)
     app.route('/users/locate-servidor-on-client')
         .all(app.config.passport.authenticate())
         .post(app.api.user.locateServidorOnClient)
@@ -73,16 +72,22 @@ module.exports = app => {
         .put(app.api.params.save)
         .get(app.api.params.getById)
         .delete(app.api.params.remove)
-    app.route('/ponte-id').post(app.api.params.getPonteId)
-    app.route('/siap-id').post(app.api.params.getSiapId)
-    app.route('/esocial-id').post(app.api.params.getESocialId)
-    app.route('/esocialjar-id').post(app.api.params.getESocialJarId)
     app.route('/mailer-cli')
         .all(app.config.passport.authenticate())
         .post(app.api.mailerCli.mailyCliSender)
     app.route('/mailer-noncli')
         // .all(app.config.passport.authenticate())
         .post(app.api.mailerCli.mailyCliSender)
+
+    /**
+     * Rotas para o MGFolha Desktop
+     */
+    app.route('/desk-users').get(app.api.user.getDeskUser)
+    app.route('/ponte-id').post(app.api.params.getPonteId)
+    app.route('/siap-id').post(app.api.params.getSiapId)
+    app.route('/esocial-id').post(app.api.params.getESocialId)
+    app.route('/esocialjar-id').post(app.api.params.getESocialJarId)
+
     /**
     * Novas Rotas /////////////////////////////////////////////////////
     * 

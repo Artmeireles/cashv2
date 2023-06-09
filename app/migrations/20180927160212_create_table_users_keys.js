@@ -10,7 +10,7 @@ exports.up = function(knex, Promise) {
         table.string('last_used_in').notNull()
         table.integer('id_users').unsigned().notNull()
         table.string('password').notNull()
-        table.foreign('id_users').references('id').inTable('users').onUpdate('Cascade').onDelete('NO ACTION')
+        table.foreign('id_users').references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE')
         table.unique(['password', 'id_users'])
     })
 };

@@ -51,6 +51,7 @@ const getYear = () => {
 
 const logout = () => {
     useUserStore().logout()
+    location.reload()
 }
 </script>
 

@@ -27,7 +27,7 @@ module.exports = app => {
             evento.evento = force ? `${evento.evento}` : `${evento.evento} ${eventoDescr}: ${fields.substring(0, fields.length - 2)}`
             evento.id_user = !(request && request.user && request.user.id) ? last.id : request.user.id
             evento.classevento = evento.classevento || "Update"
-            evento.ip = request.userIp
+            evento.ip = request.headers['x-ip-address']
             evento.geo_lt = request.userGeoLt
             evento.geo_ln = request.userGeoLn
             evento.id_registro = last.id
@@ -66,7 +66,7 @@ module.exports = app => {
             evento.id_user = !(request && request.user && request.user.id) ? next.id : request.user.id
             evento.evento = `${evento.evento}: ${eventoDescr}`
             evento.classevento = evento.classevento || "Insert"
-            evento.ip = request.userIp
+            evento.ip = request.headers['x-ip-address']
             evento.geo_lt = request.userGeoLt
             evento.geo_ln = request.userGeoLn
             evento.id_registro = next.id
@@ -103,7 +103,7 @@ module.exports = app => {
 
             evento.id_user = !(request && request.user && request.user.id) ? last.id : request.user.id
             evento.classevento = evento.classevento || "Remove"
-            evento.ip = request.userIp
+            evento.ip = request.headers['x-ip-address']
             evento.geo_lt = request.userGeoLt
             evento.geo_ln = request.userGeoLn
             evento.id_registro = last.id
@@ -127,7 +127,7 @@ module.exports = app => {
     const createEvent = async (req, res) => {
         const request = req.request
         const evento = req.evento
-        evento.ip = request.userIp
+        evento.ip = request.headers['x-ip-address']
         evento.geo_lt = request.userGeoLt
         evento.geo_ln = request.userGeoLn
         evento.created_at = new Date()

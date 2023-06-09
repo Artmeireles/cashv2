@@ -16,7 +16,7 @@ exports.up = function(knex) {
         table.integer('situacao').notNull()
         table.integer('observacao').notNull()
 
-        table.foreign('id_con_contratos').references('id').inTable('con_contratos').onUpdate('Cascade').onDelete('NO ACTION')
+        table.foreign('id_con_contratos').references('id').inTable('con_contratos').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

@@ -6,6 +6,7 @@ import App from './App.vue'
 import router from './router'
 import PrimeVue from 'primevue/config'
 import InputText from 'primevue/inputtext'
+import InputMask from 'primevue/inputmask'
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import ToastService from 'primevue/toastservice'
@@ -42,6 +43,7 @@ app.use(ToastService)
 app.use(DialogService);
 
 app.component('InputText', InputText)
+app.component('InputMask', InputMask)
 app.component('Button', Button)
 app.component('Toast', Toast)
 app.component('DynamicDialog', DynamicDialog)

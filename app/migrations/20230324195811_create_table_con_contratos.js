@@ -24,8 +24,8 @@ exports.up = function(knex) {
         table.string('data_averbacao')
         table.string('data_liquidacao')
 
-        table.foreign('id_serv').references('id').inTable('servidores').onUpdate('Cascade').onDelete('NO ACTION')
-        table.foreign('id_consign').references('id').inTable('con_consign').onUpdate('Cascade').onDelete('NO ACTION')
+        table.foreign('id_serv').references('id').inTable('servidores').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_consign').references('id').inTable('con_consign').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

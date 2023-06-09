@@ -14,7 +14,7 @@ exports.up = function(knex) {
         table.string('geo_lt')
         table.string('geo_ln')
 
-        // table.foreign('id_user').references('id').inTable('users').onUpdate('Cascade').onDelete('Cascade')
+        // table.foreign('id_user').references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE')
     })
 };
 

@@ -16,9 +16,9 @@ module.exports = app => {
      * @returns 
      */
     const signin = async (req, res) => {
-        console.log(req.body);
         const email = req.body.email || req.body.cpf || undefined
         let password = req.body.password || undefined
+        const ip = req.body.ip
         try {
             existsOrError(email, 'E-mail, nome ou CPF precisam ser informados')
         } catch (error) {
@@ -143,6 +143,8 @@ module.exports = app => {
                     cpf: user.cpf,
                     name: user.name,
                     telefone: user.telefone,
+                    ip: ip,
+                    ipSignin: ip,
                     iat: now,
                     exp: expirationTime
                 }
@@ -160,7 +162,6 @@ module.exports = app => {
                         "id_registro": null
                     }
                 })
-
                 res.json({
                     ...payload,
                     token: jwt.encode(payload, authSecret)
@@ -180,15 +181,11 @@ module.exports = app => {
         try {
             if (userData) {
                 const token = jwt.decode(userData.token, authSecret)
-                if (new Date(token.exp * 1000) > new Date()) {
-                    await
-                        app.api.logger.logInfo({ log: { line: `Token validado com sucesso`, sConsole: true } })
+                if (new Date(token.exp * 1000) > new Date() && userData.ipSignin == userData.ip) {
                     return res.send(true)
                 }
             }
-        } catch (e) {
-            // problema com o token
-        }
+        } catch (error) {}
 
         res.send(false)
     }

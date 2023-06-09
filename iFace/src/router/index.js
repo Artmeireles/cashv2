@@ -24,6 +24,11 @@ const routes = [
     component: () => import('@/views/pages/SignUp.vue')
   },
   {
+    path: '/u-token',
+    name: 'u-token',
+    component: () => import('@/views/pages/UserToken.vue')
+  },
+  {
     path: '/not-found',
     name: 'not-found',
     component: () => import('@/views/pages/NotFound.vue')
@@ -45,7 +50,7 @@ router.beforeEach((to, from, next) => {
   if (!paths.includes(to.path)) next({ path: '/not-found' })
   else if ((user && user.id) && to.path == '/signin') next({ path: '/' })
   else {
-    if (!['/', '/signin', '/signup', '/not-found'].includes(to.path) && !(user && user.id)) next({ path: '/signin' })
+    if (!['home', 'signin', 'signup', 'u-token', 'not-found'].includes(to.name) && !(user && user.id)) next({ path: '/signin' })
     else next()
   }
 })

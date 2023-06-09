@@ -15,7 +15,7 @@ exports.up = function(knex) {
         table.boolean('averbar_online').notNull().default(false).comment('Aceitar averbação online')
         table.boolean('apenas_efetivos').notNull().default(true).comment('Apenas efetivos podem contratar')
 
-        table.foreign('id_cad_bancos').references('id').inTable('wwmgca_cliente_ativos.cad_bancos').onUpdate('Cascade').onDelete('NO ACTION')
+        table.foreign('id_cad_bancos').references('id').inTable('wwmgca_cliente_ativos.cad_bancos').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

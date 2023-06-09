@@ -2,7 +2,8 @@
 const randomstring = require("randomstring")
 const { baseFrontendUrl, emailAdmin, appName } = require("../config/params")
 const { dbPrefix, jasperServerU, jasperServerK } = require("../.env")
-const { STATUS_INACTIVE, STATUS_SUSPENDED, STATUS_SUSPENDED_BY_TKN, STATUS_ACTIVE, STATUS_DELETE, MINIMUM_KEYS_BEFORE_CHANGE, TOKEN_VALIDE_MINUTES } = require("../config/userStatus")
+const { STATUS_INACTIVE, STATUS_WAITING, STATUS_SUSPENDED, STATUS_SUSPENDED_BY_TKN, STATUS_ACTIVE,
+    STATUS_DELETE, MINIMUM_KEYS_BEFORE_CHANGE, TOKEN_VALIDE_MINUTES } = require("../config/userStatus")
 const axios = require('axios')
 const moment = require('moment')
 
@@ -28,7 +29,6 @@ module.exports = app => {
      */
     const signup = async (req, res) => {
         const body = { ...req.body }
-        console.log('0',body);
         let registered = false;
         try {
             existsOrError(body.cpf, 'CPF não informado')
@@ -36,7 +36,7 @@ module.exports = app => {
             cpfOrError(body.cpf, 'CPF inválido')
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            return res.status(400).send(error)
+            return res.status(400).send({ msg: error })
         }
 
         /**
@@ -52,7 +52,6 @@ module.exports = app => {
             .where({ cpf: body.cpf }).first()
         const isStatusActive = (userFromDB && userFromDB.status == STATUS_ACTIVE) || false
 
-        console.log('1',body);
         /**
          * #1 - Se o solicitante já tem perfil:
          *      a) Se é um usuário ativo então deve redirecionar para a tela de login
@@ -73,7 +72,6 @@ module.exports = app => {
             })
         }
 
-        console.log('2',body);
         /**
          * Se for informado um e-mail, faz a validação e 
          * bloqueia a duplicidade de e-mails
@@ -85,7 +83,7 @@ module.exports = app => {
                 if (userEmail && !isStatusActive) notExistsOrError(userEmail.email, 'E-mail já registrado')
             } catch (error) {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(400).send(error)
+                return res.status(400).send({ msg: error })
             }
         }
         /**
@@ -93,7 +91,6 @@ module.exports = app => {
         */
         if ((body.isNewUser || (body.client && body.domain)) && body.celular && body.cpf) {
             delete body.isNewUser
-            console.log('3',body);
             /**
              * Se body.id NÃO for informado então não é servidor. Nesse caso body.email torna-se obrigatório
              */
@@ -102,7 +99,7 @@ module.exports = app => {
                     existsOrError(body.email, 'E-mail obrigatório não informado')
                 } catch (error) {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                    return res.status(400).send(error)
+                    return res.status(400).send({ msg: error })
                 }
             } else {
                 /**
@@ -115,17 +112,17 @@ module.exports = app => {
                         if (userCelPhone) notExistsOrError(userCelPhone.telefone, 'Celular já registrado')
                     } catch (error) {
                         app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                        return res.status(400).send(error)
+                        return res.status(400).send({ msg: error })
                     }
 
                 try {
-                    existsOrError(body.nome, 'Nome não informado')
+                    existsOrError(body.name, 'Nome não informado')
                     existsOrError(body.password, 'Senha não informada')
                     existsOrError(body.confirmPassword, 'Confirmação de Senha inválida')
                     equalsOrError(body.password, body.confirmPassword, 'Senhas não conferem')
                 } catch (error) {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                    return res.status(400).send(error)
+                    return res.status(400).send({ msg: error })
                 }
 
 
@@ -144,7 +141,6 @@ module.exports = app => {
                 body.f_mes = body.created_at.getMonth().toString().padStart(2, "0")
                 body.f_complementar = '000'
                 body.id_cadas = body.id
-                body.name = body.nome
                 body.telefone = body.celular
                 body.cliente = body.client
                 body.dominio = body.domain
@@ -153,8 +149,8 @@ module.exports = app => {
                     if (typeof isValidPassword(body.password) === 'string') throw isValidPassword(body.password)
                 } catch (error) {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                    return res.status(200).send({
-                        isValidPassword: false,
+                    return res.status(400).send({
+                        isInvalidPassword: true,
                         msg: error
                     })
                 }
@@ -217,15 +213,22 @@ module.exports = app => {
                             })
                             .catch(error => {
                                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                                return res.status(500).send(error)
+                                return res.status(500).send({ msg: error })
                             })
 
                         app.api.logger.logInfo({ log: { line: `Novo de perfil de usuário! Usuário: ${body.name}`, sConsole: true } })
-                        return res.json(body)
+                        return res.json({
+                            data: body,
+                            msg: [
+                                `Olá ${body.name.split(' ')[0]}!`,
+                                `Estamos confirmando sua inscrição ✔`,
+                                `Para liberar seu acesso, informe dentro dos próximos ${TOKEN_VALIDE_MINUTES} minutos o token que enviamos em seu email ou SMS`
+                            ]
+                        })
                     })
                     .catch(error => {
                         app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                        return res.status(500).send(error)
+                        return res.status(500).send({ msg: error })
                     })
             }
         }
@@ -279,6 +282,7 @@ module.exports = app => {
                     /**
                      * #3 - Se não tem perfil e não é localizado nos schemas dos clientes todos os dados tornam-se obrigatórios exceto o id
                     */
+                    console.log(body);
                     return res.json({ isNewUser: true, msg: await showNewUserMessage() || "Não encontramos as informações que você forneceu. Por favor, complete os campos abaixo com os dados necessários para criar seu perfil de usuário" })
                 }
             }
@@ -447,7 +451,7 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                return res.status(500).send({ msg: error })
             })
     }
 
@@ -509,11 +513,11 @@ module.exports = app => {
                 if (userFromDB.email)
                     mailyUnlocked(userFromDB)
                 app.api.logger.logInfo({ log: { line: `Usuário autorizado a usar o sistema! Usuário: ${userFromDB.name}`, sConsole: true } })
-                return res.status(200).send('Usuário autorizado a usar o sistema!<br>Obrigado por sua confirmação')
+                return res.status(200).send({ msg: 'Usuário autorizado a usar o sistema! Obrigado por sua confirmação' })
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                return res.status(500).send({ msg: error })
             })
     }
 
@@ -590,7 +594,7 @@ module.exports = app => {
             else return token
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            return res.status(500).send(error)
+            return res.status(500).send({ msg: error })
         }
     }
 
@@ -663,7 +667,7 @@ module.exports = app => {
             })
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            return res.status(500).send(error)
+            return res.status(500).send({ msg: error })
         }
     }
 
@@ -759,21 +763,6 @@ module.exports = app => {
         if (user.cpf)
 
             try {
-                // Apenas gestores podem selecionar outros admins, gestores e se o usuário pode ser multiCliente
-                if (user.id && !req.user.gestor >= 1 && (user.admin >= 1 || user.gestor >= 1 || user.multiCliente >= 1)) {
-                    delete user.admin
-                    delete user.gestor
-                    delete user.multiCliente
-                }
-                // Apenas gestores e admins podem selecionar alçadas de usuários
-                if (user.id && !(req.user.gestor >= 1) &&
-                    (
-                        user.consignatario >= 1 ||
-                        user.tipoUsuario >= 1 ||
-                        user.cad_servidores >= 1 ||
-                        user.financeiro >= 1 ||
-                        user.con_contratos >= 1
-                    )) return res.status(401).send('Unauthorized')
                 existsOrError(user.name, 'Nome não informado')
                 existsOrError(user.cpf, 'CPF não informado')
                 // existsOrError(user.email, 'E-mail não informado')
@@ -785,7 +774,6 @@ module.exports = app => {
                 } else if (!user.password) {
                     delete user.password
                 }
-
                 if (!user.id) {
                     notExistsOrError(userFromDB, 'E-mail ou CPF já registrado')
                 }
@@ -793,6 +781,20 @@ module.exports = app => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
                 return res.status(400).send(error)
             }
+
+        // Apenas gestores e admins podem selecionar alçadas de usuários
+        if (!(user.id && (user.gestor >= 1 || user.admin >= 1))) {
+            delete user.admin
+            delete user.gestor
+            delete user.multiCliente
+            delete user.consignatario
+            delete user.tipoUsuario
+            delete user.averbaOnline
+            delete user.cad_servidores
+            delete user.financeiro
+            delete user.con_contratos
+            delete user.cad_orgao
+        }
 
         if (user.email && user.email.trim.length == 0)
             delete user.email
@@ -808,6 +810,12 @@ module.exports = app => {
         delete user.confirmPassword
         delete user.j_user
         delete user.j_paswd
+        // Apenas admins podem selecionar outros admins, gestores ou multiCliente
+        if (!(user.admin >= 1)) {
+            delete user.admin
+            delete user.gestor
+            delete user.multiCliente
+        }
 
         const f_folha = new Date()
 
@@ -854,7 +862,7 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                return res.status(500).send({ msg: error })
             })
         existsOrError(rowsUpdated, 'Usuário não foi encontrado')
     }
@@ -923,12 +931,14 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                return res.status(500).send({ msg: error })
             })
     }
 
     const getById = async (req, res) => {
         let user = req.user
+
+        console.log(req.body);
         const uParams = await app.db('users').where({ id: user.id }).first();
         if (req.user.id != req.params.id && uParams.gestor < 1) return res.status(401).send('Unauthorized')
         app.db(tabela)
@@ -945,7 +955,7 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                return res.status(500).send({ msg: error })
             })
     }
 
@@ -965,7 +975,7 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                return res.status(500).send({ msg: error })
             })
     }
 
@@ -982,7 +992,7 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                return res.status(500).send({ msg: error })
             })
     }
 
@@ -1047,7 +1057,7 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                return res.status(500).send({ msg: error })
             })
     }
 

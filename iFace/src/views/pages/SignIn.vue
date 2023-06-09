@@ -77,7 +77,7 @@ const signin = async () => {
         await store.registerUser(email.value, password.value)
         if (store.userStore && store.userStore.id) {
             router.push({ path: "/" });
-            toast.add({ severity: 'success', detail: `Seja bem vindo ${store.userStore.name}!`, life: 3000 });
+            toast.add({ severity: 'success', detail: `Seja bem vindo ${store.userStore.name.split(' ')[0]}!`, life: 3000 });
         } else {
             toast.add({ severity: 'error', detail: `Combinação de usuário e senha não localizado!`, life: 3000 });
         }
