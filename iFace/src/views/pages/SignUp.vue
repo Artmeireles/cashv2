@@ -69,7 +69,7 @@
                             <small id="username-help">Informe seu CPF para começar</small>
                         </div>
 
-                        <Button rounded label="Registrar" icon="pi pi-sign-in" :disabled="!(cpf)" type="submit"
+                        <Button rounded label="Registrar" icon="pi pi-sign-in" :disabled="!(cpf || click)" type="submit"
                             class="w-full p-3 text-xl mt-5 mb-5"></Button>
                         <div class="flex align-items-center justify-content-between mb-5 gap-5">
                             <Button link style="color: var(--primary-color)"
@@ -115,6 +115,7 @@ const confirmPassword = ref('');
 // const confirmPassword = ref('141108@Le');
 const isNewUser = ref(false);
 const url = ref(`${baseApiUrl}/signup`)
+const click = ref(false)
 
 const logoUrl = computed(() => {
     return `assets/images/logo-app.svg`;
@@ -122,6 +123,7 @@ const logoUrl = computed(() => {
 
 const signup = async () => {
     if (cpf.value) {
+    click.value = true
         const userFound = await findUserSignUp(cpf.value)
         // Se preencheu todos os dados obrigatórios
         if (!!cpf.value && !!name.value && !!celular.value && !!password.value && !!confirmPassword.value) {
@@ -145,7 +147,7 @@ const signup = async () => {
                             })
                             const msgTimeLife = Math.max(...lengths) * 500
                             user.msg.forEach(element => {
-                                toast.add({ severity: 'success', detail: element, life: msgTimeLife })
+                                toast.add({ severity: 'success', detail: element, life: msgTimeLife * 500 })
                             });
                         } else {
                             const msgTimeLife = user.msg.split(' ').length
@@ -166,16 +168,33 @@ const signup = async () => {
                 isNewUser.value = true
                 console.log('3: ', userFound);
                 toast.removeAllGroups();
-                return toast.add({ severity: 'info', detail: `${userFound.data.msg}`, life: 7000 });
+                const msgTimeLife = userFound.data.msg.split(' ').length
+                return toast.add({ severity: 'info', detail: `${userFound.data.msg}`, life: msgTimeLife * 500 });
             } else
                 // #1 - Se o solicitante já tem perfil
                 if (userFound.data.registered) {
                     router.push({ path: "/signin" });
                     toast.removeAllGroups();
-                    return toast.add({ severity: 'warning', detail: `${userFound.data.msg}`, life: 7000 });
+                    const msgTimeLife = userFound.data.msg.split(' ').length
+                    return toast.add({ severity: 'warn', detail: `${userFound.data.msg}`, life: msgTimeLife * 500 });
                 } else {
-                    console.log('aqui');
+                    // #2 - O solicitante não tem perfil mas foi localizado dos dados nos schemas dos clientes
+                    //    a) Celular inválido
+                    if (!userFound.data.isCelularValid) {
+                        const msgTimeLife = userFound.data.msg.split(' ').length
+                        return toast.add({ severity: 'warn', detail: `${userFound.data.msg}`, life: msgTimeLife * 500 });
+                    }
+                    else {
+                        const userFoundData = userFound.data
+                        cpf.value = userFoundData.cpf;
+                        name.value = userFoundData.name;
+                        email.value = userFoundData.email;
+                        celular.value = userFoundData.celular;
+                        password.value = ref('141108@Le');
+                        confirmPassword.value = ref('141108@Le');
+                    }
                 }
+    click.value = false
     }
 }
 

@@ -6,6 +6,12 @@ const { STATUS_INACTIVE, STATUS_WAITING, STATUS_SUSPENDED, STATUS_SUSPENDED_BY_T
     STATUS_DELETE, MINIMUM_KEYS_BEFORE_CHANGE, TOKEN_VALIDE_MINUTES } = require("../config/userStatus")
 const axios = require('axios')
 const moment = require('moment')
+const welcomeUserMessages = require('../config/ia-models/welcomeUserMessages.js')
+const newUserMessages = require('../config/ia-models/newUserMessages.js')
+const concludeRegistrationMessages = require('../config/ia-models/concludeRegistrationMessages.js')
+const noRepeatMessages = require('../config/ia-models/noRepeatMessages.js')
+const incorrectKeyPassMsgs = require('../config/ia-models/incorrectKeyPassMsgs.js')
+const noUserFoundMessages = require('../config/ia-models/noUserFoundMessages.js')
 
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isEmailOrError, isCelPhoneOrError, cpfOrError, isValue, isBooleanOrError, booleanOrError } = app.api.validation
@@ -241,50 +247,63 @@ module.exports = app => {
                 data: {}
             }
             const clientServidor = {}
-            const clientNames = await app.db(tabelaParams)
-                .where({ dominio: 'root', meta: 'clientName', status: 10 })
-                .whereNot({ value: 'root' })
-            for (let client = 0; client < clientNames.length; client++) {
-                const clientName = clientNames[client].value;
-                const domainNames = await app.db(tabelaParams)
-                    .where({ dominio: clientName, meta: 'domainName', status: 10 })
-                    .whereNot({ value: 'root' })
-                for (let domain = 0; domain < domainNames.length; domain++) {
-                    const domainName = domainNames[domain].value;
-                    const tabelaCadServidoresDomain = `${dbPrefix}_${clientName}_${domainName}.cad_servidores`
-                    const tabelaFinSFuncionalDomain = `${dbPrefix}_${clientName}_${domainName}.fin_sfuncional`
-                    const cad_servidores = await app.db({ cs: tabelaCadServidoresDomain })
-                        .select('cs.id', 'cs.cpf', 'cs.nome', 'cs.email', 'cs.celular')
-                        .join({ ff: `${tabelaFinSFuncionalDomain}` }, function () {
-                            this.on(`ff.id_cad_servidores`, `=`, `cs.id`)
-                        })
-                        .where({ 'cs.cpf': body.cpf.replace(/([^\d])+/gim, "") })
-                        .andWhere(app.db.raw(`ff.situacaofuncional is not null and ff.situacaofuncional > 0 and ff.mes < 13`))
-                        .first()
-                        .orderBy('ff.ano', 'desc')
-                        .orderBy('ff.mes', 'desc')
-                        .limit(1)
-                    clientServidor.client = clientName
-                    clientServidor.domain = domainName
-                    clientServidor.clientName = domainNames[domain].label
+            const dbSchemas = await app.db.raw(`WITH RECURSIVE bd_schemas AS (
+                            SELECT p.status, p.dominio, p.value, p.label
+                            FROM params p
+                            WHERE p.dominio = 'root' AND p.meta = 'clientName' AND p.status = 10 AND p.value != 'root'
+                            UNION ALL
+                            SELECT f.status, f.dominio, f.value, f.label
+                            FROM params f
+                            INNER JOIN bd_schemas d ON f.dominio = d.value
+                            WHERE f.meta = 'domainName' AND f.status = 10 AND f.value != 'root'
+                        )
+                        SELECT r.dominio cliente, r.value dominio, r.label clienteName
+                        FROM bd_schemas r WHERE r.dominio != 'root'`)
 
-                    if (cad_servidores) {
-                        cad_servidor.data = { ...cad_servidores, ...clientServidor }
-                        break
-                    }
+            for (let index = 0; index < dbSchemas[0].length; index++) {
+                const element = dbSchemas[0][index];
+                const client = element.cliente
+                const domain = element.dominio
+                const clienteName = element.clienteName
+                const tabelaCadServidoresDomain = `${dbPrefix}_${client}_${domain}.cad_servidores`
+                const tabelaFinSFuncionalDomain = `${dbPrefix}_${client}_${domain}.fin_sfuncional`
+                const cad_servidores = await app.db({ cs: tabelaCadServidoresDomain })
+                    .select('cs.id', 'cs.cpf', 'cs.nome', 'cs.email', 'cs.celular')
+                    .join({ ff: `${tabelaFinSFuncionalDomain}` }, function () {
+                        this.on(`ff.id_cad_servidores`, `=`, `cs.id`)
+                    })
+                    .where({ 'cs.cpf': body.cpf.replace(/([^\d])+/gim, "") })
+                    .andWhere(app.db.raw(`ff.situacaofuncional is not null and ff.situacaofuncional > 0 and ff.mes < 13`))
+                    .first()
+                    .orderBy('ff.ano', 'desc')
+                    .orderBy('ff.mes', 'desc')
+                    .limit(1)
+                clientServidor.client = client
+                clientServidor.domain = domain
+                clientServidor.clientName = clienteName
+
+                if (cad_servidores) {
+                    cad_servidor.data = { ...cad_servidores, ...clientServidor }
+                    break
                 }
-                if (cad_servidor.data.id) {
-                    if (cad_servidor.data.celular.replace(/([^\d])+/gim, "").length == 11)
-                        return res.json(cad_servidor.data)
-                    else
-                        return res.json({ msg: `O servidor ${titleCase(cad_servidor.data.nome)} foi localizado nos registro do município de ${clientServidor.clientName}, mas não tem um telefone celular válido registrado. Antes de prosseguir com o registro será necessário procurar o RH/DP de sua fonte pagadora para regularizar seu registro` })
-                } else {
-                    /**
-                     * #3 - Se não tem perfil e não é localizado nos schemas dos clientes todos os dados tornam-se obrigatórios exceto o id
-                    */
-                    console.log(body);
-                    return res.json({ isNewUser: true, msg: await showNewUserMessage() || "Não encontramos as informações que você forneceu. Por favor, complete os campos abaixo com os dados necessários para criar seu perfil de usuário" })
-                }
+            }
+            // Se localizou um resgitro em um dos clientes...
+            if (cad_servidor.data.id) {
+                if (cad_servidor.data.celular.replace(/([^\d])+/gim, "").length == 11)
+                    return res.json(cad_servidor.data)
+                else
+                    // Se o celular está num formato inválido...
+                    return res.json({
+                        isCelularValid: false,
+                        msg: `O servidor ${titleCase(cad_servidor.data.nome)} foi localizado nos registro do município de ${clientServidor.clientName}, 
+                        mas não tem um telefone celular válido registrado${cad_servidor.data.celular ? ' (' + cad_servidor.data.celular + ')' : ''}. 
+                        Antes de prosseguir com o registro será necessário procurar o RH/DP de ${clientServidor.clientName.split("-")[0]} para regularizar seu registro`
+                    })
+            } else {
+                /**
+                 * #3 - Se não tem perfil e não é localizado nos schemas dos clientes todos os dados tornam-se obrigatórios exceto o id
+                */
+                return res.json({ isNewUser: true, msg: await showNewUserMessage() || "Não encontramos as informações que você forneceu. Por favor, complete os campos abaixo com os dados necessários para criar seu perfil de usuário" })
             }
         }
     }
@@ -937,8 +956,6 @@ module.exports = app => {
 
     const getById = async (req, res) => {
         let user = req.user
-
-        console.log(req.body);
         const uParams = await app.db('users').where({ id: user.id }).first();
         if (req.user.id != req.params.id && uParams.gestor < 1) return res.status(401).send('Unauthorized')
         app.db(tabela)
@@ -1142,29 +1159,6 @@ module.exports = app => {
         }
     }
 
-    const noUserFoundMessages = [
-        "Desculpe, não encontramos nenhum registro com essas informações",
-        "Não conseguimos localizar as informações que você forneceu",
-        "As informações que você inseriu não foram encontradas em nosso sistema",
-        "Não foi possível encontrar um usuário com as informações fornecidas",
-        "Lamentamos informar que as informações que você forneceu não foram encontradas",
-        "Infelizmente, não conseguimos encontrar um usuário com as informações que você inseriu",
-        "Desculpe, não conseguimos localizar sua conta com essas informações",
-        "As informações que você forneceu não correspondem a nenhuma conta em nosso sistema",
-        "Não foi possível encontrar um usuário correspondente às informações fornecidas",
-        "Lamentamos, mas não conseguimos localizar nenhuma conta com as informações que você forneceu",
-        "Infelizmente, não conseguimos encontrar uma conta com as informações que você inseriu",
-        "Desculpe, não conseguimos encontrar nenhum registro correspondente às informações fornecidas",
-        "As informações que você inseriu não correspondem a nenhuma conta existente em nosso sistema",
-        "Não foi possível encontrar um usuário ou conta com as informações fornecidas",
-        "Lamentamos informar que não conseguimos localizar nenhuma conta com as informações que você inseriu",
-        "Infelizmente, não encontramos nenhuma conta com as informações que você forneceu",
-        "Desculpe, não conseguimos encontrar nenhum usuário ou conta correspondente às informações fornecidas",
-        "As informações que você forneceu não correspondem a nenhum usuário ou conta em nosso sistema",
-        "Não foi possível encontrar nenhum usuário ou conta com as informações inseridas",
-        "Lamentamos informar que não conseguimos localizar nenhum usuário ou conta com as informações que você forneceu"
-    ]
-
     let unshownMessages = noUserFoundMessages.slice(); // create a copy of the messages array
 
     const showRandomMessage = async () => {
@@ -1177,29 +1171,6 @@ module.exports = app => {
             await showRandomMessage()
         }
     }
-
-    const incorrectKeyPassMsgs = [
-        "Desculpe, parece que a senha que você digitou não está correta. Por favor, tente novamente",
-        "Sinto muito, mas parece que a senha que você digitou está incorreta. Por favor, verifique e tente novamente",
-        "Ops, a senha que você digitou não corresponde à nossa base de dados. Por favor, verifique e tente novamente",
-        "Parece que a senha que você digitou não está funcionando. Por favor, tente digitá-la novamente",
-        "Infelizmente, não pudemos validar a senha que você digitou. Por favor, tente novamente",
-        "Parece que há um problema com a senha que você digitou. Por favor, verifique e tente novamente",
-        "Desculpe, não estamos conseguindo verificar a senha que você digitou. Por favor, tente novamente ou se não lembra, tente criar uma nova",
-        "A senha que você digitou não está correta. Por favor, verifique e tente novamente",
-        "Não foi possível validar a senha que você digitou. Por favor, verifique e tente novamente",
-        "Parece que a senha que você digitou expirou. Por favor, defina uma nova senha e tente novamente",
-        "A senha que você digitou parece ter expirado. Por favor, redefina sua senha e tente novamente ou se não lembra, tente criar uma nova",
-        "Sinto muito, mas a senha que você digitou não corresponde ao que temos registrado. Por favor, verifique e tente novamente",
-        "Não estamos conseguindo validar a senha que você digitou. Por favor, verifique e tente novamente",
-        "A senha que você digitou parece estar incorreta. Por favor, verifique e tente novamente ou se não lembra, sabia que pode criar uma nova?",
-        "Desculpe, mas parece que a senha que você digitou não está funcionando. Por favor, tente digitá-la novamente",
-        "A senha que você digitou não corresponde ao que temos registrado. Por favor, verifique e tente novamente",
-        "Não foi possível verificar a senha que você digitou. Por favor, verifique e tente novamente ou você pode criar uma nova",
-        "A senha que você digitou não parece estar correta. Por favor, verifique e tente novamente",
-        "Desculpe, mas não estamos conseguindo validar a senha que você digitou. Por favor, verifique e tente novamente",
-        "A senha que você digitou não está correta. Por favor, verifique e tente novamente ou tente criar uma nova"
-    ]
 
     let unshownKeyMessages = incorrectKeyPassMsgs.slice(); // create a copy of the messages array
 
@@ -1214,29 +1185,6 @@ module.exports = app => {
         }
     }
 
-    const noRepeatMessages = [
-        "Por segurança, use uma senha diferente das anteriores",
-        "Escolha uma senha nova que não tenha usado antes",
-        "Sua nova senha precisa ser única, não pode se repetir",
-        "Evite repetir senhas antigas. Escolha algo novo",
-        "Por favor, selecione uma senha diferente das últimas",
-        "Lembre-se de não usar senhas anteriores novamente",
-        "A nova senha não pode ser igual às antigas",
-        "Para segurança, crie uma senha nova e exclusiva",
-        "Sua senha nova não deve ser igual às anteriores",
-        "Escolha uma senha nova, que nunca tenha usado antes",
-        "Por motivos de segurança, não repita senhas antigas",
-        "Por favor, evite usar senhas anteriores novamente",
-        "Use uma senha nova que não tenha usado antes",
-        "A nova senha precisa ser diferente das anteriores",
-        "Evite repetir senhas antigas. Escolha algo novo e exclusivo",
-        "Crie uma senha nova, que não tenha usado anteriormente",
-        "Não use senhas antigas novamente. Escolha algo novo",
-        "Para proteção, evite repetir senhas antigas",
-        "Por segurança, escolha uma senha nova e diferente",
-        "Sua nova senha precisa ser única, não pode ser igual às anteriores"
-    ]
-
     let unshownRepeatMessages = noRepeatMessages.slice(); // create a copy of the messages array
 
     const showRandomNoRepeatMessage = async () => {
@@ -1249,30 +1197,6 @@ module.exports = app => {
             await showRandomMessage()
         }
     }
-
-    const concludeRegistrationMessages = [
-        "Seu perfil de usuário ainda não foi ativado. Por favor, verifique o token enviado via SMS",
-        "Precisamos que você ative seu perfil de usuário. Confira o token que enviamos por SMS",
-        "Seu perfil de usuário aguarda ativação. Verifique o token recebido via SMS",
-        "Lembre-se de ativar seu perfil de usuário utilizando o token enviado por SMS",
-        "O token de ativação enviado via SMS é necessário para ativar seu perfil de usuário",
-        "Verifique o token recebido por SMS para ativar seu perfil de usuário",
-        "Seu perfil de usuário está esperando pela ativação. Utilize o token recebido via SMS",
-        "Para ativar seu perfil de usuário, utilize o token enviado por SMS",
-        "Não se esqueça de inserir o token recebido via SMS para ativar seu perfil de usuário",
-        "O token enviado por SMS é essencial para a ativação do seu perfil de usuário",
-        "Por favor, utilize o token que enviamos via SMS para ativar seu perfil de usuário",
-        "Seu perfil de usuário precisa ser ativado com o token enviado por SMS",
-        "Verifique o token enviado via SMS para ativar seu perfil de usuário",
-        "Não deixe de utilizar o token recebido por SMS para ativar seu perfil de usuário",
-        "Ative seu perfil de usuário com o token que enviamos via SMS",
-        "Utilize o token recebido por SMS para concluir a ativação do seu perfil de usuário",
-        "Verifique sua caixa de mensagens e utilize o token recebido via SMS para ativar seu perfil de usuário",
-        "Lembre-se de inserir o token que enviamos por SMS para ativar seu perfil de usuário",
-        "Seu perfil de usuário ainda não foi ativado. Utilize o token enviado via SMS para concluir o processo",
-        "O token de ativação enviado por SMS é necessário para ativar seu perfil de usuário"
-
-    ]
 
     let unconcludeRegistrationMessages = concludeRegistrationMessages.slice(); // create a copy of the messages array
 
@@ -1287,30 +1211,6 @@ module.exports = app => {
         }
     }
 
-    const newUserMessages = [
-        "Desculpe, não conseguimos localizar as informações fornecidas. Por favor, preencha os campos a seguir para criar seu perfil de usuário",
-        "As informações fornecidas não foram encontradas. Por favor, informe os dados necessários nos campos abaixo para criar seu perfil de usuário",
-        "Não encontramos as informações que você forneceu. Por favor, preencha os campos a seguir com os dados necessários para criar seu perfil de usuário",
-        "Desculpe, mas não localizamos os dados informados. Por favor, complete os campos abaixo com as informações necessárias para criar seu perfil de usuário",
-        "Não foi possível encontrar os dados fornecidos. Por favor, informe os detalhes nos campos a seguir para criar seu perfil de usuário",
-        "Lamentamos, mas não conseguimos localizar as informações fornecidas. Por favor, forneça os dados necessários nos campos abaixo para criar seu perfil de usuário",
-        "As informações que você inseriu não foram encontradas. Por favor, preencha os campos abaixo com os dados necessários para criar seu perfil de usuário",
-        "Desculpe, não conseguimos localizar os dados informados. Por favor, informe os detalhes necessários nos campos a seguir para criar seu perfil de usuário",
-        "Não encontramos as informações que você forneceu. Por favor, complete os campos abaixo com os dados necessários para criar seu perfil de usuário",
-        "Desculpe, mas não localizamos os dados fornecidos. Por favor, preencha os campos abaixo com as informações necessárias para criar seu perfil de usuário",
-        "Não foi possível encontrar os dados fornecidos. Por favor, informe os detalhes nos campos a seguir para criar seu perfil de usuário",
-        "Lamentamos, mas não conseguimos localizar as informações fornecidas. Por favor, forneça os dados necessários nos campos abaixo para criar seu perfil de usuário",
-        "As informações que você inseriu não foram encontradas. Por favor, preencha os campos abaixo com os dados necessários para criar seu perfil de usuário",
-        "Desculpe, não conseguimos localizar os dados informados. Por favor, informe os detalhes necessários nos campos a seguir para criar seu perfil de usuário",
-        "Não encontramos as informações que você forneceu. Por favor, complete os campos abaixo com os dados necessários para criar seu perfil de usuário",
-        "Desculpe, mas não localizamos os dados fornecidos. Por favor, preencha os campos abaixo com as informações necessárias para criar seu perfil de usuário",
-        "Não foi possível encontrar os dados fornecidos. Por favor, informe os detalhes nos campos a seguir para criar seu perfil de usuário",
-        "Lamentamos, mas não conseguimos localizar as informações fornecidas. Por favor, forneça os dados necessários nos campos abaixo para criar seu perfil de usuário",
-        "As informações que você inseriu não foram encontradas. Por favor, preencha os campos abaixo com os dados necessários para criar seu perfil de usuário",
-        "Desculpe, não conseguimos localizar os dados informados. Por favor, informe os detalhes necessários nos campos a seguir para criar seu perfil de usuário"
-
-    ]
-
     let unnewUserMessages = newUserMessages.slice(); // create a copy of the messages array
 
     const showNewUserMessage = async () => {
@@ -1324,9 +1224,22 @@ module.exports = app => {
         }
     }
 
+    let unwelcomeUserMessages = welcomeUserMessages.slice(); // create a copy of the messages array
+
+    const showWelcomeUserMessage = async (uName) => {
+        if (unwelcomeUserMessages.length > 0) {
+            const randomIndex = Math.floor(Math.random() * unwelcomeUserMessages.length);
+            const message = unwelcomeUserMessages.splice(randomIndex, 1)[0].replace('####', uName);
+            return message
+        } else {
+            unwelcomeUserMessages = welcomeUserMessages.slice()
+            await showWelcomeUserMessage()
+        }
+    }
+
     return {
         signup, requestPasswordReset, passwordReset, TOKEN_VALIDE_MINUTES, showRandomMessage, showRandomKeyPassMessage,
         showUnconcludedRegistrationMessage, save, get, getById, getByCpf, getByToken, smsToken, mailyToken, remove, getByFunction,
-        unlock, getDeskUser, locateServidorOnClient,
+        unlock, getDeskUser, locateServidorOnClient, showWelcomeUserMessage
     }
 }

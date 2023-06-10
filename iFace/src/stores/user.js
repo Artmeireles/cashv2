@@ -7,6 +7,7 @@ export const useUserStore = defineStore('users', {
   state: () => ({
     user: {},
     ip: '',
+    ipify: undefined,
     timeToLogOut: 600,
     isTokenValid: false,
   }),
@@ -27,25 +28,27 @@ export const useUserStore = defineStore('users', {
   actions: {
     async registerUser(email, password) {
       const url = `${baseApiUrl}/signin`
-      let ipify = await axios.get("https://api.ipify.org?format=json")
-      this.ip = ipify.data.ip || undefined
-      axios.interceptors.request.use(config => {
-        if (ipify && ipify.data.ip) {
-          config.headers['X-IP-Address'] = this.ip;
-        }
-        return config;
-      });
+      if (!this.ipify) {
+        this.ipify = await axios.get("https://api.ipify.org?format=json")
+        this.ip = this.ipify.data.ip || undefined
+        axios.interceptors.request.use(config => {
+          if (this.ipify && this.ipify.data.ip) {
+            config.headers['X-IP-Address'] = this.ip;
+          }
+          return config;
+        });
+}
       await axios
         .post(url, { email, password })
         .then((res) => {
           this.user = res.data;
-          if (this.user.id) {
+          if (this.user.id && this.user.isMatch) {
             this.user.timeLogged = Math.floor(Date.now() / 1000)
             axios.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`
             localStorage.setItem(userKey, JSON.stringify({ ...res.data, ip: this.ip }));
           } else {
-            this.user = {}
             delete axios.defaults.headers.common['Authorization']
+            delete axios.defaults.headers.common['X-IP-Address']
             localStorage.removeItem(userKey);
           }
           return this.user
@@ -62,7 +65,7 @@ export const useUserStore = defineStore('users', {
           this.user = res.data;
         })
         .catch(error => {
-          return { data: error }
+          return error
         });
     },
     async validateToken(userData) {

@@ -7,7 +7,7 @@ module.exports = app => {
     const tabelaKeys = 'users_keys'
     const { existsOrError } = app.api.validation
     const { diffInDays, comparePassword } = app.api.facilities
-    const { showRandomMessage, showRandomKeyPassMessage, showUnconcludedRegistrationMessage } = app.api.user
+    const { showRandomMessage, showRandomKeyPassMessage, showUnconcludedRegistrationMessage, showWelcomeUserMessage } = app.api.user
 
     /**
      * Operações de SignIn
@@ -19,6 +19,8 @@ module.exports = app => {
         const email = req.body.email || req.body.cpf || undefined
         let password = req.body.password || undefined
         const ip = req.body.ip
+        isStatusActive = { isStatusActive: false }
+
         try {
             existsOrError(email, 'E-mail, nome ou CPF precisam ser informados')
         } catch (error) {
@@ -31,11 +33,7 @@ module.exports = app => {
             .orWhere({ 'u.name': email })
             .orWhere({ 'u.cpf': email.replace(/([^\d])+/gim, "") })
             .first()
-        try {
-            existsOrError(user, await showRandomMessage())
-        } catch (error) {
-            return res.status(500).send(error)
-        }
+        if (!user) return res.send({ msg: await showRandomMessage() })
 
         /**
          * Prazo de expiração da senha
@@ -47,7 +45,7 @@ module.exports = app => {
          */
         if (user && user.status == STATUS_INACTIVE) {
             return res.status(400).send({
-                isStatusActive: false,
+                isStatusActive,
                 'msg': `Seu acesso ao sistema foi suspenso pelo seu administrador. Por favor, entre em contato com o suporte`
             })
         }
@@ -56,7 +54,7 @@ module.exports = app => {
          */
         if (user && user.status == STATUS_WAITING) {
             return res.status(400).send({
-                isStatusActive: false,
+                isStatusActive,
                 'msg': await showUnconcludedRegistrationMessage() || "Confira o token recebido por SMS para ativar seu perfil de usuário"
             })
         }
@@ -66,7 +64,7 @@ module.exports = app => {
          */
         if (user && user.status == STATUS_PASS_EXPIRED) {
             return res.status(400).send({
-                isStatusActive: false,
+                isStatusActive,
                 'msg': `Sua senha expirou. As senhas devem ser alteradas a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
             })
         }
@@ -76,7 +74,7 @@ module.exports = app => {
          */
         if (user && user.status == STATUS_SUSPENDED_BY_TKN) {
             return res.status(400).send({
-                isStatusActive: false,
+                isStatusActive,
                 'msg': `Foi solicitada a troca de senha. Para sua segurança o seu acesso foi temporariamente suspenso. Por favor, verifique seu email ou SMS no ceular. Mesmo que não tenha solicitado isso, para sua segurança por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
             })
         }
@@ -129,7 +127,7 @@ module.exports = app => {
                             .update({ status: STATUS_PASS_EXPIRED })
                             .where({ id_users: user.id })
                         return res.status(400).send({
-                            isStatusActive: false,
+                            isStatusActive,
                             'msg': msg
                         })
                     }
@@ -162,7 +160,10 @@ module.exports = app => {
                         "id_registro": null
                     }
                 })
+                const msg = await showWelcomeUserMessage(user.name) || `Seja bem-vindo(a), ${user.name}! Estamos felizes em recebê-lo(a) em nossa plataforma`
                 res.json({
+                    msg,
+                    isMatch,
                     ...payload,
                     token: jwt.encode(payload, authSecret)
                 })
@@ -171,7 +172,12 @@ module.exports = app => {
              * Se a senha digitada for errada
              */
             else {
-                return res.status(400).send(await showRandomKeyPassMessage() || 'A senha não está correta. Por favor tente novamente ou se não lembra, tente resetá-la')
+                const body = {
+                    ...user,
+                    isMatch,
+                    msg: await showRandomKeyPassMessage() || 'A senha não está correta. Por favor tente novamente ou se não lembra, tente resetá-la'
+                }
+                return res.send(body)
             }
         }
     }
@@ -185,7 +191,7 @@ module.exports = app => {
                     return res.send(true)
                 }
             }
-        } catch (error) {}
+        } catch (error) { }
 
         res.send(false)
     }
