@@ -25,7 +25,7 @@ import 'primeflex/primeflex.scss';
 import "primevue/resources/primevue.min.css"
 import "primeicons/primeicons.css"
 
-const app = createApp(App)
+export const app = createApp(App)
 export const global = app.global
 
 app.use(createPinia())

@@ -107,7 +107,6 @@ module.exports = app => {
         const meta = body.meta
         let sql = app.db({ tbl1: tabela })
             .where({ meta: meta, 'tbl1.status': STATUS_ACTIVE })
-        console.log(forceDominio);
         if (forceDominio) {
             try {
                 existsOrError(body.dominio, 'Domínio não informado')

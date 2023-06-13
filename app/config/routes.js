@@ -46,6 +46,7 @@ module.exports = app => {
     app.route('/users/f-a/:func')
         .all(app.config.passport.authenticate())
         .get(app.api.user.getByFunction)
+    app.route('/users/f/:func').get(app.api.user.getByFunction)
     app.route('/users-cpf/:cpf')
         .all(app.config.passport.authenticate())
         .get(app.api.user.getByCpf)

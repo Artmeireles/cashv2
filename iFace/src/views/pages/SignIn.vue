@@ -1,6 +1,6 @@
 <template>
-    <div class="align-items-center justify-content-center ">
-        <div class="flex flex-column align-items-center justify-content-center">
+    <div class="align-items-center justify-content-center">
+        <div class="flex flex-column max-w-25rem md:max-w-45rem ">
             <div
                 style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div class="w-full surface-card py-5 px-5" style="border-radius: 53px">
@@ -12,7 +12,7 @@
                         <span class="text-600 font-medium" v-if="!store.userStore.id">Faça login para continuar</span>
                     </div>
 
-                    <form @submit.prevent="signin">
+                    <form @submit.prevent="signin" class="">
                         <div class="text-center mb-2">
                             <h2 v-if="store.userStore.name">Olá {{ store.userStore.name }}</h2>
                             <span class="text-600 font-medium" v-if="store.userStore.id">Agora digite sua senha para
@@ -20,28 +20,28 @@
                         </div>
                         <div v-if="!store.userStore.id" class="flex flex-column gap-2 mb-5">
                             <label for="email1" class="block text-900 text-xl font-medium mb-2">E-mail ou CPF</label>
-                            <InputText id="email1" type="text" placeholder="Seu email ou CPF" class="w-full md:w-30rem "
+                            <InputText id="email1" type="text" placeholder="Seu email ou CPF" class="w-full"
                                 style="padding: 1rem" v-model="email" />
                             <small id="username-help">Informe seu e-mail ou CPF para acessar.</small>
                         </div>
                         <div v-else class="flex flex-column gap-2 mb-3">
-                            <InputText id="password1" type="password" placeholder="Sua senha" class="w-full md:w-30rem "
-                                style="padding: 1rem" v-model="password" />
+                            <InputText id="password1" type="password" autocomplete="off" placeholder="Sua senha"
+                                class="w-full" style="padding: 1rem" v-model="password" />
                             <small id="username-help">Informe sua senha e clique em Acessar.</small>
                         </div>
 
-                        <div class="flex align-items-center justify-content-between mb-5 gap-5">
+                        <div class="flex align-items-center justify-content-between mb-5">
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
                                 @click="router.push('/signup')">Novo por aqui?</Button>
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
-                                @click="router.push('/')"><i class="pi pi-backward"></i>&nbsp;Início</Button>
+                                @click="router.push('/')">Início</Button>
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
                                 @click="router.push('/forgot')">Esqueceu a senha?</Button>
                         </div>
-                        <Button rounded label="Acessar" icon="pi pi-sign-in" :disabled="!email || click" type="submit"
+                        <Button rounded label="Acessar" icon="pi pi-sign-in" :disabled="!email" type="submit"
                             class="w-full p-3 text-xl"></Button>
                     </form>
                 </div>
@@ -54,16 +54,14 @@
 <script setup>
 import { ref, computed, } from 'vue';
 import { appName } from "@/global"
+import { defaultSuccess, defaultError } from "@/toast"
 import { useUserStore } from "@/stores/user"
-import { useToast } from "primevue/usetoast"
 import { useRouter } from 'vue-router'
 
 const store = useUserStore()
 
-const toast = useToast();
 const router = useRouter()
 
-const click = ref(false);
 const email = ref('');
 const password = ref('');
 
@@ -73,38 +71,25 @@ const logoUrl = computed(() => {
 
 
 const signin = async () => {
-    click.value = true
     if (email.value && password.value) {
         await store.registerUser(email.value, password.value)
-        const msgTimeLife = store.userStore.msg.split(' ').length
         if (store.userStore && store.userStore.isMatch) {
             router.push({ path: "/" });
-            toast.add({ severity: 'success', detail: store.userStore.msg, life: msgTimeLife * 500 });
+            defaultSuccess(store.userStore.msg)
         } else {
-            toast.add({ severity: 'error', detail: store.userStore.msg, life: msgTimeLife * 500 });
+            defaultError(store.userStore.msg)
         }
     } else {
         await store.findUser(email.value)
-        const msgTimeLife = store.userStore.msg.split(' ').length
-        if (store.userStore && store.userStore.id) {
+        if (store.userStore && store.userStore.id && store.userStore.isStatusActive) {
             email.value = store.userStore.email
         } else if (store.userStore && store.userStore.msg) {
-            toast.add({ severity: 'warn', detail: store.userStore.msg, life: msgTimeLife * 500 });
+            defaultError(store.userStore.msg)
+            router.push({ path: '/u-token', query: { q: store.userStore.id } })
         }
     }
-    click.value = false
 }
 </script>
                             
-<style scoped>
-.pi-eye {
-    transform: scale(1.6);
-    margin-right: 1rem;
-}
-
-.pi-eye-slash {
-    transform: scale(1.6);
-    margin-right: 1rem;
-}
-</style>
+<style scoped></style>
                             

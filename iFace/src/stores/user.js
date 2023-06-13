@@ -19,7 +19,6 @@ export const useUserStore = defineStore('users', {
       setInterval(() => {
         state.timeToLogOut--
         let timeTo = state.user.timeLogged + state.timeToLogOut
-        console.log(timeTo);
         return timeTo
       }, 1000);
 
@@ -67,6 +66,7 @@ export const useUserStore = defineStore('users', {
         .catch(error => {
           return error
         });
+        console.log(this.user);
     },
     async validateToken(userData) {
       const url = `${baseApiUrl}/validateToken`

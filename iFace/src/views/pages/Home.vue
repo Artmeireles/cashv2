@@ -9,8 +9,8 @@
                         Bem vindo ao {{ appName }}<small><sup>&copy;</sup></small>
                     </span>
                     <div class="text-6xl text-primary font-bold mb-3">Folhas de Pagamento e Consignados</div>
-                    <p class="mt-0 mb-4 text-700 line-height-3">Mega Assessoria e Tecnologia &copy; 2001 - {{ getYear() }}
-                    </p>
+                    <div class="mt-0 mb-4 text-800 line-height-2">Mega Assessoria e Tecnologia &copy; 2001 - {{ getYear() }}
+                    </div>
 
                     <Button @click="router.push('/signin')" v-if="!store.userStore.id"
                         class="p-button-text p-button-rounded border-none font-light line-height-2 text-blue-500">
@@ -28,8 +28,8 @@
                     <p>Time out: {{ store.userStore.timeToLogOut }}</p> -->
                 </section>
             </div>
-            <div class="col-12 md:col-6 overflow-hidden">
-                <img src="/assets/images/logo-app.svg" alt="Image" class="imgApp align-items-center">
+            <div class="col-12 md:col-6 flex-grow-1 flex overflow-hidden justify-content-center">
+                <img src="/assets/images/logo-app.svg" alt="Image" class="max-w-10rem mb-5 md:max-w-20rem md:mb-0 md:imgApp">
             </div>
         </div>
     </div>
@@ -57,7 +57,6 @@ const logout = () => {
 
 <style scope>
 .imgApp {
-    clip-path: polygon(0% 0, 100% 0%, 100% 100%, 0 100%);
     width: 70%;
     padding: 2rem;
 }

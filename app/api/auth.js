@@ -1,6 +1,6 @@
 const { authSecret } = require('../.env')
 const jwt = require('jwt-simple')
-const { STATUS_PASS_EXPIRED, STATUS_SUSPENDED_BY_TKN, MINIMUM_KEYS_BEFORE_CHANGE, STATUS_INACTIVE, STATUS_WAITING } = require("../config/userStatus")
+const { STATUS_ACTIVE, STATUS_PASS_EXPIRED, STATUS_SUSPENDED_BY_TKN, MINIMUM_KEYS_BEFORE_CHANGE, STATUS_INACTIVE, STATUS_WAITING } = require("../config/userStatus")
 
 module.exports = app => {
     const tabela = 'users'
@@ -19,7 +19,7 @@ module.exports = app => {
         const email = req.body.email || req.body.cpf || undefined
         let password = req.body.password || undefined
         const ip = req.body.ip
-        isStatusActive = { isStatusActive: false }
+        let isStatusActive = false
 
         try {
             existsOrError(email, 'E-mail, nome ou CPF precisam ser informados')
@@ -28,12 +28,17 @@ module.exports = app => {
         }
 
         let user = await app.db({ 'u': tabela })
-            .select('u.name', 'u.cpf', 'u.telefone', 'u.email', 'u.id', 'u.time_to_pas_expires', 'u.status')
+            .select('u.id', 'u.name', 'u.cpf', 'u.telefone', 'u.email', 'u.id', 'u.time_to_pas_expires', 'u.status')
             .orWhere({ 'u.email': email })
             .orWhere({ 'u.name': email })
             .orWhere({ 'u.cpf': email.replace(/([^\d])+/gim, "") })
             .first()
-        if (!user) return res.send({ msg: await showRandomMessage() })
+        /**
+         * Se não foi localizado um usuário com o dados informados, retorna a mensagem
+         */
+        if (!user) {
+            return res.status(200).send({ msg: await showRandomMessage() || 'Não conseguimos localizar um usuário com os dados informados' })
+        }
 
         /**
          * Prazo de expiração da senha
@@ -44,7 +49,7 @@ module.exports = app => {
          * Verificar se o usuário foi desativado
          */
         if (user && user.status == STATUS_INACTIVE) {
-            return res.status(400).send({
+            return res.status(200).send({
                 isStatusActive,
                 'msg': `Seu acesso ao sistema foi suspenso pelo seu administrador. Por favor, entre em contato com o suporte`
             })
@@ -53,7 +58,8 @@ module.exports = app => {
          * Verificar se o usuário ainda não ativou seu perfil
          */
         if (user && user.status == STATUS_WAITING) {
-            return res.status(400).send({
+            return res.status(200).send({
+                id: user.id,
                 isStatusActive,
                 'msg': await showUnconcludedRegistrationMessage() || "Confira o token recebido por SMS para ativar seu perfil de usuário"
             })
@@ -63,7 +69,7 @@ module.exports = app => {
          * Verificar se a senha expirou
          */
         if (user && user.status == STATUS_PASS_EXPIRED) {
-            return res.status(400).send({
+            return res.status(200).send({
                 isStatusActive,
                 'msg': `Sua senha expirou. As senhas devem ser alteradas a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
             })
@@ -73,9 +79,11 @@ module.exports = app => {
          * Verificar se foi solicitada a troca de senha
          */
         if (user && user.status == STATUS_SUSPENDED_BY_TKN) {
-            return res.status(400).send({
+            return res.status(200).send({
                 isStatusActive,
-                'msg': `Foi solicitada a troca de senha. Para sua segurança o seu acesso foi temporariamente suspenso. Por favor, verifique seu email ou SMS no ceular. Mesmo que não tenha solicitado isso, para sua segurança por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
+                'msg': `Foi solicitado um token de senha. Para sua segurança o seu acesso está temporariamente suspenso. 
+                Por favor, verifique seu email ou SMS no celular. Mesmo que não tenha solicitado isso, para sua segurança por 
+                favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
             })
         }
 
@@ -85,13 +93,6 @@ module.exports = app => {
          */
         if (user && !password) {
             return res.status(200).send(user)
-        }
-
-        /**
-         * Se não foi localizado um usuário com o dados informados, retorna a mensagem
-         */
-        if (!user) {
-            return res.status(400).send(await showRandomMessage() || 'Não conseguimos localizar um usuário com os dados informados')
         }
 
         /**

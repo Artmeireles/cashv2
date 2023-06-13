@@ -140,7 +140,7 @@ module.exports = app => {
                 body.evento = nextEventID.count + 1
                 const now = Math.floor(Date.now() / 1000)
                 body.password_reset_token = randomstring.generate(27) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-                body.sms_token = randomstring.generate(8) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+                body.sms_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
                 body.status = STATUS_WAITING
                 body.created_at = new Date()
                 body.f_ano = body.created_at.getFullYear()
@@ -290,7 +290,10 @@ module.exports = app => {
             // Se localizou um resgitro em um dos clientes...
             if (cad_servidor.data.id) {
                 if (cad_servidor.data.celular.replace(/([^\d])+/gim, "").length == 11)
-                    return res.json(cad_servidor.data)
+                    return res.json({
+                        isCelularValid: true,
+                        ...cad_servidor.data
+                    })
                 else
                     // Se o celular está num formato inválido...
                     return res.json({
@@ -303,7 +306,7 @@ module.exports = app => {
                 /**
                  * #3 - Se não tem perfil e não é localizado nos schemas dos clientes todos os dados tornam-se obrigatórios exceto o id
                 */
-                return res.json({ isNewUser: true, msg: await showNewUserMessage() || "Não encontramos as informações que você forneceu. Por favor, complete os campos abaixo com os dados necessários para criar seu perfil de usuário" })
+                return res.json({ isNewUser: true, msg: await showNewUserMessage() || "Não encontramos as informações que você forneceu. Por favor, complete os campos com os dados necessários para criar seu perfil de usuário" })
             }
         }
     }
@@ -346,7 +349,7 @@ module.exports = app => {
 
         thisUser.evento = evento
         const password_reset_token = randomstring.generate(27) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-        const sms_token = randomstring.generate(8) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+        const sms_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
         // try {
         app.db(tabela)
             .update({
@@ -493,15 +496,19 @@ module.exports = app => {
             }).first()
 
         if (!(userFromDB))
-            return res.status(400).send(await showRandomMessage() || 'Token informado é inválido ou não correspondem a nenhuma conta em nosso sistema')
+            return res.status(400).send({
+                msg: await showRandomMessage() || 'Token informado é inválido ou não correspondem a nenhuma conta em nosso sistema'
+            })
 
         const now = Math.floor(Date.now() / 1000)
         let expirationTimOk = false
         if (userFromDB.sms_token) expirationTimOk = Number(userFromDB.sms_token.split('_')[1]) > now
-        if (userFromDB.password_reset_token) expirationTimOk = Number(userFromDB.password_reset_token.split('_')[1]) > now
+        else if (userFromDB.password_reset_token) expirationTimOk = Number(userFromDB.password_reset_token.split('_')[1]) > now
 
         if (!expirationTimOk)
-            return res.status(200).send('O token informado é inválido ou já foi utilizado')
+            return res.status(200).send({
+                msg: 'O token informado é inválido ou já foi utilizado'
+            })
 
         const user = userFromDB
 
@@ -557,16 +564,17 @@ module.exports = app => {
                     .orWhere({ cpf: body.email })
             }).first()
         if (!(userFromDB))
-            return res.status(400).send(await showRandomMessage() || 'Dados informados não correspondem a nenhuma conta em nosso sistema')
+            return res.status(400).send(await showRandomMessage() || 'Os dados informados não correspondem a nenhuma conta em nosso sistema')
         const expired = !userFromDB.sms_token || userFromDB.sms_token.split('_')[1] < now
 
         if (!expired) body.sms_token = userFromDB.sms_token
         else {
-            body.sms_token = randomstring.generate(8) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+            body.sms_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+            if (body.status != STATUS_WAITING) body.status = STATUS_SUSPENDED_BY_TKN
             // Registra o token no BD
             await app.db(tabela).update({
                 sms_token: body.sms_token,
-                status: STATUS_SUSPENDED_BY_TKN
+                status: body.status
             })
                 .where(function () {
                     if (body.id) this.where({ id: body.id })
@@ -609,7 +617,7 @@ module.exports = app => {
                 bodyRes.evento = evento
                 app.db('users').update(bodyRes).where({ id: bodyRes.id }).then()
             }
-            if (req.method === 'PATCH') res.send(`SMS enviado com sucesso para o celular ${userFromDB.telefone}`)
+            if (req.method === 'PATCH') res.send({ msg: `SMS enviado com sucesso para o celular ${userFromDB.telefone}` })
             else return token
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
@@ -634,10 +642,11 @@ module.exports = app => {
             existsOrError(userFromDB, await showRandomMessage())
             const now = Math.floor(Date.now() / 1000)
             const password_reset_token = randomstring.generate(27) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+            if (body.status != STATUS_WAITING) body.status = STATUS_SUSPENDED_BY_TKN
             // Registra o token no BD
             await app.db(tabela).update({
                 password_reset_token: password_reset_token,
-                status: STATUS_SUSPENDED_BY_TKN
+                status: body.status
             }).where(function () {
                 if (body.id) this.where({ id: body.id })
                 else this.orWhere({ email: body.email })
@@ -1131,6 +1140,9 @@ module.exports = app => {
             case 'gss':
                 getSisStatus(req, res)
                 break;
+            case 'gtt':
+                getTokenTime(req, res)
+                break;
             default:
                 res.status(404).send('Função inexitente')
                 break;
@@ -1157,6 +1169,47 @@ module.exports = app => {
                     res.send(status_user)
                 })
         }
+    }
+
+    const getTokenTime = async (req, res) => {
+        const userFromDB = await app.db(tabela)
+            .select('status', 'sms_token', 'password_reset_token')
+            .where({ id: req.query.q }).first()
+        let tokenCreationTime = 0
+        if (userFromDB && userFromDB.sms_token) {
+            tokenCreationTime = Number(userFromDB.sms_token.split('_')[1])
+        }
+        else if (userFromDB && userFromDB.password_reset_token) {
+            tokenCreationTime = Number(userFromDB.password_reset_token.split('_')[1])
+        }
+
+        const now = Math.floor(Date.now() / 1000)
+        let expirationTimOk = false
+        if (userFromDB && (userFromDB.sms_token || userFromDB.password_reset_token)) {
+            if (userFromDB.sms_token) expirationTimOk = Number(userFromDB.sms_token.split('_')[1]) > now
+            else if (userFromDB.password_reset_token) expirationTimOk = Number(userFromDB.password_reset_token.split('_')[1]) > now
+            if (!expirationTimOk) {
+                return res.status(200).send({
+                    isTokenValid: false,
+                    gtt: 0,
+                    msg: 'O token informado ultrapassou o tempo máximo para ser utilizado'
+                })
+            }
+            else {
+                const totalTimeRelase = tokenCreationTime - now
+                return res.send({ isTokenValid: true, gtt: totalTimeRelase })
+            }
+        } else if (userFromDB && userFromDB.status == STATUS_ACTIVE) {
+            return res.status(400).send({
+                isToken: false,
+                msg: 'Este usuário já foi validado. Prossiga para o login'
+            })
+        } else
+            return res.status(400).send({
+                isTokenValid: false,
+                gtt: 0,
+                msg: 'Não há um token válido para este usuário'
+            })
     }
 
     let unshownMessages = noUserFoundMessages.slice(); // create a copy of the messages array
@@ -1194,7 +1247,7 @@ module.exports = app => {
             return message
         } else {
             unshownRepeatMessages = noRepeatMessages.slice()
-            await showRandomMessage()
+            await showRandomNoRepeatMessage()
         }
     }
 

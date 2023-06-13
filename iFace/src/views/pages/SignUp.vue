@@ -1,6 +1,6 @@
 <template>
-    <div class="align-items-center justify-content-center ">
-        <div class="flex flex-column align-items-center justify-content-center">
+    <div class="align-items-center justify-content-center">
+        <div class="flex flex-column max-w-25rem md:max-w-45rem ">
             <div
                 style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div class="w-full surface-card py-5 px-5" style="border-radius: 53px">
@@ -9,69 +9,90 @@
                         <div class="text-900 text-3xl font-medium mb-3">
                             Bem vindo ao {{ appName }}<small><sup>&copy;</sup></small>
                         </div>
-                        <span class="text-600 font-medium" v-if="!store.userStore.id">Informe seu CPF</span>
-                        <p class="text-center mt-2" style="color: chocolate; text-decoration: underline; ">
-                            Os dados pessoais só podem ser alterados no RH/DP de seu município
+                        <p class="text-600 font-medium mb-4">Informe a seguir os dados solicitados</p>
+                        <p v-if="!store.userStore.id && !isNewUser" class="text-center mt-2 mb-4 text-xlg font-bold"
+                            style="color: chocolate; text-decoration: underline; ">
+                            Os dados pessoais só podem ser alterados<br>no RH/DP de seu município
                         </p>
                     </div>
 
-                    <form @submit.prevent="signup" class="max-w-30rem">
+                    <form @submit.prevent="signup">
                         <div v-if="isNewUser" class="formgrid grid">
-                            <div class="field col-12">
-                                <label for="name" class="block text-900 text-xl font-medium mb-2">Seu nome</label>
-                                <InputText id="name" type="text" placeholder="Seu nome" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border 
-                                border-round appearance-none outline-none focus:border-primary w-full"
-                                    style="padding: 1rem" v-model="name" />
-                                <small id="username-help">Informe seu nome</small>
+                            <div class="field col-12 mb-4">
+                                <span v-if="canEditData" class="p-float-label">
+                                    <InputText id="name" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border 
+                                    border-round appearance-none outline-none focus:border-primary w-full"
+                                        style="padding: 1rem" v-model="name" />
+                                    <label for="name">Seu nome</label>
+                                </span>
+                                <div v-else>
+                                    <label for="name" class="block text-900 text-xl font-medium mb-2">Seu nome</label>
+                                    <InputText class="shadow-4 p-2 w-full surface-500 text-white font-bold border-round"
+                                        disabled style="padding: 1rem" :value="name" />
+                                </div>
                             </div>
-                            <div class="field col-12">
-                                <label for="email" class="block text-900 text-xl font-medium mb-2">Seu e-mail</label>
-                                <InputText id="email" type="text" placeholder="Seu e-mail" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border 
-                                border-round appearance-none outline-none focus:border-primary w-full"
-                                    style="padding: 1rem" v-model="email" />
-                                <small id="username-help">Informe seu e-mail</small>
+                            <div class="field col-12 mb-4">
+                                <span v-if="canEditData" class="p-float-label">
+                                    <InputText id="email" type="text" class="p-2 w-full" style="padding: 1rem"
+                                        v-model="email" />
+                                    <label for="email">Seu e-mail</label>
+                                </span>
+                                <div v-else>
+                                    <label for="email" class="block text-900 text-xl font-medium mb-2">Seu e-mail</label>
+                                    <InputText class="shadow-4 p-2 w-full surface-500 text-white font-bold border-round"
+                                        disabled style="padding: 1rem" :value="email" />
+                                </div>
                             </div>
-                            <div class="field col-12 md:col-6">
-                                <label for="celular" class="block text-900 text-xl font-medium mb-2">Seu celular</label>
-                                <InputMask id="celular" type="text" mask="(99) 99999-9999" placeholder="(99) 99999-9999"
-                                    class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border 
-                                border-round appearance-none outline-none focus:border-primary w-full"
-                                    style="padding: 1rem" v-model="celular" />
-                                <small id="username-help">Informe seu celular</small>
+                            <div class="field col-12 mb-4 md:col-6">
+                                <span v-if="canEditData" class="p-float-label">
+                                    <InputMask id="celular" type="text" mask="(99) 99999-9999" class="p-2 w-full"
+                                        style="padding: 1rem" v-model="celular" />
+                                    <label for="celular">Seu celular</label>
+                                </span>
+                                <div v-else>
+                                    <label for="name" class="block text-900 text-xl font-medium mb-2">Seu celular</label>
+                                    <InputText class="shadow-4 p-2 w-full surface-500 text-white font-bold border-round"
+                                        disabled style="padding: 1rem" :value="celular" />
+                                </div>
                             </div>
-                            <div class="field col-12 md:col-6">
-                                <label for="cpf" class="block text-900 text-xl font-medium mb-2">Seu CPF</label>
-                                <InputText id="cpf" type="text" placeholder="Seu CPF" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border 
-                                border-round appearance-none outline-none focus:border-primary w-full"
-                                    style="padding: 1rem" v-model="cpf" />
-                                <small id="username-help">Informe seu CPF</small>
+                            <div class="field col-12 mb-4 md:col-6">
+                                <span v-if="canEditData" class="p-float-label">
+                                    <InputText id="cpf" type="text" class="p-2 w-full"
+                                        style="padding: 1rem" v-model="cpf" />
+                                    <label for="cpf">Seu CPF</label>
+                                </span>
+                                <div v-else>
+                                    <label for="cpf" class="block text-900 text-xl font-medium mb-2">Seu CPF</label>
+                                    <InputText class="shadow-4 p-2 w-full surface-500 text-white font-bold border-round"
+                                        disabled style="padding: 1rem" :value="cpf" />
+                                </div>
                             </div>
-                            <div class="field col-12 md:col-6">
-                                <label for="password" class="block text-900 text-xl font-medium mb-2">Sua senha</label>
-                                <InputText id="password" type="password" placeholder="Sua senha" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border 
-                                border-round appearance-none outline-none focus:border-primary w-full"
-                                    style="padding: 1rem" v-model="password" />
-                                <small id="username-help">Informe sua senha</small>
+                            <div class="field col-12 md:col-6" :class="canEditData ? '' : ' mt-2'">
+                                <span class="p-float-label">
+                                    <InputText id="password" type="password" autocomplete="off" class="p-2 w-full"
+                                        style="padding: 1rem" v-model="password" />
+                                    <label for="password">Sua senha</label>
+                                </span>
                             </div>
-                            <div class="field col-12 md:col-6">
-                                <label for="confirmPassword" class="block text-900 text-xl font-medium mb-2">Confirme sua
-                                    senha</label>
-                                <InputText id="confirmPassword" type="password" placeholder="Sua senha" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border 
-                                border-round appearance-none outline-none focus:border-primary w-full"
-                                    style="padding: 1rem" v-model="confirmPassword" />
-                                <small id="username-help">Confirme sua senha</small>
+                            <div class="field col-12 md:col-6" :class="canEditData ? '' : ' mt-2'">
+                                <span class="p-float-label">
+                                    <InputText id="confirmPassword" type="password" autocomplete="off" class="p-2 w-full"
+                                        style="padding: 1rem" v-model="confirmPassword" />
+                                    <label for="confirmPassword">Confirme sua senha</label>
+                                </span>
                             </div>
                         </div>
                         <div v-if="!store.userStore.id && !isNewUser" class="flex flex-column gap-2 mb-2">
                             <label for="cpf" class="block text-900 text-xl font-medium mb-1">CPF</label>
-                            <InputText id="cpf" type="text" placeholder="Seu CPF" class="w-full md:w-30rem "
+                            <InputText id="cpf" type="text" placeholder="Seu CPF" class="w-full"
                                 style="padding: 1rem" v-model="cpf" />
-                            <small id="username-help">Informe seu CPF para começar</small>
                         </div>
+                        <small v-if="!store.userStore.id && !isNewUser" id="username-help">Informe seu CPF para
+                            começar</small>
 
                         <Button rounded label="Registrar" icon="pi pi-sign-in" :disabled="!(cpf || click)" type="submit"
-                            class="w-full p-3 text-xl mt-5 mb-5"></Button>
-                        <div class="flex align-items-center justify-content-between mb-5 gap-5">
+                            class="w-full p-3 text-xl mt-4 mb-4"></Button>
+                        <div class="flex align-items-center justify-content-between mb-4 gap-5">
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
                                 @click="router.push('/')"><i class="pi pi-backward"></i>&nbsp;Início</Button>
@@ -90,15 +111,14 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { appName } from "@/global"
+import { defaultSuccess, defaultInfo, defaultWarn } from "@/toast"
 import { useUserStore } from "@/stores/user"
-import { useToast } from 'primevue/usetoast';
 import { useRouter } from 'vue-router'
 import { baseApiUrl } from "@/env"
 import axios from '@/axios-interceptor'
 
 const store = useUserStore()
 
-const toast = useToast();
 const router = useRouter()
 
 const cpf = ref('');
@@ -107,13 +127,8 @@ const email = ref('');
 const celular = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-// const cpf = ref('38790440404');
-// const name = ref('Outro servidor');
-// const email = ref('tommendes@hotmail.com');
-// const celular = ref('81982807245');
-// const password = ref('141108@Le');
-// const confirmPassword = ref('141108@Le');
 const isNewUser = ref(false);
+const canEditData = ref(false);
 const url = ref(`${baseApiUrl}/signup`)
 const click = ref(false)
 
@@ -123,7 +138,7 @@ const logoUrl = computed(() => {
 
 const signup = async () => {
     if (cpf.value) {
-    click.value = true
+        click.value = true
         const userFound = await findUserSignUp(cpf.value)
         // Se preencheu todos os dados obrigatórios
         if (!!cpf.value && !!name.value && !!celular.value && !!password.value && !!confirmPassword.value) {
@@ -139,80 +154,53 @@ const signup = async () => {
                 .then((body) => {
                     const user = body.data
                     if (user.data.id) {
-                        if (typeof (user.msg) == 'object') {
-
-                            const lengths = []
-                            user.msg.forEach(element => {
-                                lengths.push(element.split(' ').length)
-                            })
-                            const msgTimeLife = Math.max(...lengths) * 500
-                            user.msg.forEach(element => {
-                                toast.add({ severity: 'success', detail: element, life: msgTimeLife * 500 })
-                            });
-                        } else {
-                            const msgTimeLife = user.msg.split(' ').length
-                            toast.add({ severity: 'success', detail: user.msg, life: msgTimeLife * 500 })
-                        }
+                        defaultSuccess(user.msg)
                         router.push({ path: '/u-token', query: { q: user.data.id } })
                     }
                 })
                 .catch((error) => {
-                    toast.removeAllGroups();
-                    const msg = error.response.data.msg
-                    const msgTimeLife = msg.split(' ').length
-                    return toast.add({ severity: 'error', detail: msg, life: msgTimeLife * 500 })
+                    return defaultWarn(error.response.data.msg)
                 })
         } else
             // #3 - Se não tem perfil e não é localizado nos schemas dos clientes todos os dados tornam-se obrigatórios exceto o id
             if (userFound.data.isNewUser) {
                 isNewUser.value = true
-                console.log('3: ', userFound);
-                toast.removeAllGroups();
-                const msgTimeLife = userFound.data.msg.split(' ').length
-                return toast.add({ severity: 'info', detail: `${userFound.data.msg}`, life: msgTimeLife * 500 });
+                canEditData.value = true
+                defaultInfo(userFound.data.msg)
             } else
                 // #1 - Se o solicitante já tem perfil
                 if (userFound.data.registered) {
                     router.push({ path: "/signin" });
-                    toast.removeAllGroups();
-                    const msgTimeLife = userFound.data.msg.split(' ').length
-                    return toast.add({ severity: 'warn', detail: `${userFound.data.msg}`, life: msgTimeLife * 500 });
+                    defaultWarn(userFound.data.msg)
                 } else {
-                    // #2 - O solicitante não tem perfil mas foi localizado dos dados nos schemas dos clientes
+                    // #2 - O solicitante não tem perfil mas foi localizado nos schemas dos clientes
                     //    a) Celular inválido
                     if (!userFound.data.isCelularValid) {
-                        const msgTimeLife = userFound.data.msg.split(' ').length
-                        return toast.add({ severity: 'warn', detail: `${userFound.data.msg}`, life: msgTimeLife * 500 });
+                        defaultWarn(userFound.data.msg)
                     }
+                    //    a) Celular válido
                     else {
                         const userFoundData = userFound.data
                         cpf.value = userFoundData.cpf;
-                        name.value = userFoundData.name;
+                        name.value = userFoundData.nome;
                         email.value = userFoundData.email;
                         celular.value = userFoundData.celular;
-                        password.value = ref('141108@Le');
-                        confirmPassword.value = ref('141108@Le');
+                        isNewUser.value = true
+                        canEditData.value = false
+                        delete password.value
+                        delete confirmPassword.value
                     }
                 }
-    click.value = false
+        click.value = false
     }
 }
 
 const findUserSignUp = async () => {
+
     const user = await axios.post(url.value, { cpf: cpf.value })
     return user
 }
 </script>
                             
-<style scoped>
-.pi-eye {
-    transform: scale(1.6);
-    margin-right: 1rem;
-}
-
-.pi-eye-slash {
-    transform: scale(1.6);
-    margin-right: 1rem;
-}
-</style>
+<style scoped></style>
                             
