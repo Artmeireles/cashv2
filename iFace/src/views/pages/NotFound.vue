@@ -48,7 +48,7 @@ const router = useRouter()
                         </span>
                     </router-link>
 
-                    <Button @click="router.push('/')" link class="lg:text-xl font-medium mb-0"><i class="pi pi-backward"></i>&nbsp;Início</Button>
+                    <Button @click="router.push('/')" link class="lg:text-xl font-medium mb-0">Início</Button>
                 </div>
             </div>
         </div>

@@ -6,11 +6,11 @@
                 <div class="w-full surface-card py-5 px-5" style="border-radius: 53px">
                     <div class="text-center mb-2">
                         <img :src="logoUrl" :alt="`${appName} logo`" class="mb-2 w-4rem flex-shrink-0" />
-                        <div class="text-900 text-3xl font-medium mb-3">
+                        <div class="text-900 text-3xl font-medium mb-2">
                             Bem vindo ao {{ appName }}<small><sup>&copy;</sup></small>
                         </div>
-                        <p class="text-600 font-medium mb-4">Informe a seguir os dados solicitados</p>
-                        <p v-if="!store.userStore.id && !isNewUser" class="text-center mt-2 mb-4 text-xlg font-bold"
+                        <p class="text-600 font-medium">Informe a seguir os dados solicitados</p>
+                        <p v-if="!store.userStore.id && !isNewUser" class="text-center mt-2 text-xlg font-bold"
                             style="color: chocolate; text-decoration: underline; ">
                             Os dados pessoais só podem ser alterados<br>no RH/DP de seu município
                         </p>
@@ -18,7 +18,7 @@
 
                     <form @submit.prevent="signup">
                         <div v-if="isNewUser" class="formgrid grid">
-                            <div class="field col-12 mb-4">
+                            <div class="field col-12" :class="canEditData ? ' mt-3' : ' mt-2'">
                                 <span v-if="canEditData" class="p-float-label">
                                     <InputText id="name" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border 
                                     border-round appearance-none outline-none focus:border-primary w-full"
@@ -31,7 +31,7 @@
                                         disabled style="padding: 1rem" :value="name" />
                                 </div>
                             </div>
-                            <div class="field col-12 mb-4">
+                            <div class="field col-12" :class="canEditData ? ' mt-3' : ' mt-2'">
                                 <span v-if="canEditData" class="p-float-label">
                                     <InputText id="email" type="text" class="p-2 w-full" style="padding: 1rem"
                                         v-model="email" />
@@ -43,7 +43,7 @@
                                         disabled style="padding: 1rem" :value="email" />
                                 </div>
                             </div>
-                            <div class="field col-12 mb-4 md:col-6">
+                            <div class="field col-12 md:col-6" :class="canEditData ? ' mt-3' : ' mt-2'">
                                 <span v-if="canEditData" class="p-float-label">
                                     <InputMask id="celular" type="text" mask="(99) 99999-9999" class="p-2 w-full"
                                         style="padding: 1rem" v-model="celular" />
@@ -55,10 +55,10 @@
                                         disabled style="padding: 1rem" :value="celular" />
                                 </div>
                             </div>
-                            <div class="field col-12 mb-4 md:col-6">
+                            <div class="field col-12 md:col-6" :class="canEditData ? ' mt-3' : ' mt-2'">
                                 <span v-if="canEditData" class="p-float-label">
-                                    <InputText id="cpf" type="text" class="p-2 w-full"
-                                        style="padding: 1rem" v-model="cpf" />
+                                    <InputText id="cpf" type="text" class="p-2 w-full" style="padding: 1rem"
+                                        v-model="cpf" />
                                     <label for="cpf">Seu CPF</label>
                                 </span>
                                 <div v-else>
@@ -67,14 +67,14 @@
                                         disabled style="padding: 1rem" :value="cpf" />
                                 </div>
                             </div>
-                            <div class="field col-12 md:col-6" :class="canEditData ? '' : ' mt-2'">
+                            <div class="field col-12 md:col-6" :class="canEditData ? ' mt-3' : ' mt-2'">
                                 <span class="p-float-label">
                                     <InputText id="password" type="password" autocomplete="off" class="p-2 w-full"
                                         style="padding: 1rem" v-model="password" />
                                     <label for="password">Sua senha</label>
                                 </span>
                             </div>
-                            <div class="field col-12 md:col-6" :class="canEditData ? '' : ' mt-2'">
+                            <div class="field col-12 md:col-6" :class="canEditData ? ' mt-3' : ' mt-2'">
                                 <span class="p-float-label">
                                     <InputText id="confirmPassword" type="password" autocomplete="off" class="p-2 w-full"
                                         style="padding: 1rem" v-model="confirmPassword" />
@@ -82,24 +82,27 @@
                                 </span>
                             </div>
                         </div>
-                        <div v-if="!store.userStore.id && !isNewUser" class="flex flex-column gap-2 mb-2">
+                        <div v-if="!store.userStore.id && !isNewUser" class="flex flex-column mb-2">
                             <label for="cpf" class="block text-900 text-xl font-medium mb-1">CPF</label>
-                            <InputText id="cpf" type="text" placeholder="Seu CPF" class="w-full"
-                                style="padding: 1rem" v-model="cpf" />
+                            <InputText id="cpf" type="text" placeholder="Seu CPF" class="w-full" style="padding: 1rem"
+                                v-model="cpf" />
                         </div>
                         <small v-if="!store.userStore.id && !isNewUser" id="username-help">Informe seu CPF para
                             começar</small>
 
-                        <Button rounded label="Registrar" icon="pi pi-sign-in" :disabled="!(cpf || click)" type="submit"
-                            class="w-full p-3 text-xl mt-4 mb-4"></Button>
-                        <div class="flex align-items-center justify-content-between mb-4 gap-5">
+                        <div class="flex align-items-center justify-content-between mb-2">
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
-                                @click="router.push('/')"><i class="pi pi-backward"></i>&nbsp;Início</Button>
+                                @click="router.push('/signin')">Acessar plataforma&nbsp;<i class="pi pi-sign-in"></i></Button>
+                            <Button link style="color: var(--primary-color)"
+                                class="font-medium no-underline ml-2 text-center cursor-pointer"
+                                @click="router.push('/')">Início</Button>
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
                                 @click="router.push('/forgot')">Esqueceu a senha?</Button>
                         </div>
+                        <Button rounded label="Registrar" icon="pi pi-sign-in" :loading="click" :disabled="!cpf" type="submit"
+                            class="w-full p-3 text-xl"></Button>
                     </form>
                 </div>
             </div>

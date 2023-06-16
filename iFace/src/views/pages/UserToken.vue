@@ -9,7 +9,6 @@
                         <div class="text-900 text-3xl font-medium mb-3">
                             Bem vindo ao {{ appName }}<small><sup>&copy;</sup></small>
                         </div>
-                        <span class="text-600 font-medium" v-if="tokenTimeLeft > 0">Informe seu token</span>
                     </div>
                     <div v-if="tokenTimeLeft > 0" class="text-center mb-2">
                         <span style="color: chocolate; text-decoration: underline; ">
@@ -51,18 +50,29 @@
                             </div>
                         </div>
 
+                        <div class="text-center mb-2">
+                            <span style="color: chocolate; text-decoration: underline; " v-html="tokenTimeLeftMessage" />
+                        </div>
+
+                        <div class="flex align-items-center justify-content-between mb-2">
+                            <Button link style="color: var(--primary-color)"
+                                class="font-medium no-underline ml-2 text-center cursor-pointer"
+                                @click="router.push('/signin')">Acessar plataforma&nbsp;<i
+                                    class="pi pi-sign-in"></i></Button>
+                            <Button link style="color: var(--primary-color)"
+                                class="font-medium no-underline ml-2 text-center cursor-pointer"
+                                @click="router.push('/')">Início</Button>
+                            <Button link style="color: var(--primary-color)"
+                                class="font-medium no-underline ml-2 text-center cursor-pointer"
+                                @click="router.push('/forgot')">Esqueceu a senha?</Button>
+                        </div>
+
                         <Button v-if="tokenTimeLeft > 0" rounded label="Registrar" icon="pi pi-sign-in"
                             :disabled="!(token1 && token2 && token3 && token4 && token5 && token6 && token7 && token8)"
                             type="submit" class="w-full p-3 text-xl mt-3 mb-3 gap-5"></Button>
                         <Button v-else rounded label="Solicite outro token por SMS" icon="pi pi-sign-in"
                             @click="getNewToken" class="w-full p-3 text-xl mt-3 mb-3 gap-5"></Button>
                     </form>
-                    <Button link style="color: var(--primary-color)"
-                        class="font-medium no-underline ml-2 text-center cursor-pointer" @click="router.push('/')"><i
-                            class="pi pi-backward"></i>&nbsp;Início</Button>
-                    <Button link style="color: var(--primary-color)"
-                        class="font-medium no-underline ml-2 text-center cursor-pointer"
-                        @click="router.push('/forgot')">Esqueceu a senha?</Button>
                 </div>
             </div>
         </div>
@@ -92,6 +102,7 @@ const token8 = ref('');
 const tokenTimeMinutesLeft = ref(0)
 const tokenTimeLeft = ref(0)
 const tokenTimeMessage = ref('')
+const tokenTimeLeftMessage = ref('')
 const urlUnlock = ref(`${baseApiUrl}/user-unlock/`)
 
 const logoUrl = computed(() => {
@@ -135,11 +146,15 @@ const getTokenTime = async () => {
                     if (tokenTimeLeft.value > 0) {
                         tokenTimeLeft.value--
                         tokenTimeMinutesLeft.value = Math.floor(tokenTimeLeft.value / 60) + 1
-                        if (tokenTimeMinutesLeft.value > 1)
+                        if (tokenTimeMinutesLeft.value > 1) {
                             tokenTimeMessage.value = `Dentro de ${tokenTimeMinutesLeft.value} minutos, informe o token enviado por SMS`
-                        else
+                            tokenTimeLeftMessage.value = `Aguarde ${tokenTimeMinutesLeft.value} minutos para solicitar novo token`
+                        }
+                        else {
                             tokenTimeMessage.value = `Dentro de ${tokenTimeLeft.value + 1} segundos, informe o token enviado por SMS`
-                    }
+                        }
+
+                    } else tokenTimeLeftMessage.value = `Seu token venceu.<br>Clique abaixo para solicitar novo token`
                 }, 1000);
             })
             .catch((error) => {
@@ -156,6 +171,7 @@ const getNewToken = async () => {
     const urlTo = `${baseApiUrl}/user-sms-unlock`
     await axios.patch(urlTo, { id: idUser.value })
         .then(async (body) => {
+            tokenTimeLeftMessage.value = ""
             await getTokenTime()
             defaultSuccess(body.data.msg)
         })

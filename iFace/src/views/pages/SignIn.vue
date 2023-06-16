@@ -14,23 +14,23 @@
 
                     <form @submit.prevent="signin" class="">
                         <div class="text-center mb-2">
-                            <h2 v-if="store.userStore.name">Olá {{ store.userStore.name }}</h2>
+                            <h2 v-if="store.userStore.name">Olá {{ store.userStore.name.split(' ')[0] }}</h2>
                             <span class="text-600 font-medium" v-if="store.userStore.id">Agora digite sua senha para
                                 acessar</span>
                         </div>
-                        <div v-if="!store.userStore.id" class="flex flex-column gap-2 mb-5">
+                        <div v-if="!store.userStore.id" class="flex flex-column mb-2">
                             <label for="email1" class="block text-900 text-xl font-medium mb-2">E-mail ou CPF</label>
                             <InputText id="email1" type="text" placeholder="Seu email ou CPF" class="w-full"
                                 style="padding: 1rem" v-model="email" />
                             <small id="username-help">Informe seu e-mail ou CPF para acessar.</small>
                         </div>
-                        <div v-else class="flex flex-column gap-2 mb-3">
+                        <div v-else class="flex flex-column mb-2">
                             <InputText id="password1" type="password" autocomplete="off" placeholder="Sua senha"
                                 class="w-full" style="padding: 1rem" v-model="password" />
                             <small id="username-help">Informe sua senha e clique em Acessar.</small>
                         </div>
 
-                        <div class="flex align-items-center justify-content-between mb-5">
+                        <div class="flex align-items-center justify-content-between mb-2">
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
                                 @click="router.push('/signup')">Novo por aqui?</Button>
@@ -41,7 +41,7 @@
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
                                 @click="router.push('/forgot')">Esqueceu a senha?</Button>
                         </div>
-                        <Button rounded label="Acessar" icon="pi pi-sign-in" :disabled="!email" type="submit"
+                        <Button rounded label="Acessar" icon="pi pi-sign-in" :loading="click" :disabled="!email" type="submit"
                             class="w-full p-3 text-xl"></Button>
                     </form>
                 </div>
@@ -64,6 +64,7 @@ const router = useRouter()
 
 const email = ref('');
 const password = ref('');
+const click = ref(false)
 
 const logoUrl = computed(() => {
     return `assets/images/logo-app.svg`;
@@ -72,6 +73,7 @@ const logoUrl = computed(() => {
 
 const signin = async () => {
     if (email.value && password.value) {
+        click.value = !click.value
         await store.registerUser(email.value, password.value)
         if (store.userStore && store.userStore.isMatch) {
             router.push({ path: "/" });
@@ -81,11 +83,13 @@ const signin = async () => {
         }
     } else {
         await store.findUser(email.value)
+        console.log(store.userStore);
         if (store.userStore && store.userStore.id && store.userStore.isStatusActive) {
             email.value = store.userStore.email
         } else if (store.userStore && store.userStore.msg) {
             defaultError(store.userStore.msg)
-            router.push({ path: '/u-token', query: { q: store.userStore.id } })
+            if (store.userStore.isStatusActive === false)
+                return router.push({ path: '/u-token', query: { q: store.userStore.id } })
         }
     }
 }

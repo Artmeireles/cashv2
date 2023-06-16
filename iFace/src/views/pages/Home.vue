@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-    <div
+    <div class="max-w-25rem mb-5 md:max-w-max"
         style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
         <div class="grid grid-nogutter surface-section text-800" style="border-radius: 53px">
             <div class="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center">
@@ -14,7 +14,7 @@
 
                     <Button @click="router.push('/signin')" v-if="!store.userStore.id"
                         class="p-button-text p-button-rounded border-none font-light line-height-2 text-blue-500">
-                        Entrar&nbsp;<i class="pi pi-sign-in"></i>
+                        Acessar plataforma&nbsp;<i class="pi pi-sign-in"></i>
                     </Button>
                     <Button label="Sign Out" @click="logout" v-else
                         class="p-button-rounded border-none ml-5 font-light text-white line-height-2 bg-blue-500">
@@ -29,7 +29,8 @@
                 </section>
             </div>
             <div class="col-12 md:col-6 flex-grow-1 flex overflow-hidden justify-content-center">
-                <img src="/assets/images/logo-app.svg" alt="Image" class="max-w-10rem mb-5 md:max-w-20rem md:mb-0 md:imgApp">
+                <img src="/assets/images/logo-app.svg" alt="Image"
+                    class="max-w-10rem mb-5 md:max-w-20rem md:mb-0 md:imgApp">
             </div>
         </div>
     </div>

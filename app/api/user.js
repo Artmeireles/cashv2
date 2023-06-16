@@ -300,7 +300,8 @@ module.exports = app => {
                         isCelularValid: false,
                         msg: `O servidor ${titleCase(cad_servidor.data.nome)} foi localizado nos registro do município de ${clientServidor.clientName}, 
                         mas não tem um telefone celular válido registrado${cad_servidor.data.celular ? ' (' + cad_servidor.data.celular + ')' : ''}. 
-                        Antes de prosseguir com o registro será necessário procurar o RH/DP de ${clientServidor.clientName.split("-")[0]} para regularizar seu registro`
+                        Antes de prosseguir com o registro será necessário procurar o RH/DP de ${clientServidor.clientName.split("-")[0]} 
+                        para regularizar seu registro`
                     })
             } else {
                 /**
