@@ -12,7 +12,6 @@
 import { useUserStore } from "@/stores/user"
 import { userKey } from "@/global"
 import { onMounted } from "vue";
-
 const validateToken = async () => {
   const json = localStorage.getItem(userKey);
   const userData = JSON.parse(json);

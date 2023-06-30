@@ -13,7 +13,6 @@ exports.up = function(knex, Promise) {
         table.string('telefone')
         table.string('password').notNull()
         table.string('password_reset_token')
-        table.string('sms_token')
         table.integer('id_cadas').notNull().unsigned()
         table.string('cliente').comment('cliente em snake_case')
         table.string('dominio').comment('dominio do usuário')

@@ -16,7 +16,7 @@
                         </span>
                     </div>
 
-                    <form @submit.prevent="unlock" class="max-w-30rem">
+                    <form @submit.prevent="passReset" class="max-w-30rem">
                         <div class="formgrid grid" v-if="tokenTimeLeft > 0">
                             <div class="field col-12">
                                 <label for="token1" class="block text-900 text-xl font-medium mb-2">Seu token</label>
@@ -44,8 +44,21 @@
                                         @input="moveToNextInput(7)" pattern="[0-9a-zA-Z]{1}" class="centered-input"
                                         style="max-width: 30px; text-transform:uppercase" />
                                     <InputText v-model="token8" id="token8" autocomplete="off" maxlength="1" :size="1"
-                                        @input="unlock" class="centered-input"
+                                        @input="moveToNextInput('password')" class="centered-input"
                                         style="max-width: 30px; text-transform:uppercase" />
+                                </div>
+
+                                <div class="formgrid grid">
+                                    <div class="field col-12 md:col-6 mt-4">
+                                        <label for="password">Sua senha</label>
+                                        <InputText id="password" type="password" autocomplete="off" class="p-2 w-full"
+                                            style="padding: 1rem" v-model="password" />
+                                    </div>
+                                    <div class="field col-12 md:col-6 mt-4">
+                                        <label for="confirmPassword">Confirme sua senha</label>
+                                        <InputText id="confirmPassword" type="password" autocomplete="off"
+                                            class="p-2 w-full" style="padding: 1rem" v-model="confirmPassword" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -62,9 +75,6 @@
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
                                 @click="router.push('/')">Início</Button>
-                            <Button link style="color: var(--primary-color)"
-                                class="font-medium no-underline ml-2 text-center cursor-pointer"
-                                @click="router.push('/forgot')">Esqueceu a senha?</Button>
                         </div>
 
                         <Button v-if="tokenTimeLeft > 0" rounded label="Registrar" icon="pi pi-sign-in"
@@ -99,11 +109,13 @@ const token5 = ref('');
 const token6 = ref('');
 const token7 = ref('');
 const token8 = ref('');
+const password = ref('');
+const confirmPassword = ref('');
 const tokenTimeMinutesLeft = ref(0)
 const tokenTimeLeft = ref(0)
 const tokenTimeMessage = ref('')
 const tokenTimeLeftMessage = ref('')
-const urlUnlock = ref(`${baseApiUrl}/user-unlock/`)
+const urlUnlock = ref(`${baseApiUrl}/password-reset/`)
 
 const logoUrl = computed(() => {
     return `assets/images/logo-app.svg`;
@@ -115,21 +127,24 @@ onMounted(async () => {
     await getTokenTime()
 })
 
-const unlock = async () => {
+const passReset = async () => {
     const urlTo = `${urlUnlock.value}${idUser.value}`
-    if (token1.value && token2.value && token3.value && token4.value && token5.value && token6.value && token7.value && token8.value) {
+    if (token1.value && token2.value && token3.value && token4.value && token5.value
+        && token6.value && token7.value && token8.value) {
         // Se preencheu todos os dados obrigatórios
         if (idUser.value) {
-            axios.post(urlTo, {
-                token: (token1.value + token2.value + token3.value + token4.value + token5.value + token6.value + token7.value + token8.value).toUpperCase()
+            axios.put(urlTo, {
+                token: (token1.value + token2.value + token3.value + token4.value + token5.value + token6.value + token7.value + token8.value).toUpperCase(),
+                password: password.value,
+                confirmPassword: confirmPassword.value,
             })
                 .then((body) => {
                     const user = body.data
+                    router.push({ path: "/signin" });
                     defaultSuccess(user.msg)
-                    router.push({ name: 'signin' })
                 })
                 .catch((error) => {
-                    return defaultError(error.response.data.msg)
+                    return defaultError(error.response.data)
                 })
         }
     }
@@ -163,8 +178,7 @@ const getTokenTime = async () => {
                 if (data.isToken == false) return router.push({ path: "/" })
             })
     } else {
-        defaultError("Token de validação não informado")
-        return router.push({ path: "/" })
+        return defaultError("Token de validação não informado")
     }
 }
 
@@ -182,7 +196,12 @@ const getNewToken = async () => {
 }
 
 const moveToNextInput = (index) => {
-    const nextInput = document.querySelector(`#token${index + 1}`);
+    let nextInput = undefined
+    if (typeof (index) === 'number') {
+        nextInput = document.querySelector(`#token${index + 1}`);
+    } else {
+        nextInput = document.querySelector(`#${index}`);
+    }
     if (nextInput !== null) {
         nextInput.focus();
     }

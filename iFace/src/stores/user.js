@@ -28,7 +28,7 @@ export const useUserStore = defineStore('users', {
     async registerUser(email, password) {
       const url = `${baseApiUrl}/signin`
       if (!this.ipify) {
-        this.ipify = await axios.get("https://api.ipify.org?format=json")
+        this.ipify = await axios.get("https://api.ipify.org/?format=json")
         this.ip = this.ipify.data.ip || undefined
         axios.interceptors.request.use(config => {
           if (this.ipify && this.ipify.data.ip) {
@@ -36,7 +36,7 @@ export const useUserStore = defineStore('users', {
           }
           return config;
         });
-}
+      }
       await axios
         .post(url, { email, password })
         .then((res) => {
@@ -66,7 +66,7 @@ export const useUserStore = defineStore('users', {
         .catch(error => {
           return error
         });
-        console.log(this.user);
+      console.log(this.user);
     },
     async validateToken(userData) {
       const url = `${baseApiUrl}/validateToken`
@@ -94,6 +94,22 @@ export const useUserStore = defineStore('users', {
       delete axios.defaults.headers.common['X-IP-Address']
       localStorage.removeItem(userKey);
     },
+    async fetchGeolocation(ip) {
+      fetch(`https://geo.ipify.org/api/v2/country?apiKey=at_i4b4nP8XICRqi6fpTyZh3LDBq8BFs&ipAddress=${ip}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.length > 0) {
+            const location = data[0];
+            this.location = {
+              latitude: location.lat,
+              longitude: location.lon
+            };
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao obter a geolocalização:', error);
+        });
+    }
   },
 
 })

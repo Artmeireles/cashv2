@@ -2,7 +2,7 @@
 const randomstring = require("randomstring")
 const { baseFrontendUrl, emailAdmin, appName } = require("../config/params")
 const { dbPrefix, jasperServerU, jasperServerK } = require("../.env")
-const { STATUS_INACTIVE, STATUS_WAITING, STATUS_SUSPENDED, STATUS_SUSPENDED_BY_TKN, STATUS_ACTIVE,
+const { STATUS_INACTIVE, STATUS_WAITING, STATUS_PASS_EXPIRED, STATUS_SUSPENDED, STATUS_SUSPENDED_BY_TKN, STATUS_ACTIVE,
     STATUS_DELETE, MINIMUM_KEYS_BEFORE_CHANGE, TOKEN_VALIDE_MINUTES } = require("../config/userStatus")
 const axios = require('axios')
 const moment = require('moment')
@@ -139,8 +139,7 @@ module.exports = app => {
                 // Variáveis da criação de um novo registro
                 body.evento = nextEventID.count + 1
                 const now = Math.floor(Date.now() / 1000)
-                body.password_reset_token = randomstring.generate(27) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-                body.sms_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+                body.password_reset_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
                 body.status = STATUS_WAITING
                 body.created_at = new Date()
                 body.f_ano = body.created_at.getFullYear()
@@ -324,55 +323,68 @@ module.exports = app => {
             existsOrError(user.cpf, 'CPF não informado')
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            return res.status(400).send(error)
+            return res.status(200).send(error)
         }
-        const thisUser = await app.db(tabela).where({ cpf: user.cpf.replace(/([^\d])+/gim, "") }).first()
+        const thisUser = await app.db(tabela)
+            .where({ cpf: user.cpf.replace(/([^\d])+/gim, "") })
+            .orWhere({ email: user.cpf })
+            .first()
         try {
             existsOrError(thisUser, await showRandomMessage())
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-            return res.status(400).send(error)
+            return res.status(200).send(error)
         }
 
+        let password_reset_token = undefined
         const now = Math.floor(Date.now() / 1000)
-        // Editar perfil de um usuário inserindo um token de renovação e um time
-        // registrar o evento na tabela de eventos
-        const { createEvent } = app.api.sisEvents
-        const evento = await createEvent({
-            "request": req,
-            "evento": {
-                "id_user": thisUser.id,
-                "evento": `Criação de token de troca de senha de usuário`,
-                "classevento": `requestPasswordReset`,
-                "id_registro": null
-            }
-        })
+        let validate = 0
+        if (thisUser.password_reset_token && thisUser.password_reset_token.split('_').length > 0) validate = thisUser.password_reset_token.split('_')[1]
+        if (validate > (now - 60)) {
+            // Se o token estiver dentro da validade menos um minuto então não gera outro
+            return res.status(200).send({
+                id: thisUser.id,
+                msg: `Verifique seu email${thisUser.email ? (' (' + thisUser.email + ')') : ''} ou SMS no celular (${thisUser.telefone}) para concluir a operação!`,
+                token: thisUser.password_reset_token
+            })
+        } else {
+            // Editar perfil de um usuário inserindo um token de renovação e um time
+            // registrar o evento na tabela de eventos
+            const { createEvent } = app.api.sisEvents
+            const evento = await createEvent({
+                "request": req,
+                "evento": {
+                    "id_user": thisUser.id,
+                    "evento": `Criação de token de troca de senha de usuário`,
+                    "classevento": `requestPasswordReset`,
+                    "id_registro": null
+                }
+            })
 
-        thisUser.evento = evento
-        const password_reset_token = randomstring.generate(27) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-        const sms_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-        // try {
-        app.db(tabela)
-            .update({
-                status: STATUS_SUSPENDED_BY_TKN,
-                evento: evento,
-                updated_at: new Date(),
-                password_reset_token: password_reset_token,
-                sms_token: sms_token
-            })
-            .where({ cpf: thisUser.cpf })
-            .then(_ => {
-                req.body = thisUser
-                smsToken(req)
-                mailyPasswordReset(thisUser)
-                return res.status(200).send({
-                    msg: `Verifique seu email${thisUser.email ? (' (' + thisUser.email + ')') : ''} ou SMS no celular (${thisUser.telefone}) para concluir a operação! Sua conta foi temporariamente desativada até que a nova senha seja criada`,
-                    token: password_reset_token
+            thisUser.evento = evento
+            password_reset_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+            // try {
+            app.db(tabela)
+                .update({
+                    evento: evento,
+                    updated_at: new Date(),
+                    password_reset_token: password_reset_token,
                 })
-            })
-            .catch(msg => {
-                res.status(400).send(error)
-            })
+                .where({ cpf: thisUser.cpf })
+                .then(_ => {
+                    req.body = thisUser
+                    smsToken(req)
+                    mailyPasswordReset(thisUser)
+                    return res.status(200).send({
+                        id: thisUser.id,
+                        msg: `Verifique seu email${thisUser.email ? (' (' + thisUser.email + ')') : ''} ou SMS no celular (${thisUser.telefone}) para concluir a operação!`,
+                        token: password_reset_token
+                    })
+                })
+                .catch(msg => {
+                    res.status(200).send(error)
+                })
+        }
     }
 
     /**
@@ -392,11 +404,11 @@ module.exports = app => {
             return res.status(400).send(await showRandomMessage() || 'Token ausente, inválido ou não corresponde a nenhuma conta em nosso sistema')
         const token = req.query.tkn || req.body.token
         const userFromDB = await app.db(tabela)
-            .select('id', 'status', 'email', 'sms_token', 'password_reset_token', 'name')
+            .select('id', 'status', 'email', 'password_reset_token', 'name')
             .where({ id: req.params.id })
             .where(function () {
-                this.where({ password_reset_token: token })
-                    .orWhere(app.db.raw(`sms_token like "${token}%"`))
+                this.where(app.db.raw(`SUBSTRING_INDEX(password_reset_token,'_',1) = '${token}'`))
+                    .andWhere({ id: req.params.id })
             }).first()
         if (!(userFromDB))
             return res.status(400).send(await showRandomMessage() || 'Token informado é inválido ou não correspondem a nenhuma conta em nosso sistema')
@@ -422,9 +434,8 @@ module.exports = app => {
         };
 
         const passTest = user.password
-
         try {
-            if (!booleanOrError(isValidPassword(passTest))) throw isValidPassword(passTest)
+            if (typeof isValidPassword(passTest) === 'string') throw isValidPassword(passTest)
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
             return res.status(200).send({
@@ -453,8 +464,7 @@ module.exports = app => {
             .update({
                 status: STATUS_ACTIVE,
                 updated_at: new Date(),
-                password_reset_token: null,
-                sms_token: null
+                password_reset_token: null
             })
             .where({ id: userFromDB.id })
         delete user.password_reset_token
@@ -470,7 +480,9 @@ module.exports = app => {
                 id_users: userFromDB.id
             })
             .then(_ => {
-                return res.status(200).send('Senha criada/alterada com sucesso!')
+                return res.status(200).send({
+                    msg: 'Senha criada/alterada com sucesso!'
+                })
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
@@ -487,13 +499,13 @@ module.exports = app => {
     const unlock = async (req, res) => {
         if (!(req.query.tkn || (req.body && req.body.token)))
             return res.status(400).send(await showRandomMessage() || 'Token ausente, inválido ou não corresponde a nenhuma conta em nosso sistema')
+        console.log(req.body);
         const token = req.query.tkn || req.body.token
         const userFromDB = await app.db(tabela)
-            .select('id', 'status', 'email', 'sms_token', 'password_reset_token', 'name')
-            .where({ id: req.params.id })
+            .select('id', 'status', 'email', 'password_reset_token', 'name')
             .where(function () {
-                this.where({ password_reset_token: token })
-                    .orWhere(app.db.raw(`sms_token like "${token}%"`))
+                this.where(app.db.raw(`SUBSTRING_INDEX(password_reset_token,'_',1) = '${token}'`))
+                    .andWhere({ id: req.params.id })
             }).first()
 
         if (!(userFromDB))
@@ -503,8 +515,7 @@ module.exports = app => {
 
         const now = Math.floor(Date.now() / 1000)
         let expirationTimOk = false
-        if (userFromDB.sms_token) expirationTimOk = Number(userFromDB.sms_token.split('_')[1]) > now
-        else if (userFromDB.password_reset_token) expirationTimOk = Number(userFromDB.password_reset_token.split('_')[1]) > now
+        if (userFromDB.password_reset_token) expirationTimOk = Number(userFromDB.password_reset_token.split('_')[1]) > now
 
         if (!expirationTimOk)
             return res.status(200).send({
@@ -531,7 +542,6 @@ module.exports = app => {
         user.status = STATUS_ACTIVE
         user.updated_at = new Date()
         user.password_reset_token = null
-        user.sms_token = null
         user.tipoUsuario = user.id_cadas ? 0 : 1
         app.db(tabela)
             .update(user)
@@ -566,15 +576,15 @@ module.exports = app => {
             }).first()
         if (!(userFromDB))
             return res.status(400).send(await showRandomMessage() || 'Os dados informados não correspondem a nenhuma conta em nosso sistema')
-        const expired = !userFromDB.sms_token || userFromDB.sms_token.split('_')[1] < now
+        const expired = !userFromDB.password_reset_token || userFromDB.password_reset_token.split('_')[1] < now
 
-        if (!expired) body.sms_token = userFromDB.sms_token
+        if (!expired) body.password_reset_token = userFromDB.password_reset_token
         else {
-            body.sms_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-            if (body.status != STATUS_WAITING) body.status = STATUS_SUSPENDED_BY_TKN
+            body.password_reset_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+            if (![STATUS_WAITING, STATUS_PASS_EXPIRED].includes(userFromDB.status)) body.status = STATUS_SUSPENDED_BY_TKN
             // Registra o token no BD
             await app.db(tabela).update({
-                sms_token: body.sms_token,
+                password_reset_token: body.password_reset_token,
                 status: body.status
             })
                 .where(function () {
@@ -583,7 +593,7 @@ module.exports = app => {
                         .orWhere({ cpf: body.email })
                 })
         }
-        token = body.sms_token.split('_')[0]
+        token = body.password_reset_token.split('_')[0]
         try {
             const url = "https://sms.comtele.com.br/api/v2/send"
             moment().locale('pt-br')
@@ -602,7 +612,7 @@ module.exports = app => {
             // const responseData = response.data;
             if (expired) {
                 const bodyRes = userFromDB
-                bodyRes.sms_token = body.sms_token
+                bodyRes.password_reset_token = body.password_reset_token
                 const { createEventUpd } = app.api.sisEvents
                 const evento = await createEventUpd({
                     "notTo": ['created_at'],
@@ -642,8 +652,9 @@ module.exports = app => {
                 }).first()
             existsOrError(userFromDB, await showRandomMessage())
             const now = Math.floor(Date.now() / 1000)
-            const password_reset_token = randomstring.generate(27) + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-            if (body.status != STATUS_WAITING) body.status = STATUS_SUSPENDED_BY_TKN
+            const password_reset_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
+            console.log('mailyToken: ', userFromDB.status);
+            if (![STATUS_WAITING, STATUS_PASS_EXPIRED].includes(userFromDB.status)) body.status = STATUS_SUSPENDED_BY_TKN
             // Registra o token no BD
             await app.db(tabela).update({
                 password_reset_token: password_reset_token,
@@ -655,14 +666,14 @@ module.exports = app => {
             })
 
             if (userFromDB.email) {
-                let expirationTimOk = userFromDB.sms_token ? Number(userFromDB.sms_token.split('_')[1]) > now : false
+                let expirationTimOk = userFromDB.password_reset_token ? Number(userFromDB.password_reset_token.split('_')[1]) > now : false
                 await transporter.sendMail({
                     from: `"${appName}" <contato@mgcash.app.br>`, // sender address
                     to: `${userFromDB.email}`, // list of receivers
                     subject: `Bem-vindo ao ${appName}`, // Subject line
                     text: `Olá ${userFromDB.name}!\n
                 Estamos confirmando sua inscrição✔
-                Para liberar seu acesso, por favor acesse o link abaixo${expirationTimOk ? ` ou utilize o código ${userFromDB.sms_token.split('_')[0]} na tela de login` : ''}.\n
+                Para liberar seu acesso, por favor acesse o link abaixo${expirationTimOk ? ` ou utilize o código ${password_reset_token.split('_')[0]} na tela de login` : ''}.\n
                 ${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${password_reset_token}\n
                 Atenciosamente,\nTime ${appName}`,
                     html: `<p><b>Olá ${userFromDB.name}!</b></p>
@@ -671,7 +682,7 @@ module.exports = app => {
                 <ul>
                 <li>Clique <a href="${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${password_reset_token}">aqui</a></li>
                 <li>Acesse o link ${baseFrontendUrl}/user-unlock/${userFromDB.id}?tkn=${password_reset_token}</li>
-                ${expirationTimOk ? `<li>Ou utilize o código <strong><code>${userFromDB.sms_token.split('_')[0]}</code></strong> na tela de login</li>` : ''}
+                ${expirationTimOk ? `<li>Ou utilize o código <strong><code>${password_reset_token.split('_')[0]}</code></strong> na tela de login</li>` : ''}
                 </ul>
                 <p>Atenciosamente,</p>
                 <p><b>Time ${appName}</b></p>`,
@@ -722,7 +733,7 @@ module.exports = app => {
                 html: `<p><b>Olá ${user.name}!</b></p>
                 <p>Para atualizar/criar sua senha, por favor acesse o link abaixo.</p>
                 <p>Lembre-se de que esse link tem validade de ${TOKEN_VALIDE_MINUTES} minutos.</p>
-                ${user.sms_token ? `<p>Você necessitará informar o token a seguir para liberar sua nova senha: <strong>${user.sms_token.split('_')[0]}</strong></p>` : ''}
+                ${user.password_reset_token ? `<p>Você necessitará informar o token a seguir para liberar sua nova senha: <strong>${user.password_reset_token.split('_')[0]}</strong></p>` : ''}
                 <a href="${baseFrontendUrl}/password-reset/${user.id}?tkn=${user.password_reset_token}">${baseFrontendUrl}/password-reset/${user.id}?tkn=${user.password_reset_token}</a>
                 <p>Atenciosamente,</p>
                 <p><b>Time ${appName}</b></p>`,
@@ -1009,7 +1020,7 @@ module.exports = app => {
     const getByToken = async (req, res) => {
         if (!req.params.token) return res.status(401).send('Unauthorized')
         const sql = app.db(tabela)
-            .select('users.id', app.db.raw('REPLACE(users.name, " de", "") as name'), app.db.raw('substring(users.sms_token, 1, 8) as sms_token'))
+            .select('users.id', app.db.raw('REPLACE(users.name, " de", "") as name'), app.db.raw('substring(users.password_reset_token, 1, 8) as password_reset_token'))
             .where(app.db.raw(`users.password_reset_token = '${req.params.token}'`))
             .first()
         sql.then(user => {
@@ -1174,21 +1185,17 @@ module.exports = app => {
 
     const getTokenTime = async (req, res) => {
         const userFromDB = await app.db(tabela)
-            .select('status', 'sms_token', 'password_reset_token')
+            .select('status', 'password_reset_token')
             .where({ id: req.query.q }).first()
         let tokenCreationTime = 0
-        if (userFromDB && userFromDB.sms_token) {
-            tokenCreationTime = Number(userFromDB.sms_token.split('_')[1])
-        }
-        else if (userFromDB && userFromDB.password_reset_token) {
+        if (userFromDB && userFromDB.password_reset_token) {
             tokenCreationTime = Number(userFromDB.password_reset_token.split('_')[1])
         }
 
         const now = Math.floor(Date.now() / 1000)
         let expirationTimOk = false
-        if (userFromDB && (userFromDB.sms_token || userFromDB.password_reset_token)) {
-            if (userFromDB.sms_token) expirationTimOk = Number(userFromDB.sms_token.split('_')[1]) > now
-            else if (userFromDB.password_reset_token) expirationTimOk = Number(userFromDB.password_reset_token.split('_')[1]) > now
+        if (userFromDB && userFromDB.password_reset_token) {
+            if (userFromDB.password_reset_token) expirationTimOk = Number(userFromDB.password_reset_token.split('_')[1]) > now
             if (!expirationTimOk) {
                 return res.status(200).send({
                     isTokenValid: false,

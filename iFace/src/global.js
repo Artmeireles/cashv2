@@ -77,8 +77,25 @@ export function titleCase(str) {
   return splitStr.join(' ');
 }
 
+
+/**
+ * Tipos possívels de status de usuários
+ */
+export const STATUS_INACTIVE = 0
+export const STATUS_WAITING = 1
+export const STATUS_SUSPENDED_BY_TKN = 8
+export const STATUS_SUSPENDED = 9
+export const STATUS_ACTIVE = 10
+export const STATUS_PASS_EXPIRED = 19
+export const STATUS_DELETE = 99
+export const MINIMUM_KEYS_BEFORE_CHANGE = 3 // Não pode repetiar a últimas X senhas
+export const TOKEN_VALIDE_MINUTES = 10 // 10 minutos de validade
+
 export default {
   userKey, appName, dbPrefix, noPermissAccess,
   isValidEmail, highlight, removeMark, downloadFile,
-  setValidCep, titleCase
+  setValidCep, titleCase, STATUS_INACTIVE, STATUS_WAITING,
+  STATUS_SUSPENDED_BY_TKN, STATUS_SUSPENDED, STATUS_ACTIVE,
+  STATUS_PASS_EXPIRED, STATUS_DELETE, MINIMUM_KEYS_BEFORE_CHANGE,
+  TOKEN_VALIDE_MINUTES
 }

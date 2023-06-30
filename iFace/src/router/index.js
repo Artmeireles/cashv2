@@ -19,6 +19,11 @@ const routes = [
     component: () => import('@/views/pages/SignIn.vue')
   },
   {
+    path: '/modal',
+    name: 'modal',
+    component: () => import('@/views/pages/Modal.vue')
+  },
+  {
     path: '/signup',
     name: 'signup',
     component: () => import('@/views/pages/SignUp.vue')
@@ -27,6 +32,16 @@ const routes = [
     path: '/u-token',
     name: 'u-token',
     component: () => import('@/views/pages/UserToken.vue')
+  },
+  {
+    path: '/request-password-reset',
+    name: 'request-password-reset',
+    component: () => import('@/views/pages/UserRequestPassReset.vue')
+  },
+  {
+    path: '/password-reset',
+    name: 'password-reset',
+    component: () => import('@/views/pages/UserPassReset.vue')
   },
   {
     path: '/not-found',
@@ -41,6 +56,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const nameUnblockedRoutes = ['home', 'signin', 'signup',
+    'u-token', 'not-found', 'request-password-reset', 'password-reset']
   const json = localStorage.getItem(userKey)
   const user = JSON.parse(json)
   const paths = []
@@ -50,7 +67,7 @@ router.beforeEach((to, from, next) => {
   if (!paths.includes(to.path)) next({ path: '/not-found' })
   else if ((user && user.id) && to.path == '/signin') next({ path: '/' })
   else {
-    if (!['home', 'signin', 'signup', 'u-token', 'not-found'].includes(to.name) && !(user && user.id)) next({ path: '/signin' })
+    if (!nameUnblockedRoutes.includes(to.name) && !(user && user.id)) next({ path: '/signin' })
     else next()
   }
 })

@@ -19,7 +19,6 @@ module.exports = app => {
         const email = req.body.email || req.body.cpf || undefined
         let password = req.body.password || undefined
         const ip = req.body.ip
-        let isStatusActive = false
 
         try {
             existsOrError(email, 'E-mail, nome ou CPF precisam ser informados')
@@ -50,7 +49,7 @@ module.exports = app => {
          */
         if (user && user.status == STATUS_INACTIVE) {
             return res.status(200).send({
-                isStatusActive,
+                'status': STATUS_INACTIVE,
                 'msg': `Seu acesso ao sistema foi suspenso pelo seu administrador. Por favor, entre em contato com o suporte`
             })
         }
@@ -60,7 +59,7 @@ module.exports = app => {
         if (user && user.status == STATUS_WAITING) {
             return res.status(200).send({
                 id: user.id,
-                isStatusActive,
+                'status': STATUS_WAITING,
                 'msg': await showUnconcludedRegistrationMessage() || "Confira o token recebido por SMS para ativar seu perfil de usuário"
             })
         }
@@ -70,20 +69,21 @@ module.exports = app => {
          */
         if (user && user.status == STATUS_PASS_EXPIRED) {
             return res.status(200).send({
-                isStatusActive,
+                'status': STATUS_PASS_EXPIRED,
                 'msg': `Sua senha expirou. As senhas devem ser alteradas a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
             })
         }
 
         /**
          * Verificar se foi solicitada a troca de senha
-         */
+        */
         if (user && user.status == STATUS_SUSPENDED_BY_TKN) {
             return res.status(200).send({
-                isStatusActive,
-                'msg': `Foi solicitado um token de senha. Para sua segurança o seu acesso está temporariamente suspenso. 
-                Por favor, verifique seu email ou SMS no celular. Mesmo que não tenha solicitado isso, para sua segurança por 
-                favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
+                'status': STATUS_SUSPENDED_BY_TKN,
+                'id': user.id,
+                'msg': `Foi solicitado um token de senha. Por favor, verifique seu email ou SMS no celular. 
+                Para sua segurança sugerimos que altere sua senha de tempos em tempos e nunca a forneça a ninguém. 
+                A nova senha não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
             })
         }
 
@@ -119,7 +119,7 @@ module.exports = app => {
                     */
                     if (diffInDays(dateStr, days)) {
                         const passTime = diffInDays(dateStr) - 1
-                        msg = `Se passaram ${passTime} dias desde que criou sua senha. Ela deve ser alterada a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
+                        const msg = `Se passaram ${passTime} dias desde que criou sua senha. Ela deve ser alterada a cada ${days} dias. Por favor altere agora sua senha. Ela não pode ser igual às últimas ${MINIMUM_KEYS_BEFORE_CHANGE} senhas utilizadas`
                         app.api.logger.logInfo({ log: { line: `${user.name}: ${msg}`, sConsole: true } })
                         await app.db(tabela)
                             .update({ status: STATUS_PASS_EXPIRED })
@@ -127,8 +127,8 @@ module.exports = app => {
                         await app.db(tabelaKeys)
                             .update({ status: STATUS_PASS_EXPIRED })
                             .where({ id_users: user.id })
-                        return res.status(400).send({
-                            isStatusActive,
+                        return res.status(200).send({
+                            'status': STATUS_PASS_EXPIRED,
                             'msg': msg
                         })
                     }

@@ -1,6 +1,6 @@
 <template>
     <div class="align-items-center justify-content-center">
-        <div class="flex flex-column max-w-25rem md:max-w-45rem ">
+        <div class="flex flex-column max-w-25rem md:max-w-30rem  ">
             <div
                 style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div class="w-full surface-card py-5 px-5" style="border-radius: 53px">
@@ -99,7 +99,7 @@
                                 @click="router.push('/')">Início</Button>
                             <Button link style="color: var(--primary-color)"
                                 class="font-medium no-underline ml-2 text-center cursor-pointer"
-                                @click="router.push('/forgot')">Esqueceu a senha?</Button>
+                                @click="router.push('/request-password-reset')">Trocar/Recuperar a senha?</Button>
                         </div>
                         <Button rounded label="Registrar" icon="pi pi-sign-in" :loading="click" :disabled="!cpf" type="submit"
                             class="w-full p-3 text-xl"></Button>
@@ -124,6 +124,7 @@ const store = useUserStore()
 
 const router = useRouter()
 
+const id = ref('');
 const cpf = ref('');
 const name = ref('');
 const email = ref('');
@@ -147,6 +148,7 @@ const signup = async () => {
         if (!!cpf.value && !!name.value && !!celular.value && !!password.value && !!confirmPassword.value) {
             axios.post(url.value, {
                 isNewUser: isNewUser.value,
+                id: id.value,
                 cpf: cpf.value,
                 email: email.value,
                 name: name.value,
@@ -184,6 +186,7 @@ const signup = async () => {
                     //    a) Celular válido
                     else {
                         const userFoundData = userFound.data
+                        id.value = userFoundData.id;
                         cpf.value = userFoundData.cpf;
                         name.value = userFoundData.nome;
                         email.value = userFoundData.email;
@@ -199,7 +202,6 @@ const signup = async () => {
 }
 
 const findUserSignUp = async () => {
-
     const user = await axios.post(url.value, { cpf: cpf.value })
     return user
 }
