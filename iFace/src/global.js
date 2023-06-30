@@ -36,7 +36,6 @@ export function removeMark(text) {
 export function downloadFile(linkSource, fileName) {
   const linkUrl = linkSource.replaceAll(' ', '%20')
   const file = fileName.replaceAll(' ', '%20')
-  // console.log(linkUrl, file);
   const downloadLink = document.createElement("a");
   downloadLink.href = linkUrl;
   downloadLink.download = file;

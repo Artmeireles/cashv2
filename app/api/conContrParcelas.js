@@ -351,7 +351,6 @@ module.exports = app => {
                 }
                 bodyParcelas.push(bodyParcela)
                 linhasExecutadas++
-                // if (linhasExecutadas % 100 == 0) console.log('Linhas executadas: ' + linhasExecutadas);
             }
             app.db(tabelaDomain).insert(bodyParcelas)
                 .then()

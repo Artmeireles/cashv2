@@ -499,7 +499,6 @@ module.exports = app => {
     const unlock = async (req, res) => {
         if (!(req.query.tkn || (req.body && req.body.token)))
             return res.status(400).send(await showRandomMessage() || 'Token ausente, inválido ou não corresponde a nenhuma conta em nosso sistema')
-        console.log(req.body);
         const token = req.query.tkn || req.body.token
         const userFromDB = await app.db(tabela)
             .select('id', 'status', 'email', 'password_reset_token', 'name')
@@ -653,7 +652,6 @@ module.exports = app => {
             existsOrError(userFromDB, await showRandomMessage())
             const now = Math.floor(Date.now() / 1000)
             const password_reset_token = randomstring.generate(8).toUpperCase() + '_' + Number(now + TOKEN_VALIDE_MINUTES * 60)
-            console.log('mailyToken: ', userFromDB.status);
             if (![STATUS_WAITING, STATUS_PASS_EXPIRED].includes(userFromDB.status)) body.status = STATUS_SUSPENDED_BY_TKN
             // Registra o token no BD
             await app.db(tabela).update({

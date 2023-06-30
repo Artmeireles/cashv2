@@ -66,7 +66,6 @@ export const useUserStore = defineStore('users', {
         .catch(error => {
           return error
         });
-      console.log(this.user);
     },
     async validateToken(userData) {
       const url = `${baseApiUrl}/validateToken`

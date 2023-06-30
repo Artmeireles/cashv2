@@ -68,10 +68,8 @@ const logoUrl = computed(() => {
 
 const passRequest = async () => {
     if (cpf.value) {
-        console.log('urlRequest:', urlRequest.value);
         await axios.post(urlRequest.value, { cpf: cpf.value })
             .then(body => {
-                console.log('body:', body);
                 if (body.data.id) {
                     router.push({ path: "password-reset", query: { q: body.data.id } });
                     defaultSuccess(body.data.msg)
@@ -79,7 +77,6 @@ const passRequest = async () => {
                     defaultWarn("Ops! Parece que houve um erro ao executar sua solicitação. Por favor tente de novo")
             })
             .catch(error => {
-                console.log('error:', error);
                 defaultError(error)
             })
     }
