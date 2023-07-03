@@ -87,7 +87,7 @@ const model = ref([
             {
                 label: 'Not Found',
                 icon: 'pi pi-fw pi-exclamation-circle',
-                to: '/pages/notfound'
+                to: '/not-found'
             },
             {
                 label: 'Empty',

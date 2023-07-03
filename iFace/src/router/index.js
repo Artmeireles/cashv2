@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { userKey } from '../global'
-// import AppLayout from '@/layout/AppLayout.vue'
 
 const routes = [
   {
@@ -17,11 +16,6 @@ const routes = [
     path: '/signin',
     name: 'signin',
     component: () => import('@/views/pages/SignIn.vue')
-  },
-  {
-    path: '/modal',
-    name: 'modal',
-    component: () => import('@/views/pages/Modal.vue')
   },
   {
     path: '/signup',
@@ -46,7 +40,7 @@ const routes = [
   {
     path: '/not-found',
     name: 'not-found',
-    component: () => import('@/views/pages/NotFound.vue')
+    component: () => import('@/views/not-found.vue')
   },
 ]
 
