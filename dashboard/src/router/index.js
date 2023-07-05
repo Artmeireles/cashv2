@@ -13,6 +13,11 @@ const routes = [
                 component: () => import('@/views/Dashboard.vue')
             },
             {
+                path: '/servidores',
+                name: 'servidores',
+                component: () => import('@/views/servidores/ServidoresGrid.vue')
+            },
+            {
                 path: '/uikit/formlayout',
                 name: 'formlayout',
                 component: () => import('@/views/uikit/FormLayout.vue')
@@ -176,7 +181,7 @@ const routes = [
         path: '/u-token',
         name: 'u-token',
         component: () => import('@/views/pages/auth/UserToken.vue')
-    },
+    }
 ];
 const router = createRouter({
     history: createWebHashHistory(),
@@ -190,6 +195,10 @@ router.beforeEach((to, from, next) => {
     const paths = [];
     routes.forEach((element) => {
         // console.log(element.path);
+        if (element.children)
+            element.children.forEach((element) => {
+                paths.push(element.path);
+            });
         paths.push(element.path);
     });
     // console.log(to.path, paths.includes(to.path));

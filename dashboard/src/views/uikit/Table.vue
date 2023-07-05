@@ -24,7 +24,8 @@ const representatives = ref([
     { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
     { name: 'Onyama Limba', image: 'onyamalimba.png' },
     { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-    { name: 'XuXue Feng', image: 'xuxuefeng.png' }
+    { name: 'XuXue Feng', image: 'xuxuefeng.png' },
+    { name: 'Tom Mendes', image: 'tommendes.jpg' }
 ]);
 
 const customerService = new CustomerService();
@@ -68,11 +69,11 @@ const collapseAll = () => {
     expandedRows.value = null;
 };
 const formatCurrency = (value) => {
-    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'USD' });
 };
 
 const formatDate = (value) => {
-    return value.toLocaleDateString('en-US', {
+    return value.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
@@ -175,7 +176,7 @@ const calculateCustomerTotal = (name) => {
                             {{ formatCurrency(data.balance) }}
                         </template>
                         <template #filter="{ filterModel }">
-                            <InputNumber v-model="filterModel.value" mode="currency" currency="USD" locale="en-US" />
+                            <InputNumber v-model="filterModel.value" mode="currency" currency="USD" locale="pt-BR" />
                         </template>
                     </Column>
                     <Column field="status" header="Status" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">

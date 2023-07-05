@@ -44,6 +44,7 @@ export const useUserStore = defineStore('users', {
                         this.user.timeLogged = Math.floor(Date.now() / 1000);
                         axios.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`;
                         localStorage.setItem(userKey, JSON.stringify({ ...res.data, ip: this.ip }));
+                        location.reload();
                     } else {
                         delete axios.defaults.headers.common['Authorization'];
                         delete axios.defaults.headers.common['X-IP-Address'];

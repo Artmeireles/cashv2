@@ -58,7 +58,7 @@ const searchCountry = (event) => {
                             <AutoComplete id="autocomplete" v-model="value2" :suggestions="filteredCountries" @complete="searchCountry($event)" field="name" class="p-invalid" />
                         </div>
                         <div class="field">
-                            <label for="calendar">Calendar</label>
+                            <label for="calendar">Calendário</label>
                             <Calendar id="calendar" v-model="value3" class="p-invalid" :showIcon="true" />
                         </div>
                         <div class="field">

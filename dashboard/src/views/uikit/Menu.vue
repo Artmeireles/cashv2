@@ -62,11 +62,11 @@ const nestedMenuitems = ref([
         ]
     },
     {
-        label: 'Profile',
+        label: 'Perfil',
         icon: 'pi pi-fw pi-user',
         items: [
             {
-                label: 'Settings',
+                label: 'Configurações',
                 icon: 'pi pi-fw pi-cog'
             },
             {
@@ -158,11 +158,11 @@ const tieredMenuItems = ref([
         ]
     },
     {
-        label: 'Profile',
+        label: 'Perfil',
         icon: 'pi pi-fw pi-user',
         items: [
             {
-                label: 'Settings',
+                label: 'Configurações',
                 icon: 'pi pi-fw pi-cog'
             },
             {
@@ -415,11 +415,11 @@ const panelMenuitems = ref([
         ]
     },
     {
-        label: 'Profile',
+        label: 'Perfil',
         icon: 'pi pi-fw pi-user',
         items: [
             {
-                label: 'Settings',
+                label: 'Configurações',
                 icon: 'pi pi-fw pi-cog'
             },
             {

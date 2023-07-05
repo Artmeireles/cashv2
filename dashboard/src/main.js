@@ -114,11 +114,7 @@ app.use(createPinia());
 app.use(router);
 app.use(PrimeVue, {
     ripple: true,
-    inputStyle: 'filled',
-    locale: {
-        accept: 'Sim',
-        reject: 'Não'
-    }
+    inputStyle: 'filled'
 });
 app.use(ToastService);
 app.use(DialogService);

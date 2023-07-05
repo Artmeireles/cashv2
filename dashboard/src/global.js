@@ -1,5 +1,6 @@
 export const userKey = '__cash_user';
 export const appName = 'Cash';
+export const softwareHouse = 'Mega Assessoria';
 export const dbPrefix = 'wwmgca';
 export const noPermissAccess = 'Ops!!! Parece que seu perfil não dá acesso a essa operação';
 

@@ -1,12 +1,12 @@
 <script setup>
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref, onMounted } from 'vue';
 import AppTopbar from './AppTopbar.vue';
 import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppConfig from './AppConfig.vue';
 import { useLayout } from '@/layout/composables/layout';
 
-const { layoutConfig, layoutState, isSidebarActive } = useLayout();
+const { layoutConfig, layoutState, setScale, isSidebarActive } = useLayout();
 
 const outsideClickListener = ref(null);
 
@@ -55,6 +55,25 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+const applyScale = () => {
+    let layoutCfg = localStorage.getItem('layoutCfg');
+    layoutCfg = JSON.parse(layoutCfg);
+    if (layoutCfg && layoutCfg.screenScale) {
+        setScale(layoutCfg.screenScale);
+        document.documentElement.style.fontSize = layoutCfg.screenScale + 'px';
+    }
+};
+const applyMenuType = () => {
+    let layoutCfg = localStorage.getItem('layoutCfg');
+    layoutCfg = JSON.parse(layoutCfg);
+    if (layoutCfg && layoutCfg.menuType) {
+        layoutConfig.menuMode.value = layoutCfg.menuType;
+    }
+};
+onMounted(() => {
+    applyScale();
+    applyMenuType();
+});
 </script>
 
 <template>

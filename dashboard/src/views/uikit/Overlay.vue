@@ -50,7 +50,7 @@ const toggleDataTable = (event) => {
 };
 
 const formatCurrency = (value) => {
-    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'USD' });
 };
 
 const onProductSelect = (event) => {
@@ -61,7 +61,7 @@ const onProductSelect = (event) => {
 const confirm = (event) => {
     confirmPopup.require({
         target: event.target,
-        message: 'Are you sure you want to proceed?',
+        message: 'Confirma a operação?',
         icon: 'pi pi-exclamation-triangle',
         accept: () => {
             toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
@@ -126,11 +126,11 @@ const confirm = (event) => {
                 <Dialog header="Confirmation" v-model:visible="displayConfirmation" :style="{ width: '350px' }" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span>Are you sure you want to proceed?</span>
+                        <span>Confirma a operação?</span>
                     </div>
                     <template #footer>
-                        <Button label="No" icon="pi pi-times" @click="closeConfirmation" class="p-button-text" />
-                        <Button label="Yes" icon="pi pi-check" @click="closeConfirmation" class="p-button-text" autofocus />
+                        <Button label="Não" icon="pi pi-times" @click="closeConfirmation" class="p-button-text" />
+                        <Button label="Sim" icon="pi pi-check" @click="closeConfirmation" class="p-button-text" autofocus />
                     </template>
                 </Dialog>
             </div>

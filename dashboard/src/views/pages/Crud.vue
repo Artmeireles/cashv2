@@ -30,7 +30,7 @@ onMounted(() => {
     productService.getProducts().then((data) => (products.value = data));
 });
 const formatCurrency = (value) => {
-    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'USD' });
 };
 
 const openNew = () => {
@@ -270,7 +270,7 @@ const initFilters = () => {
                     <div class="formgrid grid">
                         <div class="field col">
                             <label for="price">Price</label>
-                            <InputNumber id="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" :class="{ 'p-invalid': submitted && !product.price }" :required="true" />
+                            <InputNumber id="price" v-model="product.price" mode="currency" currency="USD" locale="pt-BR" :class="{ 'p-invalid': submitted && !product.price }" :required="true" />
                             <small class="p-invalid" v-if="submitted && !product.price">Price is required.</small>
                         </div>
                         <div class="field col">

@@ -2,12 +2,45 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user';
+import { useToast } from 'primevue/usetoast';
+import { appName } from '@/global';
 
-const { layoutConfig, onMenuToggle } = useLayout();
+const toast = useToast();
+
+const { onMenuToggle } = useLayout();
 
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
+const items = [
+    {
+        label: 'Ver perfil',
+        icon: 'pi pi-refresh',
+        command: () => {
+            toast.add({ severity: 'info', summary: 'Success', detail: 'Ver perfil', life: 3000 });
+        }
+    },
+    {
+        label: 'Sair do sistema',
+        icon: 'pi pi-times',
+        command: () => {
+            logout();
+        }
+    },
+    {
+        label: 'Trocar senha',
+        icon: 'pi pi-external-link',
+        command: () => {
+            router.push({ path: '/request-password-reset' });
+        }
+    }
+];
+
+const logout = () => {
+    useUserStore().logout();
+    location.reload();
+};
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -18,7 +51,7 @@ onBeforeUnmount(() => {
 });
 
 const logoUrl = computed(() => {
-    return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
+    return `assets/images/logo-app.svg`;
 });
 
 const onTopBarMenuButton = () => {
@@ -58,13 +91,23 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+const menu = ref();
+const toggle = (event) => {
+    menu.value.toggle(event);
+};
+const toggleAppConfig = () => {
+    const btn = document.getElementById('btnTglAppConfig');
+    if (btn) {
+        btn.click();
+    }
+};
 </script>
 
 <template>
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo">
             <img :src="logoUrl" alt="logo" />
-            <span>SAKAI</span>
+            <span>{{ appName }}</span>
         </router-link>
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
@@ -78,17 +121,25 @@ const isOutsideClicked = (event) => {
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
+                <span>Calendário</span>
             </button>
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
+            <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
-                <span>Profile</span>
-            </button>
-            <button @click="onSettingsClick()" class="p-link layout-topbar-button">
+                <span>Perfil</span>
+            </button> -->
+            <Button type="button" label="Toggle" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu"
+                class="p-link layout-topbar-button">
+                <i class="pi pi-user"></i>
+                <span>Perfil</span>
+            </Button>
+            <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+            <button @click="toggleAppConfig()" class="p-link layout-topbar-button">
                 <i class="pi pi-cog"></i>
-                <span>Settings</span>
+                <span>Configurações</span>
             </button>
         </div>
+
+        <Toast />
     </div>
 </template>
 

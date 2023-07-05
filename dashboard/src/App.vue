@@ -1,13 +1,15 @@
 <script setup>
 import { useUserStore } from '@/stores/user';
 import { userKey } from '@/global';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+const isTokenValid = ref(false);
 const validateToken = async () => {
     const json = localStorage.getItem(userKey);
     const userData = JSON.parse(json);
 
     const store = useUserStore();
     await store.validateToken(userData);
+    isTokenValid.value = store.isTokenValid;
 };
 
 onMounted(() => {
@@ -18,8 +20,8 @@ onMounted(() => {
 <template>
     <div class="container">
         <router-view />
-        <Toast position="bottom-right" />
-    <DynamicDialog />
+        <Toast position="bottom-right" v-if="!isTokenValid" />
+        <!-- <DynamicDialog /> -->
     </div>
 </template>
 

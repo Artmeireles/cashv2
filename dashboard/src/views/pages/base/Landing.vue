@@ -14,7 +14,7 @@ const smoothScroll = (id) => {
 };
 
 const logoUrl = computed(() => {
-    return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
+    return `assets/images/logo-app.svg`;
 });
 </script>
 

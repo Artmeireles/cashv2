@@ -27,6 +27,7 @@ export default class CustomerService {
         const queryParams = Object.keys(params)
             .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
             .join('&');
+        console.log('https://www.primefaces.org//demo/data/customers?' + queryParams);
         return fetch('https://www.primefaces.org//demo/data/customers?' + queryParams).then((res) => res.json());
     }
 }
