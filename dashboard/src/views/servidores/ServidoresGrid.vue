@@ -10,7 +10,7 @@ const toast = useToast();
 const filters = ref(null);
 const menu = ref();
 const gridData = ref(null);
-const loading = ref(null);
+const loading = ref(true);
 const urlBase = ref(`${baseApiUrl}/cadastros`);
 
 const initFilters = () => {
@@ -111,7 +111,25 @@ onBeforeMount(() => {
 
 <template>
     <div class="card">
+        <DataTable :value="gridData" v-if="loading">
+            <Column field="matricula" header="Matricula" style="min-width: 14rem">
+                <template #body>
+                    <Skeleton></Skeleton>
+                </template>
+            </Column>
+            <Column field="nome" header="Nome" style="min-width: 25rem">
+                <template #body>
+                    <Skeleton></Skeleton>
+                </template>
+            </Column>
+            <Column field="cpf" header="CPF" style="min-width: 14rem">
+                <template #body>
+                    <Skeleton></Skeleton>
+                </template>
+            </Column>
+        </DataTable>
         <DataTable
+            v-else
             :value="gridData"
             :paginator="true"
             class="p-datatable-gridlines"
@@ -134,41 +152,40 @@ onBeforeMount(() => {
                     </span>
                 </div>
             </template>
-            <template #empty> Sem registros por enquanto. </template>
-            <!-- <Column selectionMode="multiple" headerStyle="width: 3rem"></Column> -->
+            <!-- <template #empty> Sem registros por enquanto. </template> -->
             <Column field="matricula" header="Matricula" sortable style="min-width: 14rem">
                 <template #body="{ data }">
                     {{ data.matricula }}
+                    <Skeleton v-if="loading"></Skeleton>
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por matricula" />
                 </template>
-                <Skeleton></Skeleton>
             </Column>
-            <Column field="nome" header="Nome" sortable style="min-width: 14rem">
+            <Column field="nome" header="Nome" sortable style="min-width: 25rem">
                 <template #body="{ data }">
                     {{ data.nome }}
+                    <Skeleton v-if="loading"></Skeleton>
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nome" />
                 </template>
-                <Skeleton></Skeleton>
             </Column>
             <Column field="cpf" header="CPF" sortable style="min-width: 14rem">
                 <template #body="{ data }">
                     {{ data.cpf }}
+                    <Skeleton v-if="loading"></Skeleton>
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por CPF" />
                 </template>
-                <Skeleton></Skeleton>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
                 <template #body>
                     <Button type="button" icon="pi pi-cog" rounded @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" />
                     <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+                    <Skeleton v-if="loading"></Skeleton>
                 </template>
-                <Skeleton></Skeleton>
             </Column>
         </DataTable>
     </div>

@@ -5,6 +5,7 @@ import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppConfig from './AppConfig.vue';
 import { useLayout } from '@/layout/composables/layout';
+import { usePrimeVue } from 'primevue/config';
 
 const { layoutConfig, layoutState, setScale, isSidebarActive } = useLayout();
 
@@ -70,9 +71,25 @@ const applyMenuType = () => {
         layoutConfig.menuMode.value = layoutCfg.menuType;
     }
 };
+const changeToPortuguese = () => {
+    const primevue = usePrimeVue();
+    primevue.config.locale.accept = 'Aceitar';
+    primevue.config.locale.reject = 'Rejeitar';
+    primevue.config.locale.matchAll = 'Comparar todos';
+    primevue.config.locale.matchAny = 'Comparar alguns';
+    primevue.config.locale.startsWith = 'Começa com';
+    primevue.config.locale.contains = 'Contém';
+    primevue.config.locale.notContains = 'Não contém';
+    primevue.config.locale.endsWith = 'Termina com';
+    primevue.config.locale.equals = 'Igual';
+    primevue.config.locale.notEquals = 'Diferente';
+    primevue.config.locale.noFilter = 'Sem filtro';
+    primevue.config.locale.filter = 'Filtro';
+};
 onMounted(() => {
     applyScale();
     applyMenuType();
+    changeToPortuguese();
 });
 </script>
 

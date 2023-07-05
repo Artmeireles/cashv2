@@ -106,6 +106,7 @@ import BlockViewer from '@/components/BlockViewer.vue';
 
 import '@/assets/app.css';
 import '@/assets/styles.scss';
+import './locale-pt-BR.json';
 
 export const app = createApp(App);
 export const global = app.global;
