@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { baseApiUrl } from '@/env';
+import { baseApiAuthUrl } from '@/env';
 import { userKey } from '@/global';
 import axios from '@/axios-interceptor';
 
@@ -25,7 +25,7 @@ export const useUserStore = defineStore('users', {
     },
     actions: {
         async registerUser(email, password) {
-            const url = `${baseApiUrl}/signin`;
+            const url = `${baseApiAuthUrl}/signin`;
             if (!this.ipify) {
                 this.ipify = await axios.get('https://api.ipify.org/?format=json');
                 this.ip = this.ipify.data.ip || undefined;
@@ -57,7 +57,7 @@ export const useUserStore = defineStore('users', {
                 });
         },
         async findUser(cpf) {
-            const url = `${baseApiUrl}/signin`;
+            const url = `${baseApiAuthUrl}/signin`;
             await axios
                 .post(url, { cpf })
                 .then((res) => {
@@ -68,7 +68,7 @@ export const useUserStore = defineStore('users', {
                 });
         },
         async validateToken(userData) {
-            const url = `${baseApiUrl}/validateToken`;
+            const url = `${baseApiAuthUrl}/validateToken`;
             // Pra validar movimentação/troca de IP
             if (userData && userData.ip) userData.ipSignin = userData.ip; // comentar esta linha e descomentar as duas seguintes
             // let ipify = await axios.get("https://api.ipify.org?format=json")
@@ -81,6 +81,8 @@ export const useUserStore = defineStore('users', {
                         this.user = userData;
                         axios.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`;
                         this.timeToLogOut = 600;
+                    } else {
+                        this.logout();
                     }
                 })
                 .catch((error) => {

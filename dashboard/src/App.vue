@@ -2,6 +2,10 @@
 import { useUserStore } from '@/stores/user';
 import { userKey } from '@/global';
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 const isTokenValid = ref(false);
 const validateToken = async () => {
     const json = localStorage.getItem(userKey);
@@ -10,6 +14,7 @@ const validateToken = async () => {
     const store = useUserStore();
     await store.validateToken(userData);
     isTokenValid.value = store.isTokenValid;
+    if (!isTokenValid.value) router.push('/');
 };
 
 onMounted(() => {

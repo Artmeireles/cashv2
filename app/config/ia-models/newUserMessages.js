@@ -22,7 +22,6 @@ const msgs = [
     "Lamentamos, mas não conseguimos localizar as informações fornecidas. Por favor, forneça os dados necessários nos campos para criar seu perfil de usuário",
     "As informações que você inseriu não foram encontradas. Por favor, preencha os campos com os dados necessários para criar seu perfil de usuário",
     "Desculpe, não conseguimos localizar os dados informados. Por favor, informe os detalhes necessários nos campos a seguir para criar seu perfil de usuário"
-
 ]
 
 module.exports = msgs

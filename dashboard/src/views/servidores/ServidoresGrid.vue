@@ -1,15 +1,17 @@
 <script setup>
-import { ref, onBeforeMount } from 'vue';
+import { ref, onBeforeMount, onMounted } from 'vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
-import { useToast } from 'primevue/usetoast';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
+import { defaultSuccess, defaultWarn } from '@/toast';
+import { useRouter } from 'vue-router';
 
-const toast = useToast();
+const router = useRouter();
 
 const filters = ref(null);
 const menu = ref();
 const gridData = ref(null);
+const itemData = ref(null);
 const loading = ref(true);
 const urlBase = ref(`${baseApiUrl}/cadastros`);
 
@@ -57,55 +59,47 @@ const clearFilter = () => {
 // };
 const items = ref([
     {
-        label: 'Add',
+        label: 'Editar',
         icon: 'pi pi-pencil',
         command: () => {
-            toast.add({ severity: 'info', summary: 'Add', detail: 'Data Added' });
+            router.push({ path: `/servidores/${itemData.value.id}` });
         }
     },
     {
-        label: 'Update',
-        icon: 'pi pi-refresh',
-        command: () => {
-            toast.add({ severity: 'success', summary: 'Update', detail: 'Data Updated' });
-        }
-    },
-    {
-        label: 'Delete',
+        label: 'Excluir',
         icon: 'pi pi-trash',
         command: () => {
-            toast.add({ severity: 'error', summary: 'Delete', detail: 'Data Deleted' });
+            defaultWarn('Excluir registro (ID): ' + itemData.value.id);
         }
     },
     {
-        label: 'Upload',
+        label: 'Documentos',
         icon: 'pi pi-upload',
         command: () => {
-            toast.add({ severity: 'error', summary: 'Upload', detail: 'File Upload' });
-        }
-    },
-    {
-        label: 'Vue Website',
-        icon: 'pi pi-external-link',
-        command: () => {
-            window.location.href = 'https://vuejs.org/';
+            defaultSuccess('documentos registro (ID): ' + itemData.value.id);
         }
     }
 ]);
 const toggle = (event) => {
     menu.value.toggle(event);
 };
-const loadData = async () => {
-    const axiosRes = await axios.get(urlBase.value);
-    gridData.value = axiosRes.data.data;
-    gridData.value.forEach((element) => {
-        element.matricula = element.matricula.toString().padStart(8, '0');
+const getItem = (data) => {
+    itemData.value = data;
+};
+const loadData = () => {
+    axios.get(urlBase.value).then((axiosRes) => {
+        gridData.value = axiosRes.data.data;
+        gridData.value.forEach((element) => {
+            element.matricula = element.matricula.toString().padStart(8, '0');
+        });
+        loading.value = false;
     });
 };
 onBeforeMount(() => {
-    loadData();
-    loading.value = false;
     initFilters();
+});
+onMounted(() => {
+    loadData();
 });
 </script>
 
@@ -123,6 +117,11 @@ onBeforeMount(() => {
                 </template>
             </Column>
             <Column field="cpf" header="CPF" style="min-width: 14rem">
+                <template #body>
+                    <Skeleton></Skeleton>
+                </template>
+            </Column>
+            <Column headerStyle="width: 5rem; text-align: center">
                 <template #body>
                     <Skeleton></Skeleton>
                 </template>
@@ -156,7 +155,6 @@ onBeforeMount(() => {
             <Column field="matricula" header="Matricula" sortable style="min-width: 14rem">
                 <template #body="{ data }">
                     {{ data.matricula }}
-                    <Skeleton v-if="loading"></Skeleton>
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por matricula" />
@@ -165,7 +163,6 @@ onBeforeMount(() => {
             <Column field="nome" header="Nome" sortable style="min-width: 25rem">
                 <template #body="{ data }">
                     {{ data.nome }}
-                    <Skeleton v-if="loading"></Skeleton>
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nome" />
@@ -174,17 +171,15 @@ onBeforeMount(() => {
             <Column field="cpf" header="CPF" sortable style="min-width: 14rem">
                 <template #body="{ data }">
                     {{ data.cpf }}
-                    <Skeleton v-if="loading"></Skeleton>
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por CPF" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
-                <template #body>
-                    <Button type="button" icon="pi pi-cog" rounded @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" />
+                <template #body="{ data }">
+                    <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" class="p-button-outlined" />
                     <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
-                    <Skeleton v-if="loading"></Skeleton>
                 </template>
             </Column>
         </DataTable>

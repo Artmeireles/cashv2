@@ -18,6 +18,11 @@ const routes = [
                 component: () => import('@/views/servidores/ServidoresGrid.vue')
             },
             {
+                path: '/servidores/:id',
+                name: 'servidor',
+                component: () => import('@/views/servidores/ServidorForm.vue')
+            },
+            {
                 path: '/uikit/formlayout',
                 name: 'formlayout',
                 component: () => import('@/views/uikit/FormLayout.vue')
@@ -201,9 +206,9 @@ router.beforeEach((to, from, next) => {
             });
         paths.push(element.path);
     });
-    // console.log(to.path, paths.includes(to.path));
+    // console.log('router: ', to.path, paths.includes(to.path.split('/:')[0]));
     // next();
-    if (!paths.includes(to.path)) next({ path: '/not-found' });
+    if (!paths.includes(to.matched[1].path)) next({ path: '/not-found' });
     else if (user && user.id && to.path == '/signin') next({ path: '/' });
     else {
         if (!nameUnblockedRoutes.includes(to.name) && !(user && user.id)) next({ path: '/welcome' });
