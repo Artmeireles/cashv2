@@ -3,30 +3,68 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
-    const { mailyCliSender } = app.api.mailerCli
+    const { existsOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
+    const { convertESocialTextToJson } = app.api.facilities
     const tabela = 'fin_rubricas'
+    const tabelaParams = 'params'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
     const save = async (req, res) => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
-        const body = { ...req.body }
-        delete body.id_emp
-        body.id_emp = req.params.id_emp
+        let body = { ...req.body }
         if (req.params.id) body.id = req.params.id
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         try {
             // Alçada para edição
             if (body.id)
-                isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Edição de ${tabela}"`)
+                isMatchOrError(uParams && uParams.financeiro >= 3, `${noAccessMsg} "Edição de ${tabela}"`)
             // Alçada para inclusão
-            else isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
+            else isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+        const contentType = req.headers['content-type']
+        if (contentType == "text/plain") {
+            const bodyRaw = convertESocialTextToJson(req.body)
+            body = {}
+            const tpl = await app.db(tabelaDomain).where({ 'cod_rubr': bodyRaw.codRubr_13 }).first()
+            if (tpl && tpl.id) {
+                body.id = tpl.id
+            }
+            body.cod_rubr = bodyRaw.codRubr_13
+            body.ini_valid = bodyRaw.iniValid_15 || bodyRaw.iniValid_44
+            body.dsc_rubr = bodyRaw.dscRubr_18
+            body.id_param_cod_inc_cprp = bodyRaw.codIncCPRP_35 || bodyRaw.codIncCPRP_47
+            try {
+                if ((id = await app.db(tabelaParams).select('id').where({ 'meta': 'natRubrica', 'value': bodyRaw.natRubr_19 }).first()) != null)
+                    body.id_param_nat_rubr = id.id
+                else throw 'Natureza da Rubrica não encontrada ' + bodyRaw.natRubr_19
+                if ((id = await app.db(tabelaParams).select('id').where({ 'meta': 'tpRubrica', 'value': bodyRaw.tpRubr_20 }).first()) != null)
+                    body.id_param_tipo = id.id
+                else throw 'Tipo da Rubrica não encontrada ' + bodyRaw.tpRubr_20
+                if ((id = await app.db(tabelaParams).select('id').where({ 'meta': 'codIncCP', 'value': bodyRaw.codIncCP_21 }).first()) != null)
+                    body.id_param_cod_inc_cp = id.id
+                else throw 'Código de Incidência Tributária não encontrada ' + bodyRaw.codIncCP_21
+                if ((id = await app.db(tabelaParams).select('id').where({ 'meta': 'codIncIRRF', 'value': bodyRaw.codIncIRRF_22 }).first()) != null)
+                    body.id_param_cod_inc_irrf = id.id
+                else throw 'Código IRRF não encontrada ' + bodyRaw.codIncIRRF_22
+                if ((id = await app.db(tabelaParams).select('id').where({ 'meta': 'codIncFGTS', 'value': bodyRaw.codIncFGTS_23 }).first()) != null)
+                    body.id_param_cod_inc_fgts = id.id
+                else throw 'Código FGTS não encontrada ' + bodyRaw.codIncFGTS_23
+                if ((id = await app.db(tabelaParams).select('id').where({ 'meta': 'codIncCPRP', 'value': body.id_param_cod_inc_cprp }).first()) != null)
+                    body.id_param_cod_inc_cprp = id.id
+                else throw 'Código CPRP não encontrada ' + bodyRaw.codIncCPRP_35
+            } catch (error) {
+                app.api.logger.logError({ log: { line: `Erro no salvamento da rubrica ${body.cod_rubr} via PonteCash: ${error}`, sConsole: true } })
+            }
+            body.teto_remun = bodyRaw.tetoRemun_36 || bodyRaw.tetoRemun_48 || "N"
+            body.consignado = "0"
+            body.consignavel = "1"
+        }
 
+        body.id_emp = req.params.id_emp
         try {
             existsOrError(body.id_emp, 'Órgão não informado')
             existsOrError(body.cod_rubr, 'Código da Rúbrica não informado')
@@ -49,9 +87,12 @@ module.exports = app => {
             existsOrError(body.consignavel, 'Consignável não informado')
             //existsOrError(body.observacao, 'Observação não informado')
         }
-         catch (error) {
-            return res.status(400).send(error)
+        catch (error) {
+            if (contentType != "text/plain")
+                return res.status(400).send(error)
         }
+
+        // return console.log(body);
 
         if (body.id) {
             // Variáveis da edição de um registro
@@ -116,7 +157,7 @@ module.exports = app => {
 
     const limit = 20 // usado para paginação
     const get = async (req, res) => {
-        let user = req.user        
+        let user = req.user
         const id_emp = req.params.id_emp
         const key = req.query.key ? req.query.key : ''
         const uParams = await app.db('users').where({ id: user.id }).first();

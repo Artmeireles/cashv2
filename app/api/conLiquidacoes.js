@@ -35,7 +35,7 @@ module.exports = app => {
             return res.status(401).send(error)
         }
 
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         if (req.params.id) body.id = req.params.id
         if (body.id) {
             // Validação unitária de registro de liquidação
@@ -395,7 +395,7 @@ module.exports = app => {
         const uParams = await app.db('users').where({ id: user.id }).first();
         if (!(uParams.admin >= 1 || uParams.con_contratos >= 2)) return res.status(401).send('Unauthorized')
         const body = { ...req.body }
-        const tabelaDomain = `${dbPrefix}_api.con_liquidacoes`
+        const tabelaDomain = `${dbPrefix}_app.con_liquidacoes`
 
         const dominios = await getDomainsByClient(req, res)
         const trx = req.trx
@@ -431,7 +431,7 @@ module.exports = app => {
     }
 
     const setConsignatario = async (cliente, dominio, trx) => {
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         const tabelaClienteConsignatariosDomain = `${dbPrefix}_${cliente}_${dominio}.consignatarios`
         try {
             await app.db.raw(`
@@ -536,7 +536,7 @@ module.exports = app => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
         if (!(uParams.admin >= 1 || uParams.con_contratos >= 2)) return res.status(401).send('Unauthorized')
-        const tabelaDomainApi = `${dbPrefix}_api.${tabela}`
+        const tabelaDomainApi = `${dbPrefix}_app.${tabela}`
         // Recupera domínios do cliente
         const dominios = await app.db('params')
             .select({ 'dominios': 'value' })
@@ -666,7 +666,7 @@ module.exports = app => {
         for (const dominio of dominios) {
             let returnDomain = ''
             const tabelaConsignatariosCliente = `${dbPrefix}_${uParams.cliente}_${dominio.dominios}.consignatarios`
-            const tabelaConLiquidacoesApi = `${dbPrefix}_api.con_liquidacoes`
+            const tabelaConLiquidacoesApi = `${dbPrefix}_app.con_liquidacoes`
             const tabelaConEventosCliente = `${dbPrefix}_${uParams.cliente}_${dominio.dominios}.con_eventos`
             const tabelaConContratosCliente = `${dbPrefix}_${uParams.cliente}_${dominio.dominios}.con_contratos`
 
@@ -749,7 +749,7 @@ module.exports = app => {
             batchResult.push({ dominio: dominio.dominios })
             const tabelaCadServidoresCliente = `${dbPrefix}_${uParams.cliente}_${dominio.dominios}.cad_servidores`
             const tabelaConsignatariosCliente = `${dbPrefix}_${uParams.cliente}_${dominio.dominios}.consignatarios`
-            const tabelaConLiquidacoesApi = `${dbPrefix}_api.con_liquidacoes`
+            const tabelaConLiquidacoesApi = `${dbPrefix}_app.con_liquidacoes`
             const tabelaBancosCliente = `${dbPrefix}_${uParams.cliente}_${dominio.dominios}.cad_bancos`
             const liquidacoes = await app.db({ cl: tabelaConLiquidacoesApi })
                 .select('cl.folha_ano', 'cl.folha_mes', 'cs.matricula', 'cb.febraban', 'cl.prestacao', 'cl.prz_total', 'cl.v_prestacao')
@@ -790,7 +790,7 @@ module.exports = app => {
             return res.status(401).send(error)
         }
         const page = req.query.page || 1
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         const tabelaConsignatarioDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.consignatarios`
         const tabelaBancosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_bancos`
         const optionStatus = req.query.optionStatus || 10
@@ -889,7 +889,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         const ret = app.db(tabelaDomain)
             .where({ id: req.params.id })
             .first()
@@ -903,7 +903,7 @@ module.exports = app => {
     }
 
     const getPendding = async (req, res) => {
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         const id_convenio = req.query.id_convenio || undefined
 
         try {
@@ -935,7 +935,7 @@ module.exports = app => {
             return res.status(401).send(error)
         }
 
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         let sql = app.db(tabelaDomain).select([field])
         if (field && filter) sql.where({
             [field]: filter

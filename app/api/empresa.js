@@ -7,7 +7,6 @@ module.exports = app => {
         isMatchOrError, noAccessMsg, cpfOrError,
         isCityOrError, cnpjOrError } = app.api.validation
     const { convertESocialTextToJson } = app.api.facilities
-    const { mailyCliSender } = app.api.mailerCli
     const tabela = 'empresa'
     const tabelaParams = 'params'
     const STATUS_ACTIVE = 10
@@ -35,14 +34,7 @@ module.exports = app => {
             body = {}
             body.nr_insc = bodyRaw.nrInsc_14
             body.cnpj_efr = bodyRaw.cnpjEFR_45 || bodyRaw.cnpjEFR_70
-            const class_trib = await app.db(tabelaParams).select('id')
-                .where({ 'meta': 'classTrib', 'value': bodyRaw.classTrib_16 }).first()
-            try {
-                if (!(!!class_trib)) throw "Classificação tributária não localizada"
-            } catch (error) {
-                return res.status(500).send(error)
-            }
-            body.id_param_cl_trib = class_trib.id
+            body.id_param_cl_trib = ((id = await app.db(tabelaParams).select('id').where({ 'meta': 'natRubrica', 'value': bodyRaw.classTrib_16 }).first()) != null) ? id.id : null
             body.ind_opt_reg_eletron = bodyRaw.indOptRegEletron_21
             body.razao_social = bodyRaw.razao_social
             body.id_cidade = bodyRaw.id_cidade
@@ -60,7 +52,7 @@ module.exports = app => {
             body.mes_descsindical = bodyRaw.mes_descsindical
         }
 
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         try {
             existsOrError(body.nr_insc, 'CPF ou CNPJ não informado')
             if (body.nr_insc && body.nr_insc.length == 11) cpfOrError(body.nr_insc)
@@ -214,7 +206,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
 
 
         try {
@@ -326,7 +318,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
 
         const page = req.query.page || 1
 
@@ -362,7 +354,7 @@ module.exports = app => {
             return res.status(401).send(error)
         }
 
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         const ret = app.db({ tbl1: tabelaDomain })
             .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
             .where({ id: req.params.id, status: STATUS_ACTIVE }).first()
@@ -384,7 +376,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_api.${tabela}`
+        const tabelaDomain = `${dbPrefix}_app.${tabela}`
         const registro = { status: STATUS_DELETE }
         try {
             // registrar o evento na tabela de eventos

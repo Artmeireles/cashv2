@@ -183,7 +183,7 @@ module.exports = app => {
         const count = parseInt(result[0][0].count) || 0
 
         let ret = app.db({ tb1: `${tabelaDomain}` })
-            .select('tb1.*', `cc.contrato`, app.db.raw(`${dbPrefix}_api.getStatusLabel(tb1.status) as status_label`))
+            .select('tb1.*', `cc.contrato`, app.db.raw(`${dbPrefix}_app.getStatusLabel(tb1.status) as status_label`))
             .join({ cc: `${tabelaContratosDomain}` }, `cc.id`, `=`, `tb1.id_con_contratos`)
             .where({ 'tb1.id_con_contratos': id_con_contratos })
             .where(function () {
@@ -220,11 +220,11 @@ module.exports = app => {
         const id = req.params.id
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const tabelaContratosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_contratos`
-        const tabelaEventosDomain = `${dbPrefix}_api.sis_events`
-        const tabelaUsersDomain = `${dbPrefix}_api.users`
+        const tabelaEventosDomain = `${dbPrefix}_app.sis_events`
+        const tabelaUsersDomain = `${dbPrefix}_app.users`
 
         let ret = app.db({ tb1: `${tabelaDomain}` })
-            .select('tb1.*', `cc.contrato`, { 'uName': 'u.name' }, app.db.raw(`${dbPrefix}_api.getStatusLabel(tb1.status) as status_label`))
+            .select('tb1.*', `cc.contrato`, { 'uName': 'u.name' }, app.db.raw(`${dbPrefix}_app.getStatusLabel(tb1.status) as status_label`))
             .join({ cc: `${tabelaContratosDomain}` }, `cc.id`, `=`, `tb1.id_con_contratos`)
             .leftJoin({ se: tabelaEventosDomain }, 'se.id', '=', 'tb1.evento')
             .leftJoin({ u: tabelaUsersDomain }, 'u.id', '=', 'se.id_user')

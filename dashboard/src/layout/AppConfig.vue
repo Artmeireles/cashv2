@@ -13,7 +13,7 @@ defineProps({
         default: false
     }
 });
-const scales = ref([12, 13, 14, 15, 16, 17, 18]);
+const scales = ref([12, 13, 14, 15, 16]);
 const visible = ref(false);
 
 const { changeThemeSettings, setScale, layoutConfig } = useLayout();

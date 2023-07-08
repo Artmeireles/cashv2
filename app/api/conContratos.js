@@ -34,7 +34,7 @@ module.exports = app => {
             return res.status(401).send(error)
         }
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
-        const tabelaConvenios = `${dbPrefix}_api.con_convenios`
+        const tabelaConvenios = `${dbPrefix}_app.con_convenios`
         const tabelaParcelasDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_parcelas`
         const tabelaConsignatariosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.consignatarios`
         if (req.params.id) body.id = req.params.id
@@ -95,7 +95,7 @@ module.exports = app => {
                 // Apenas servidores efetivos e aposentados
                 const tabelaFinSFuncionalDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.fin_sfuncional`
                 const vinculoFuncional = await app.db(tabelaFinSFuncionalDomain)
-                    .select({ id_vinculo: 'id_vinculo', vinculo: app.db.raw(`${dbPrefix}_api.getVinculoLabel(id_vinculo)`) })
+                    .select({ id_vinculo: 'id_vinculo', vinculo: app.db.raw(`${dbPrefix}_app.getVinculoLabel(id_vinculo)`) })
                     .where({ id_cad_servidores: body.id_cad_servidores })
                     .orderBy('ano', 'desc')
                     .orderBy('mes', 'desc')
@@ -348,7 +348,7 @@ module.exports = app => {
         const tabelaConEventos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_eventos`
         const tabelaEventos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.fin_eventos`
         const tabelaConsignatarios = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.consignatarios`
-        const tabelaConvenios = `${dbPrefix}_api.con_convenios`
+        const tabelaConvenios = `${dbPrefix}_app.con_convenios`
         const tabelaBancos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_bancos`
 
         const page = req.query.page || 1
@@ -370,7 +370,7 @@ module.exports = app => {
 
         let ret = app.db({ tb1: `${tabelaDomain}` })
             .select('tb1.*', `fe.id_evento`, `fe.evento_nome`, `cb.nome as banco`,
-                `cv.agencia`, app.db.raw(`${dbPrefix}_api.getStatusLabel(tb1.status) as status_label`),
+                `cv.agencia`, app.db.raw(`${dbPrefix}_app.getStatusLabel(tb1.status) as status_label`),
                 app.db.raw(`(SELECT COALESCE(MAX(prazo), 0) FROM ${dbPrefix}_${uParams.cliente}_${uParams.dominio}.fin_rubricas fr WHERE fr.id_con_contratos = tb1.id) as parcelasQuitadas`),
                 `cv.qmp`)
             .leftJoin({ ce: `${tabelaConEventos}` }, `ce.id`, `=`, `tb1.id_con_eventos`)
@@ -530,7 +530,7 @@ module.exports = app => {
         let ret = app.db({ tb1: `${tabelaDomain}` })
             .select('tb1.*', `fe.id_evento`, `fe.evento_nome`,
                 app.db.raw(`(SELECT COALESCE(MAX(prazo), 0) FROM ${dbPrefix}_${uParams.cliente}_${uParams.dominio}.fin_rubricas fr WHERE fr.id_con_contratos = tb1.id) as parcelasQuitadas`),
-                app.db.raw(`${dbPrefix}_api.getStatusLabel(tb1.status) as status_label`))
+                app.db.raw(`${dbPrefix}_app.getStatusLabel(tb1.status) as status_label`))
             .leftJoin({ ce: `${tabelaConEventos}` }, `ce.id`, `=`, `tb1.id_con_eventos`)
             .leftJoin({ fe: `${tabelaEventos}` }, `fe.id`, `=`, `ce.id_fin_eventos`)
             .leftJoin({ co: `${tabelaConsignatarios}` }, `co.id`, `=`, `tb1.id_consignatario`)
@@ -613,7 +613,7 @@ module.exports = app => {
 
     const getDataCorte = async (req, res) => {
         const uParams = await app.db('users').where({ id: req.user.id }).first();
-        const tabelaConvenios = `${dbPrefix}_api.con_convenios`
+        const tabelaConvenios = `${dbPrefix}_app.con_convenios`
         const tabelaConsignatariosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.consignatarios`
 
         const convenio = await app.db({ 'cv': tabelaConvenios })

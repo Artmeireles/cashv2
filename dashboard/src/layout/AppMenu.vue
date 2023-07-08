@@ -10,7 +10,7 @@ const model = ref([
     },
     {
         label: 'Cadastros',
-        items: [{ label: 'Servidores', icon: 'pi pi-fw pi-id-card', to: '/servidores' }]
+        items: [{ label: 'Gestão de Empregados', icon: 'pi pi-fw pi-id-card', to: '/servidores' }]
     },
     {
         label: 'Outros órgãos (link externo)',

@@ -199,7 +199,7 @@ module.exports = app => {
         const uParams = await app.db('users').where({ id: user.id }).first();
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const tabelaBancos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_bancos`
-        const tabelaConvenios = `${dbPrefix}_api.con_convenios`
+        const tabelaConvenios = `${dbPrefix}_app.con_convenios`
         const ret = app.db({ td: `${tabelaDomain}` })
             .join({ 'cv': tabelaConvenios }, 'td.id_convenio', '=', 'cv.id')
             .select(`cv.id`, `cb.nome`, `cb.nomeAbrev`, `cv.agencia`)
@@ -225,10 +225,10 @@ module.exports = app => {
             return res.status(401).send(error)
         }
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
-        const tabelaConvenios = `${dbPrefix}_api.con_convenios`
+        const tabelaConvenios = `${dbPrefix}_app.con_convenios`
         const tabelaBancos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_bancos`
         const tabelaContratos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_contratos`
-        const tabelaUserParams = `${dbPrefix}_api.users`
+        const tabelaUserParams = `${dbPrefix}_app.users`
         const ret = app.db({ co: `${tabelaDomain}` })
             .select(`cb.id as id_cad_bancos`, `cb.nome as banco`, `cb.febraban`, `co.id as id_consignatario`, `cv.agencia`, `cv.qmp`, `cv.qmar`)
             .join({ 'cv': tabelaConvenios }, 'co.id_convenio', '=', 'cv.id')

@@ -46,7 +46,7 @@ module.exports = app => {
         let ret = app.db({ tb1: `${tabelaDomain}` })
             .select('tb1.*', `fe.id_evento`, `fe.evento_nome`,
                 app.db.raw(`(SELECT COALESCE(MAX(prazo), 0) FROM ${dbPrefix}_${uParams.cliente}_${uParams.dominio}.fin_rubricas fr WHERE fr.id_con_contratos = tb1.id) as parcelasQuitadas`),
-                app.db.raw(`${dbPrefix}_api.getStatusLabel(tb1.status) as status_label`))
+                app.db.raw(`${dbPrefix}_app.getStatusLabel(tb1.status) as status_label`))
             .leftJoin({ ce: `${tabelaConEventos}` }, `ce.id`, `=`, `tb1.id_con_eventos`)
             .leftJoin({ fe: `${tabelaEventos}` }, `fe.id`, `=`, `ce.id_fin_eventos`)
             .leftJoin({ co: `${tabelaConsignatarios}` }, `co.id`, `=`, `tb1.id_consignatario`)

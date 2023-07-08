@@ -89,13 +89,13 @@ module.exports = app => {
     }
 
     const getIdParam = async (meta, value) => {
-        const tabelaDomain = `${dbPrefix}_api.params`
+        const tabelaDomain = `${dbPrefix}_app.params`
         const param = await app.db(tabelaDomain).select('id').where({ 'meta': meta, 'value': value }).first()
         return param.id || 0
     }
 
     function getIdCidade(ibge) {
-        const tabelaDomain = `${dbPrefix}_api.cad_cidades`
+        const tabelaDomain = `${dbPrefix}_app.cad_cidades`
         const param = app.db(tabelaDomain).select('id').where({ 'ibge': ibge }).first()
         return param.id || 0
     }
