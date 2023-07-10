@@ -161,11 +161,11 @@ const moveToNextInput = (index) => {
 
                                 <div class="formgrid grid">
                                     <div class="field col-12 md:col-6 mt-4">
-                                        <label for="password">Sua senha</label>
+                                        <label for="password">Nova senha</label>
                                         <InputText id="password" type="password" autocomplete="off" class="p-2 w-full" style="padding: 1rem" v-model="password" />
                                     </div>
                                     <div class="field col-12 md:col-6 mt-4">
-                                        <label for="confirmPassword">Confirme sua senha</label>
+                                        <label for="confirmPassword">Confirme a senha</label>
                                         <InputText id="confirmPassword" type="password" autocomplete="off" class="p-2 w-full" style="padding: 1rem" v-model="confirmPassword" />
                                     </div>
                                 </div>

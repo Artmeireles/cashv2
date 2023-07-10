@@ -6,7 +6,7 @@ module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, cpfOrError,
         isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
-    const { convertESocialTextToJson, getIdParam } = app.api.facilities
+    const { convertESocialTextToJson, getIdParam, getIdCidade } = app.api.facilities
     const tabela = 'servidores'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
@@ -16,31 +16,39 @@ module.exports = app => {
         const uParams = await app.db('users').where({ id: user.id }).first();
         let body = { ...req.body }
         if (req.params.id) body.id = req.params.id
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         try {
             // Alçada para edição
             if (body.id)
-                isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Edição de ${tabela}"`)
+                isMatchOrError(uParams && uParams.cad_servidores >= 3, `${noAccessMsg} "Edição de ${tabela}"`)
             // Alçada para inclusão
-            else isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
+            else isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
         } catch (error) {
             return res.status(401).send(error)
         }
         const contentType = req.headers['content-type']
         if (contentType == "text/plain") {
             const bodyRaw = convertESocialTextToJson(req.body)
-            return res.send(bodyRaw)
+            // return res.send(bodyRaw)
             body = {}
+            // return res(app.db(tabelaDomain).where({ 'cpf_trab': bodyRaw.cpfTrab_13 }).first().toString());
+            // console.log(bodyRaw.cpfTrab_13, tabelaDomain);
+            // return
+            const tpl = await app.db(tabelaDomain).where({ 'cpf_trab': bodyRaw.cpfTrab_13 }).first()
+            if (tpl && tpl.id) {
+                body.id = tpl.id
+            }
             body.cpf_trab = bodyRaw.cpfTrab_13
             body.nome = bodyRaw.nmTrab_15
-            body.id_param_sexo = getIdParam('sexo', bodyRaw.sexo_16)
-            body.id_param_raca_cor = getIdParam('racaCor', bodyRaw.racaCor_17)
-            body.id_param_est_civ = getIdParam('estCiv', bodyRaw.estCiv_18)
-            body.id_param_grau_instr = getIdParam('grauInstr', bodyRaw.grauInstr_19)
+            body.id_param_sexo = await getIdParam('sexo', bodyRaw.sexo_16)
+            body.id_param_raca_cor = await getIdParam('racaCor', bodyRaw.racaCor_17)
+            body.id_param_est_civ = await getIdParam('estCiv', bodyRaw.estCiv_18)
+            body.id_param_grau_instr = await getIdParam('grauInstr', bodyRaw.grauInstr_19)
             body.dt_nascto = bodyRaw.dtNascto_23
-            body.id_param_p_nascto = getIdParam('pais', bodyRaw.paisNascto_26)
-            body.id_param_p_nacld = getIdParam('pais', bodyRaw.paisNac_27)
-            body.id_param_tplograd = getIdParam('tpLograd', bodyRaw.tpLograd_61)
-            body.id_cidade = getIdCidade(bodyRaw.codMunic_67)
+            body.id_param_p_nascto = await getIdParam('pais', bodyRaw.paisNascto_26)
+            body.id_param_p_nacld = await getIdParam('pais', bodyRaw.paisNac_27)
+            body.id_param_tplograd = await getIdParam('tpLograd', bodyRaw.tpLograd_61)
+            body.id_cidade = await getIdCidade(bodyRaw.codMunic_67)
             body.cep = bodyRaw.cep_66
             body.nr = bodyRaw.nrLograd_63
             body.bairro = bodyRaw.bairro_65
@@ -53,13 +61,15 @@ module.exports = app => {
             body.def_intelectual = bodyRaw.defIntelectual_87
             body.reab_readap = bodyRaw.reabReadap_88
             body.telefone = bodyRaw.fonePrinc_103
-            // body.email = bodyRaw.
-            // body.mae = bodyRaw.
-            // body.pai = bodyRaw.
-            // body.naturalidade = bodyRaw.
+            // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
+            body.email = bodyRaw.email
+            body.mae = bodyRaw.mae
+            body.pai = bodyRaw.pai
+            body.naturalidade = bodyRaw.naturalidade
+            body.dt_nascto = bodyRaw.dt_nascto
         }
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
+        body.id_emp = req.params.id_emp
         try {
             existsOrError(body.id_emp, 'Órgão não informado')
             existsOrError(body.cpf_trab, 'CPF do Trabalhador não informado')
@@ -86,10 +96,10 @@ module.exports = app => {
             existsOrError(body.bairro, 'Bairro não informado')
             existsOrError(body.nr, 'Número não informado')
             existsOrError(body.logradouro, 'Logradouro não informado')
-            existsOrError(body.dsc_lograd, 'Descrição do Logradouro não informado')
+            // existsOrError(body.dsc_lograd, 'Descrição do Logradouro não informado')
             existsOrError(body.reab_readap, 'Reabilitado/Readaptado não informado')
             existsOrError(body.mae, 'Nome da Mãe não informado')
-            existsOrError(body.pai, 'Nome do Pai não informado')
+            // existsOrError(body.pai, 'Nome do Pai não informado')
             existsOrError(body.naturalidade, 'Naturalidade não informada')
             if (body.cpf_trab) {
                 const dataFromDB = await app.db(tabelaDomain)
@@ -99,6 +109,8 @@ module.exports = app => {
                 notExistsOrError(dataFromDB, 'Combinação de CPF já cadastrado')
             }
         } catch (error) {
+            console.log(error);
+            console.log(body);
             return res.status(400).send(error)
         }
 
@@ -108,6 +120,7 @@ module.exports = app => {
         const { changeUpperCase, removeAccentsObj } = app.api.facilities
         body = (JSON.parse(JSON.stringify(body), removeAccentsObj));
         body = (JSON.parse(JSON.stringify(body), changeUpperCase));
+
 
         if (body.id) {
             // Variáveis da edição de um registro
@@ -173,6 +186,7 @@ module.exports = app => {
     const limit = 20 // usado para paginação
     const get = async (req, res) => {
         let user = req.user
+        const id_emp = req.params.id_emp
         const key = req.query.key ? req.query.key.trim() : ''
         let keyCpf = req.query.keyCpf ? req.query.keyCpf : ''
         let keyMat = req.query.keyMat ? req.query.keyMat : ''
@@ -194,7 +208,7 @@ module.exports = app => {
 
         let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
             .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-            .where({ 'tbl1.status': STATUS_ACTIVE })
+            .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: req.params.id_emp })
             .where(function () {
                 this.where({ 'sv.matricula': keyMat })
                     .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
@@ -207,7 +221,7 @@ module.exports = app => {
         const ret = app.db({ tbl1: tabelaDomain })
             .select('tbl1.*', 'sv.matricula')
             .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-            .where({ 'tbl1.status': STATUS_ACTIVE })
+            .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: req.params.id_emp })
             .where(function () {
                 this.where({ 'sv.matricula': keyMat })
                     .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))

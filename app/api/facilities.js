@@ -90,20 +90,24 @@ module.exports = app => {
 
     const getIdParam = async (meta, value) => {
         const tabelaDomain = `${dbPrefix}_app.params`
+        let body = { id: 0 }
         const param = await app.db(tabelaDomain).select('id').where({ 'meta': meta, 'value': value }).first()
-        return param.id || 0
+        if (param) return param.id
+        else undefined
     }
 
-    function getIdCidade(ibge) {
+    const getIdCidade = async (ibge) => {
         const tabelaDomain = `${dbPrefix}_app.cad_cidades`
-        const param = app.db(tabelaDomain).select('id').where({ 'ibge': ibge }).first()
-        return param.id || 0
+        const param = await app.db(tabelaDomain).select('id').where({ 'municipio_id': ibge }).first()
+        if (param) return param.id
+        else undefined
     }
 
-    function getIdCargos(nome) {
+    const getIdCargos = async (nome) => {
         const tabelaDomain = `${dbPrefix}_cliente_ativos.aux_cargos`
-        const param = app.db(tabelaDomain).select('id').where({ 'nome': nome }).first()
-        return param.id || 0
+        const param = await app.db(tabelaDomain).select('id').where({ 'nome': nome }).first()
+        if (param) return param.id
+        else undefined
     }
 
     return {
