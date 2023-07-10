@@ -14,15 +14,16 @@ module.exports = app => {
         let user = req.user
         const uParams = await app.db('users').where({ id: user.id }).first();
         let body = { ...req.body }
-        delete body.id_serv
-        body.id_serv = req.params.id_serv
+        // delete body.id_serv
+        // body.id_serv = req.params.id_serv
         if (req.params.id) body.id = req.params.id
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         try {
             // Alçada para edição
             if (body.id)
-                isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Edição de ${tabela}"`)
+                isMatchOrError(uParams && uParams.cad_servidores >= 3, `${noAccessMsg} "Edição de ${tabela}"`)
             // Alçada para inclusão
-            else isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
+            else isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
         } catch (error) {
             return res.status(401).send(error)
         }
@@ -42,7 +43,7 @@ module.exports = app => {
             body.abono_perm = bodyRaw.indAbonoPerm_223         
             body.d_inicio_abono = bodyRaw.dtIniAbono_224     
             body.d_ing_cargo = bodyRaw.dtIngrCargo_227        
-            body.id_cargo = await bodyRaw.getIdCargos('nome', bodyRaw.nmCargo_225)           
+            body.id_cargo = await getIdCargos('nome', bodyRaw.nmCargo_225)           
             body.acum_cargo = bodyRaw.acumCargo_230        
             body.id_param_cod_categ = await getIdParam('codCatg', bodyRaw.codCateg_151)
             body.qtd_hr_sem = bodyRaw.qtdHrsSem_176        
@@ -52,22 +53,20 @@ module.exports = app => {
             body.desc_jornd = bodyRaw.dscJorn_242    
             body.id_param_grau_exp = await getIdParam('grauExp', bodyRaw.grauExp_64) 
             // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2     
-            // body.pis = bodyRaw. 
-            // body.dt_pis = bodyRaw.           
-            // body.tempo_servico = bodyRaw.    
-            // body.tempo_final = bodyRaw.      
-            // body.titulo = bodyRaw.           
-            // body.tit_uf = bodyRaw.           
-            // body.tit_zona = bodyRaw.         
-            // body.tit_secao = bodyRaw.        
-            // body.dt_nomeacao = bodyRaw.      
-            // body.nom_edital = bodyRaw.       
-            // body.nom_nr_inscr = bodyRaw.     
-            // body.id_siap_pub = bodyRaw.      
+            // body.pis = bodyRaw.pis
+            // body.dt_pis = bodyRaw.dt_pis           
+            // body.tempo_servico = bodyRaw.tempo_servico  
+            // body.tempo_final = bodyRaw.tempo_final      
+            // body.titulo = bodyRaw.titulo           
+            // body.tit_uf = bodyRaw.tit_uf           
+            // body.tit_zona = bodyRaw.tit_zona         
+            // body.tit_secao = bodyRaw.tit_secao        
+            // body.dt_nomeacao = bodyRaw.dt_nomeacao      
+            // body.nom_edital = bodyRaw.nom_edital       
+            // body.nom_nr_inscr = bodyRaw.nom_nr_inscr     
+            // body.id_siap_pub = bodyRaw.id_siap_pub      
     }
-        
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
-
+                
         try {
             existsOrError(body.id_vinc_principal, 'Vinculo Principal não informado')
             existsOrError(body.matricula, 'Matrícula do Trabalhador não informada')

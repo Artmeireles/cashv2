@@ -71,6 +71,7 @@ module.exports = app => {
             existsOrError(body.cpf_trab, 'CPF do Trabalhador não informado')
             cpfOrError(body.cpf_trab, 'CPF inválido')
             existsOrError(body.nome, 'Nome não informado')
+            //existsOrError(body.nome_social, 'Nome Social não informado')
             existsOrError(body.id_param_sexo, 'Sexo não informado')
             existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Sexo selecionado não existe')
             existsOrError(body.id_param_raca_cor, 'Raça ou Cor não informado')
@@ -111,6 +112,7 @@ module.exports = app => {
         const { changeUpperCase, removeAccentsObj } = app.api.facilities
         body = (JSON.parse(JSON.stringify(body), removeAccentsObj));
         body = (JSON.parse(JSON.stringify(body), changeUpperCase));
+
 
         if (body.id) {
             // Variáveis da edição de um registro
