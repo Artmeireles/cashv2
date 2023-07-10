@@ -102,7 +102,6 @@ module.exports = app => {
         let isMatch = false
         if (user && password) {
             let userKeyPass = await app.db({ 'ut': tabelaKeys })
-                // .select('ut.password', 'ut.id', 'ut.created_at')
                 .where({ id_users: user.id })
                 .orderBy('ut.created_at', 'desc')
                 .first()

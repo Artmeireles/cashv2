@@ -28,9 +28,8 @@ module.exports = app => {
     }
 
     function existsOrMsgError(value, msg) {
-        if (!value) return msg + ', '
-        if (typeof value === 'string' && !value.trim().length > 0) return msg + ', '
-        if (Array.isArray(value) && value.length === 0) return msg + ', '
+        if (!value) return `${msg}, `
+        else return null
     }
 
     function isBooleanOrError(value) {
@@ -92,9 +91,15 @@ module.exports = app => {
     }
 
     async function isParamOrError(meta, id) {
-        const param = await app.db(`${dbPrefix}_app.params`)
-            .where({ 'status': 10, 'dominio': 'root', 'meta': meta, 'id': id }).first()
-        if (param && param.id > 0) return true
+        try {
+            const param = await app.db(`${dbPrefix}_app.params`)
+                .where({ 'status': 10, 'dominio': 'root', 'meta': meta, 'id': id }).first()
+            if (param && param.id > 0) return true
+        } catch (error) {
+            console.log(app.db(`${dbPrefix}_app.params`)
+                .where({ 'status': 10, 'dominio': 'root', 'meta': meta, 'id': id }).first().toString());
+            console.log('Erro ao executar isParamOrError: ', error);
+        }
     }
 
     async function isCityOrError(id) {

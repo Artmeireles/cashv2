@@ -1,0 +1,1 @@
+insert into users_keys select null, 10, 1, now(), id, password from users

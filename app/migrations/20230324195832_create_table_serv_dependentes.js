@@ -14,9 +14,9 @@ exports.up = function(knex) {
         table.specificType('data_nasc', 'char(10)').notNull().comment("Data de Nascimento")
         table.string('cpf').comment("CPF do Dependente")
         table.integer('id_param_sexo').notNull().unsigned().comment("Sexo do Dependente")
-        table.boolean('dep_irrf').notNull().comment("S-Sim, N-Não / Dedução pelo Imposto de Renda")
-        table.boolean('dep_sf').notNull().comment("S-Sim, N-Não / Recebimento do Salário Família")
-        table.boolean('inc_trab').notNull().comment("S-Sim, N-Não / Incapacidade Física ou Mental")
+        table.string('dep_irrf', 1).notNull().comment("S-Sim, N-Não / Dedução pelo Imposto de Renda")
+        table.string('dep_sf', 1).notNull().comment("S-Sim, N-Não / Recebimento do Salário Família")
+        table.string('inc_trab', 1).notNull().comment("S-Sim, N-Não / Incapacidade Física ou Mental")
         table.specificType('dt_limite_prev', 'char(10)').comment("Data Limite Prev")
         table.specificType('dt_limite_irpf', 'char(10)').comment("Data Limite IRPF")
         table.string('certidao', 255).comment("Certidão de Nascimento")
@@ -29,6 +29,7 @@ exports.up = function(knex) {
         table.foreign('id_serv').references('id').inTable('servidores').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_tp_dep').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_sexo').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.unique(['id_serv', 'cpf'])
     })
 };
 

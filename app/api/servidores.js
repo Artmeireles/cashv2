@@ -29,11 +29,7 @@ module.exports = app => {
         const contentType = req.headers['content-type']
         if (contentType == "text/plain") {
             const bodyRaw = convertESocialTextToJson(req.body)
-            // return res.send(bodyRaw)
             body = {}
-            // return res(app.db(tabelaDomain).where({ 'cpf_trab': bodyRaw.cpfTrab_13 }).first().toString());
-            // console.log(bodyRaw.cpfTrab_13, tabelaDomain);
-            // return
             const tpl = await app.db(tabelaDomain).where({ 'cpf_trab': bodyRaw.cpfTrab_13 }).first()
             if (tpl && tpl.id) {
                 body.id = tpl.id
@@ -61,8 +57,8 @@ module.exports = app => {
             body.def_intelectual = bodyRaw.defIntelectual_87
             body.reab_readap = bodyRaw.reabReadap_88
             body.telefone = bodyRaw.fonePrinc_103
+            body.email = bodyRaw.emailPrinc_105
             // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
-            body.email = bodyRaw.email
             body.mae = bodyRaw.mae
             body.pai = bodyRaw.pai
             body.naturalidade = bodyRaw.naturalidade
@@ -75,7 +71,6 @@ module.exports = app => {
             existsOrError(body.cpf_trab, 'CPF do Trabalhador não informado')
             cpfOrError(body.cpf_trab, 'CPF inválido')
             existsOrError(body.nome, 'Nome não informado')
-            //existsOrError(body.nome_social, 'Nome Social não informado')
             existsOrError(body.id_param_sexo, 'Sexo não informado')
             existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Sexo selecionado não existe')
             existsOrError(body.id_param_raca_cor, 'Raça ou Cor não informado')
@@ -84,7 +79,7 @@ module.exports = app => {
             existsOrError(await isParamOrError('estCiv', body.id_param_est_civ), 'Estado Civil selecionado não existe')
             existsOrError(body.id_param_grau_instr, 'Grau de Instrução não informado')
             existsOrError(await isParamOrError('grauInstr', body.id_param_grau_instr), 'Grau de Instrução selecionado não existe')
-            //existsOrError(body.dt_nascto, 'Data de Nascimento não informada')
+            existsOrError(body.dt_nascto, 'Data de Nascimento não informada')
             existsOrError(body.id_param_p_nascto, 'País de Nascimento não informado')
             existsOrError(await isParamOrError('pais', body.id_param_p_nascto), 'País de Nascimento selecionado não existe')
             existsOrError(body.id_param_p_nacld, 'País de Nacionalidade não informado')
@@ -96,10 +91,8 @@ module.exports = app => {
             existsOrError(body.bairro, 'Bairro não informado')
             existsOrError(body.nr, 'Número não informado')
             existsOrError(body.logradouro, 'Logradouro não informado')
-            // existsOrError(body.dsc_lograd, 'Descrição do Logradouro não informado')
             existsOrError(body.reab_readap, 'Reabilitado/Readaptado não informado')
             existsOrError(body.mae, 'Nome da Mãe não informado')
-            // existsOrError(body.pai, 'Nome do Pai não informado')
             existsOrError(body.naturalidade, 'Naturalidade não informada')
             if (body.cpf_trab) {
                 const dataFromDB = await app.db(tabelaDomain)
@@ -109,8 +102,6 @@ module.exports = app => {
                 notExistsOrError(dataFromDB, 'Combinação de CPF já cadastrado')
             }
         } catch (error) {
-            console.log(error);
-            console.log(body);
             return res.status(400).send(error)
         }
 
@@ -120,7 +111,6 @@ module.exports = app => {
         const { changeUpperCase, removeAccentsObj } = app.api.facilities
         body = (JSON.parse(JSON.stringify(body), removeAccentsObj));
         body = (JSON.parse(JSON.stringify(body), changeUpperCase));
-
 
         if (body.id) {
             // Variáveis da edição de um registro

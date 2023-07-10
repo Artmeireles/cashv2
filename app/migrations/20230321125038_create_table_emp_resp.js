@@ -23,7 +23,7 @@ exports.up = function(knex) {
         
         table.foreign('id_emp').references('id').inTable('wwmgca_app.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_local_params_tipo').references('id').inTable('es_params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_cidade').references('id').inTable('wwmgca_app.cidades').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_cidade').references('id').inTable('wwmgca_app.cad_cidades').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

@@ -31,7 +31,7 @@ exports.up = function(knex) {
         table.foreign('id_param_raca_cor').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_est_civ').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_tplograd').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_cidade').references('id').inTable('wwmgca_app.cidades').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_cidade').references('id').inTable('wwmgca_app.cad_cidades').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 

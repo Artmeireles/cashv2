@@ -25,7 +25,11 @@ function convertSQLToJSON(sql) {
   }
   
 
-  const sql = "(0,10,1,now(),null,'root','codIncCP','00','Não é base de cálculo'),(0,10,1,now(),null,'root','codIncCP','00','Não é base de cálculo'),(0,10,1,now(),null,'root','codIncCP','00','Não é base de cálculo'),(0,10,1,now(),null,'root','codIncCP','00','Não é base de cálculo'),";
+  const sql = `(0,10,1,now(),null,'root','estCiv','1','Solteiro'),
+  (0,10,1,now(),null,'root','estCiv','2','Casado'),
+  (0,10,1,now(),null,'root','estCiv','3','Divorciado'),
+  (0,10,1,now(),null,'root','estCiv','4','Separado'),
+  (0,10,1,now(),null,'root','estCiv','5','Viúvo')`;
 
   const jsonArray = convertSQLToJSON(sql);
   console.log(jsonArray);

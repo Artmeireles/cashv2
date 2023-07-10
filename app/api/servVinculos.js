@@ -29,28 +29,29 @@ module.exports = app => {
         const contentType = req.headers['content-type']
         if (contentType == "text/plain") {
             const bodyRaw = convertESocialTextToJson(req.body)
-            return res.send(bodyRaw)
+            //return res.send(bodyRaw)
             body = {}
-            // body.id_serv = bodyRaw.           
-            // body.id_vinc_principal = bodyRaw.
+            
             body.matricula = bodyRaw.matricula_108
             //body.sit_func = bodyRaw.
             body.tp_reg_prev = bodyRaw.tpRegPrev_110        
-            body.id_param_tp_prov = getIdParam('tpProv', bodyRaw.tpProv_141)   
+            body.id_param_tp_prov = await getIdParam('tpProv', bodyRaw.tpProv_141)   
             body.data_exercicio = bodyRaw.dtExercicio_144    
             body.tp_plan_rp = bodyRaw.tpPlanRP_145 //obs        
             body.teto_rgps = bodyRaw.indTetoRGPS_222          
             body.abono_perm = bodyRaw.indAbonoPerm_223         
             body.d_inicio_abono = bodyRaw.dtIniAbono_224     
             body.d_ing_cargo = bodyRaw.dtIngrCargo_227        
-            body.id_cargo = bodyRaw.getIdCargos('nome', bodyRaw.nmCargo_225)           
+            body.id_cargo = await bodyRaw.getIdCargos('nome', bodyRaw.nmCargo_225)           
             body.acum_cargo = bodyRaw.acumCargo_230        
-            body.id_param_cod_categ = getIdParam('codCatg', bodyRaw.codCateg_151)
+            body.id_param_cod_categ = await getIdParam('codCatg', bodyRaw.codCateg_151)
             body.qtd_hr_sem = bodyRaw.qtdHrsSem_176        
-            body.id_param_tp_jor = getIdParam('tpJornada', bodyRaw.tpJornada_177)    
-            body.id_param_tmp_parc = getIdParam('tmpParc', bodyRaw.tmpParc_179)    
+            body.id_param_tp_jor = await getIdParam('tpJornada', bodyRaw.tpJornada_177)    
+            body.id_param_tmp_parc = await getIdParam('tmpParc', bodyRaw.tmpParc_179)    
             body.hr_noturno = bodyRaw.horNoturno_241         
-            body.desc_jornd = bodyRaw.dscJorn_242         
+            body.desc_jornd = bodyRaw.dscJorn_242    
+            body.id_param_grau_exp = await getIdParam('grauExp', bodyRaw.grauExp_64) 
+            // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2     
             // body.pis = bodyRaw. 
             // body.dt_pis = bodyRaw.           
             // body.tempo_servico = bodyRaw.    
@@ -63,13 +64,11 @@ module.exports = app => {
             // body.nom_edital = bodyRaw.       
             // body.nom_nr_inscr = bodyRaw.     
             // body.id_siap_pub = bodyRaw.      
-            body.id_param_grau_exp = getIdParam('grauExp', bodyRaw.grauExp_64) 
     }
         
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            //existsOrError(body.id_serv, ' não informada')
             existsOrError(body.id_vinc_principal, 'Vinculo Principal não informado')
             existsOrError(body.matricula, 'Matrícula do Trabalhador não informada')
             existsOrError(body.sit_func, 'Situação Funcional não informada')

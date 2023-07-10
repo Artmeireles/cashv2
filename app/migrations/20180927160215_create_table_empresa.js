@@ -30,7 +30,7 @@ exports.up = function(knex) {
         table.specificType('mes_descsindical', 'char(2)').comment("Mês Desconto Sindical")
 
         table.foreign('id_param_cl_trib').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_cidade').references('id').inTable('wwmgca_app.cidades').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_cidade').references('id').inTable('wwmgca_app.cad_cidades').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 
