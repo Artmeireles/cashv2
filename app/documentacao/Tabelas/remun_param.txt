@@ -20,7 +20,7 @@ remun_param (
             "complementar":"100", 
             "ano_inf":"2023",
             "mes_inf":"12",
-            "inf_complementar":"200",
+            "complementar_inf":"200",
             "descricao":"200",
             "mensagem":"200",
             "mensagem_especial":"200"

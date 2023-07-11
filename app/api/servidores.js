@@ -59,10 +59,10 @@ module.exports = app => {
             body.telefone = bodyRaw.fonePrinc_103
             body.email = bodyRaw.emailPrinc_105
             // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
-            body.mae = bodyRaw.mae
-            body.pai = bodyRaw.pai
-            body.naturalidade = bodyRaw.naturalidade
-            body.dt_nascto = bodyRaw.dt_nascto
+            // body.mae = bodyRaw.mae
+            // body.pai = bodyRaw.pai
+            // body.naturalidade = bodyRaw.naturalidade
+            //body.dt_nascto = bodyRaw.dt_nascto
         }
 
         body.id_emp = req.params.id_emp
@@ -71,6 +71,7 @@ module.exports = app => {
             existsOrError(body.cpf_trab, 'CPF do Trabalhador não informado')
             cpfOrError(body.cpf_trab, 'CPF inválido')
             existsOrError(body.nome, 'Nome não informado')
+            //existsOrError(body.nome_social, 'Nome Social não informado')
             existsOrError(body.id_param_sexo, 'Sexo não informado')
             existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Sexo selecionado não existe')
             existsOrError(body.id_param_raca_cor, 'Raça ou Cor não informado')
@@ -111,6 +112,7 @@ module.exports = app => {
         const { changeUpperCase, removeAccentsObj } = app.api.facilities
         body = (JSON.parse(JSON.stringify(body), removeAccentsObj));
         body = (JSON.parse(JSON.stringify(body), changeUpperCase));
+
 
         if (body.id) {
             // Variáveis da edição de um registro
