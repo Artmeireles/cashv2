@@ -11,7 +11,6 @@ module.exports = {
 		tableName: 'knex_migrations',
 		directory: [
 			'./migrations',
-			// './migrations/Scripts'
 		]
 	}
 };

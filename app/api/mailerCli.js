@@ -9,12 +9,12 @@ module.exports = app => {
         if (!mailBody) mailBody = req.body
 
         try {
-            existsOrError(mailBody.from, 'Remetente não informado')
-            isValidEmail(mailBody.from, 'Remetente inválido')
-            existsOrError(mailBody.to, 'Destinatário não informado')
-            isValidEmail(mailBody.to, 'Destinatário inválido')
+            existsOrError(mailBody.from, 'Remetente não informado')
+            isValidEmail(mailBody.from, 'Remetente inválido')
+            existsOrError(mailBody.to, 'Destinatário não informado')
+            isValidEmail(mailBody.to, 'Destinatário inválido')
             existsOrError(mailBody.subject, 'Assunto não informado')
-            existsOrError(mailBody.message, 'Mensagem não informada')
+            existsOrError(mailBody.message, 'Mensagem não informada')
         } catch (error) {
             return res.status(400).send(error)
         }

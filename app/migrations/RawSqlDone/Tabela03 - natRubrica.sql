@@ -10,7 +10,7 @@ values
 (0,10,1,now(),null,'root','natRubrica','1006','Intervalos intra e inter jornadas não concedidos'),
 (0,10,1,now(),null,'root','natRubrica','1007','Luvas e premiações'),
 (0,10,1,now(),null,'root','natRubrica','1009','Salário-família - Complemento'),
-(0,10,1,now(),null,'root','natRubrica','1010','Salário in natura - Pagos em bens ou serviços'),
+(0,10,1,now(),null,'root','natRubrica','1010','Salário in natura - Pagos em bens ou serviços'),
 (0,10,1,now(),null,'root','natRubrica','1011','Sobreaviso e prontidão'),
 (0,10,1,now(),null,'root','natRubrica','1020','Férias'),
 (0,10,1,now(),null,'root','natRubrica','1021','Férias - Abono ou gratificação de férias superior a 20 dias'),

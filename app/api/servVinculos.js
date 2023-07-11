@@ -31,26 +31,26 @@ module.exports = app => {
             const bodyRaw = convertESocialTextToJson(req.body)
             //return res.send(bodyRaw)
             body = {}
-            
+
             body.matricula = bodyRaw.matricula_108
             //body.sit_func = bodyRaw.
-            body.tp_reg_prev = bodyRaw.tpRegPrev_110        
-            body.id_param_tp_prov = await getIdParam('tpProv', bodyRaw.tpProv_141)   
-            body.data_exercicio = bodyRaw.dtExercicio_144    
+            body.tp_reg_prev = bodyRaw.tpRegPrev_110
+            body.id_param_tp_prov = await getIdParam('tpProv', bodyRaw.tpProv_141)
+            body.data_exercicio = bodyRaw.dtExercicio_144
             body.tp_plan_rp = bodyRaw.tpPlanRP_145 //obs        
-            body.teto_rgps = bodyRaw.indTetoRGPS_222          
-            body.abono_perm = bodyRaw.indAbonoPerm_223         
-            body.d_inicio_abono = bodyRaw.dtIniAbono_224     
-            body.d_ing_cargo = bodyRaw.dtIngrCargo_227        
-            body.id_cargo = await bodyRaw.getIdCargos('nome', bodyRaw.nmCargo_225)           
-            body.acum_cargo = bodyRaw.acumCargo_230        
+            body.teto_rgps = bodyRaw.indTetoRGPS_222
+            body.abono_perm = bodyRaw.indAbonoPerm_223
+            body.d_inicio_abono = bodyRaw.dtIniAbono_224
+            body.d_ing_cargo = bodyRaw.dtIngrCargo_227
+            body.id_cargo = await bodyRaw.getIdCargos('nome', bodyRaw.nmCargo_225)
+            body.acum_cargo = bodyRaw.acumCargo_230
             body.id_param_cod_categ = await getIdParam('codCatg', bodyRaw.codCateg_151)
-            body.qtd_hr_sem = bodyRaw.qtdHrsSem_176        
-            body.id_param_tp_jor = await getIdParam('tpJornada', bodyRaw.tpJornada_177)    
-            body.id_param_tmp_parc = await getIdParam('tmpParc', bodyRaw.tmpParc_179)    
-            body.hr_noturno = bodyRaw.horNoturno_241         
-            body.desc_jornd = bodyRaw.dscJorn_242    
-            body.id_param_grau_exp = await getIdParam('grauExp', bodyRaw.grauExp_64) 
+            body.qtd_hr_sem = bodyRaw.qtdHrsSem_176
+            body.id_param_tp_jor = await getIdParam('tpJornada', bodyRaw.tpJornada_177)
+            body.id_param_tmp_parc = await getIdParam('tmpParc', bodyRaw.tmpParc_179)
+            body.hr_noturno = bodyRaw.horNoturno_241
+            body.desc_jornd = bodyRaw.dscJorn_242
+            body.id_param_grau_exp = await getIdParam('grauExp', bodyRaw.grauExp_64)
             // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2     
             // body.pis = bodyRaw. 
             // body.dt_pis = bodyRaw.           
@@ -64,8 +64,8 @@ module.exports = app => {
             // body.nom_edital = bodyRaw.       
             // body.nom_nr_inscr = bodyRaw.     
             // body.id_siap_pub = bodyRaw.      
-    }
-        
+        }
+
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
@@ -106,7 +106,7 @@ module.exports = app => {
             existsOrError(body.id_siap_pub, 'Veículo Publicação não informado')
             existsOrError(body.id_param_grau_exp, 'Grau de Experiência não informado')
         }
-    catch (error) {
+        catch (error) {
             return res.status(400).send(error)
         }
         body.matricula = body.matricula.padStart(8, '0')
@@ -194,10 +194,10 @@ module.exports = app => {
         const page = req.query.page || 1
 
         let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-        .where({ status: STATUS_ACTIVE, id_serv: req.params.id_serv })
-        .where(function () {
-            this.where(app.db.raw(`tbl1.matricula regexp('${key.toString().replace(' ', '.+')}')`))
-        })
+            .where({ status: STATUS_ACTIVE, id_serv: req.params.id_serv })
+            .where(function () {
+                this.where(app.db.raw(`tbl1.matricula regexp('${key.toString().replace(' ', '.+')}')`))
+            })
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
         const ret = app.db({ tbl1: tabelaDomain })

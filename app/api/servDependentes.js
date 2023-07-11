@@ -15,7 +15,7 @@ module.exports = (app) => {
     isParamOrError,
   } = app.api.validation;
   const { mailyCliSender } = app.api.mailerCli;
-  const { convertESocialTextToJson, getIdParam } = app.api.facilities;
+  const { convertESocialTextToJson, getIdParam, countOccurrences } = app.api.facilities;
   const tabela = "serv_dependentes";
   const STATUS_ACTIVE = 10;
   const STATUS_DELETE = 99;
@@ -30,19 +30,15 @@ module.exports = (app) => {
     try {
       // Alçada para edição
       if (body.id)
-        isMatchOrError(
-          uParams && uParams.cad_servidores >= 1,
-          `${noAccessMsg} "Edição de ${tabela}"`
-        );
+        isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Edição de ${tabela}"`);
       // Alçada para inclusão
       else
-        isMatchOrError(
-          uParams && uParams.cad_servidores >= 1,
-          `${noAccessMsg} "Inclusão de ${tabela}"`
-        );
+        isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`);
     } catch (error) {
       return res.status(401).send(error);
     }
+
+    // Se a requisicao for do tipo text/plain, enviar para o saveBatch
     const contentType = req.headers["content-type"];
     if (contentType == "text/plain") {
       return saveBatch(req, res);
@@ -53,10 +49,7 @@ module.exports = (app) => {
 
     try {
       existsOrError(body.id_param_tp_dep, "Tipo do Dependente não informado");
-      existsOrError(
-        await isParamOrError("tpDep", body.id_param_tp_dep),
-        "Tipo do Dependente selecionado não existe"
-      );
+      existsOrError(await isParamOrError("tpDep", body.id_param_tp_dep), "Tipo do Dependente selecionado não existe");
       existsOrError(body.nome, "Nome não informado");
       existsOrError(body.data_nasc, "Data de Nascimento não informada");
 
@@ -64,22 +57,10 @@ module.exports = (app) => {
         throw `A data de nascimento (${body.data_nasc}) não pode ser anterior à (01/01/1890)`;
       }
       existsOrError(body.id_param_sexo, "Sexo não informado");
-      existsOrError(
-        await isParamOrError("sexo", body.id_param_sexo),
-        "Sexo selecionado não existe"
-      );
-      existsOrError(
-        body.dep_irrf,
-        "Dedução pelo Imposto de Renda não informado"
-      );
-      existsOrError(
-        body.dep_sf,
-        "Recebimento do Salário Família não informado"
-      );
-      existsOrError(
-        body.inc_trab,
-        "Incapacidade Física ou Mental não informada"
-      );
+      existsOrError(await isParamOrError("sexo", body.id_param_sexo), "Sexo selecionado não existe");
+      existsOrError(body.dep_irrf, "Dedução pelo Imposto de Renda não informado");
+      existsOrError(body.dep_sf, "Recebimento do Salário Família não informado");
+      existsOrError(body.inc_trab, "Incapacidade Física ou Mental não informada");
       // existsOrError(body.dt_limite_prev,"Data Limite Previdência não informada");
       //existsOrError(body.dt_limite_prev, 'Data Limite Previdência não informada')
       //existsOrError(body.dt_limite_irpf, 'Data Limite IRPF não informada')
@@ -90,20 +71,14 @@ module.exports = (app) => {
       // existsOrError(body.cart_vacinacao, 'Cartão de Vacinação não informado')
       // existsOrError(body.declaracao_escolar, 'Declaração Escolar não informada')
       if (body.dep_irrf == 1) {
-        existsOrError(
-          body.cpf,
-          "Se há Dedução pelo Imposto de Renda(IRRF) o CPF deverá ser informado"
-        );
+        existsOrError(body.cpf, "Se há Dedução pelo Imposto de Renda(IRRF) o CPF deverá ser informado");
         cpfOrError(body.cpf, "CPF inválido");
         const depExists = await app
           .db(tabelaDomain)
           .where({ cpf: body.cpf })
           .where(app.db.raw(`id_serv != ${id_serv}`))
           .first();
-        notExistsOrError(
-          depExists,
-          "CPF de dependente já informado para outro servidor"
-        );
+        notExistsOrError(depExists, "CPF de dependente já informado para outro servidor");
       }
     } catch (error) {
       return res.status(400).send(error);
@@ -135,10 +110,10 @@ module.exports = (app) => {
       let rowsUpdated = app
         .db(tabelaDomain)
         .update(body)
-        .where({ id: body.id })      
+        .where({ id: body.id })
         .then((ret) => {
           if (ret > 0) res.status(200).send(body);
-          else res.status(200).send("Rúbrica não foi encontrada");
+          else res.status(200).send("Dependente não foi encontrado");
         })
         .catch((error) => {
           app.api.logger.logError({
@@ -194,198 +169,169 @@ module.exports = (app) => {
     let user = req.user;
     const uParams = await app.db("users").where({ id: user.id }).first();
     let body = { ...req.body };
-    const id_serv = req.params.id_serv;
     try {
       // Alçada para edição
-      isMatchOrError(
-        uParams && uParams.cad_servidores >= 3,
-        `${noAccessMsg} "Edição de ${tabela}"`
-      );
+      isMatchOrError(uParams && uParams.cad_servidores >= 3, `${noAccessMsg} "Edição de ${tabela}"`);
     } catch (error) {
       return res.status(401).send(error);
     }
     const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
+    const tabelaServidoresDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.servidores`;
     const { changeUpperCase, removeAccentsObj } = app.api.facilities;
     const bodyRaw = convertESocialTextToJson(req.body);
+    // return res.send(bodyRaw)
     body = [];
-    for (let index = 0; index < bodyRaw.INCLUIRDEPENDENTE_91.length; index++) {
-      body.push({
-        id_param_tp_dep: await getIdParam("tpDep", bodyRaw.tpDep_92[index]),
-        nome: bodyRaw.nmDep_93[index],
-        data_nasc: bodyRaw.dtNascto_251[index],
-        cpf: bodyRaw.cpfDep_95[index],
-        dep_irrf: bodyRaw.depIRRF_96[index],
-        dep_sf: bodyRaw.depSF_97[index],
-        id_param_sexo: await getIdParam("sexo", bodyRaw.sexoDep_252[index]),
-        inc_trab: bodyRaw.incTrab_99[index],
-        // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
-        // body.dt_limite_prev = bodyRaw.
-        // body.dt_limite_irpf = bodyRaw.
-        // body.certidao = bodyRaw.
-        // body.cert_livro = bodyRaw.
-        // body.cert_folha = bodyRaw.
-        // body.dt_cert = bodyRaw.
-        // body.cart_vacinacao = bodyRaw.
-        // body.declaracao_escolar = bodyRaw.
-      });
-    }
     const respError = [];
     const respSuccess = [];
-
-    for (let index = 0; index < body.length; index++) {
-      let element = body[index];
-      try {
-        let erros = "";
-        existsOrError(element.nome, "Nome não informado");
-        cpfOrError(element.cpf, "CPF inválido");
-
-        const tpl = await app
-          .db(tabelaDomain)
-          .where({ id_serv: id_serv, cpf: element.cpf })
-          .first();
-        if (tpl && tpl.id) {
-          element.id = tpl.id;
+    const id_serv = await app.db(tabelaServidoresDomain).select('id').where({ cpf_trab: bodyRaw.cpfTrab_13 }).first();
+    let ocorrencias = countOccurrences(JSON.stringify(bodyRaw), 'INCLUIRDEPENDENTE_91');
+    if (Array.isArray(bodyRaw.INCLUIRDEPENDENTE_91)) ocorrencias = bodyRaw.INCLUIRDEPENDENTE_91.length;
+    console.log(ocorrencias);
+    if (id_serv && id_serv.id && ocorrencias > 0) {
+      for (let index = 0; index < ocorrencias; index++) {
+        if ((bodyRaw.cpfDep_95 || (ocorrencias > 1 && bodyRaw.cpfDep_95[index]))) {
+          body.push({
+            id_serv: id_serv.id,
+            id_param_tp_dep: (bodyRaw.tpDep_92) ? await getIdParam("tpDep", ocorrencias == 1 ? bodyRaw.tpDep_92[index] : bodyRaw.tpDep_92[index]) : undefined,
+            nome: ocorrencias > 1 ? bodyRaw.nmDep_93[index] : bodyRaw.nmDep_93,
+            data_nasc: ocorrencias > 1 ? bodyRaw.dtNascto_251[index] : bodyRaw.dtNascto_251,
+            cpf: ocorrencias > 1 ? bodyRaw.cpfDep_95[index] : bodyRaw.cpfDep_95,
+            dep_irrf: ocorrencias > 1 ? bodyRaw.depIRRF_96[index] : bodyRaw.depIRRF_96,
+            dep_sf: ocorrencias > 1 ? bodyRaw.depSF_97[index] : bodyRaw.depSF_97,
+            id_param_sexo: (bodyRaw.sexoDep_252) ? await getIdParam("sexo", ocorrencias > 1 ? bodyRaw.sexoDep_252[index] : bodyRaw.sexoDep_252) : undefined,
+            inc_trab: ocorrencias > 1 ? bodyRaw.incTrab_99[index] : bodyRaw.incTrab_99,
+            // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
+            dt_limite_prev: ocorrencias > 1 ? bodyRaw.dt_limite_prev[index] : bodyRaw.dt_limite_prev,
+            dt_limite_irpf: ocorrencias > 1 ? bodyRaw.dt_limite_irpf[index] : bodyRaw.dt_limite_irpf,
+            certidao: ocorrencias > 1 ? bodyRaw.certidao[index] : bodyRaw.certidao,
+            cert_livro: ocorrencias > 1 ? bodyRaw.cert_livro[index] : bodyRaw.cert_livro,
+            cert_folha: ocorrencias > 1 ? bodyRaw.cert_folha[index] : bodyRaw.cert_folha,
+            dt_cert: ocorrencias > 1 ? bodyRaw.dt_cert[index] : bodyRaw.dt_cert,
+            cart_vacinacao: ocorrencias > 1 ? bodyRaw.cart_vacinacao[index] : bodyRaw.cart_vacinacao,
+            declaracao_escolar: ocorrencias > 1 ? bodyRaw.declaracao_escolar[index] : bodyRaw.declaracao_escolar,
+          });
+          console.log(body[index]);
         }
-
-        existsOrError(
-          element.id_param_tp_dep,
-          "Tipo do Dependente não informado"
-        );
-        existsOrError(
-          await isParamOrError("tpDep", element.id_param_tp_dep),
-          "Tipo do Dependente selecionado não existe"
-        );
-        existsOrError(element.nome, "Nome não informado");
-        existsOrError(element.data_nasc, "Data de Nascimento não informada");
-
-        if (moment(element.data_nasc, "DD/MM/YYYY") < moment("1890-01-01")) {
-          erros += `A data de nascimento (${element.data_nasc}) não pode ser anterior à (01/01/1890)`;
-        }
-        existsOrError(element.id_param_sexo, "Sexo não informado");
-        existsOrError(
-          await isParamOrError("sexo", element.id_param_sexo),
-          "Sexo selecionado não existe"
-        );
-        existsOrError(
-          element.dep_irrf,
-          "Dedução pelo Imposto de Renda não informado"
-        );
-        existsOrError(
-          element.dep_sf,
-          "Recebimento do Salário Família não informado"
-        );
-        existsOrError(
-          element.inc_trab,
-          "Incapacidade Física ou Mental não informada"
-        );
-        // existsOrError(element.dt_limite_prev, 'Data Limite Previdência não informada')
-        // existsOrError(element.dt_limite_irpf, 'Data Limite IRPF não informada')
-        // existsOrError(element.certidao, 'Certidão não informada')
-        // existsOrError(element.cert_livro, 'Livro não informada')
-        // existsOrError(element.cert_folha, 'Folha não informada')
-        // existsOrError(element.dt_cert, 'Data da Certidão não informada')
-        // existsOrError(element.cart_vacinacao, 'Cartão de Vacinação não informado')
-        // existsOrError(element.declaracao_escolar, 'Declaração Escolar não informada')
-        if (element.dep_irrf == 1) {
-          existsOrError(
-            element.cpf,
-            "Se há Dedução pelo Imposto de Renda(IRRF) o CPF deverá ser informado"
-          );
-          cpfOrError(element.cpf, "CPF inválido");
-          const depExists = await app
-            .db(tabelaDomain)
-            .where({ cpf: element.cpf })
-            .where(app.db.raw(`id_serv != ${element.id_serv}`))
-            .first();
-          notExistsOrError(
-            depExists,
-            "CPF de dependente já informado para outro servidor"
-          );
-        }
-      } catch (error) {
-        respError.push(`Erro em dependente ${element.nome}: ${error}`)
       }
 
+      for (let index = 0; index < body.length; index++) {
+        let element = body[index];
+        if (element.cpf) {
+          try {
+            existsOrError(element.nome, "Nome não informado");
+            const tpl = await app.db(tabelaDomain).where({ id_serv: element.id_serv, cpf: element.cpf }).first();
+            if (tpl && tpl.id) element.id = tpl.id;
+            existsOrError(element.id_param_tp_dep, "Tipo do Dependente não informado");
+            existsOrError(await isParamOrError("tpDep", element.id_param_tp_dep), "Tipo do Dependente selecionado não existe");
+            existsOrError(element.nome, "Nome não informado");
+            existsOrError(element.data_nasc, "Data de Nascimento não informada");
 
-      element = JSON.parse(JSON.stringify(element), removeAccentsObj);
-      element = JSON.parse(JSON.stringify(element), changeUpperCase);
-      if (element.id) {
-        // Variáveis da edição de um registro
-        // registrar o evento na tabela de eventos
-        const { createEventUpd } = app.api.sisEvents;
-        const evento = await createEventUpd({
-          notTo: ["created_at", "evento"],
-          last: await app.db(tabelaDomain).where({ id: element.id }).first(),
-          next: element,
-          request: req,
-          evento: {
-            evento: `Alteração de cadastro de ${tabela}`,
-            tabela_bd: tabela,
-          },
-        });
+            if (moment(element.data_nasc, "DD/MM/YYYY") < moment("1890-01-01"))
+              throw `A data de nascimento (${element.data_nasc}) não pode ser anterior à (01/01/1890)`;
 
-        element.evento = evento;
-        element.updated_at = new Date();
+            existsOrError(element.id_param_sexo, "Sexo não informado");
+            existsOrError(await isParamOrError("sexo", element.id_param_sexo), "Sexo selecionado não existe");
+            existsOrError(element.dep_irrf, "Dedução pelo Imposto de Renda não informado");
+            existsOrError(element.dep_sf, "Recebimento do Salário Família não informado");
+            existsOrError(element.inc_trab, "Incapacidade Física ou Mental não informada");
+            // existsOrError(element.dt_limite_prev, 'Data Limite Previdência não informada')
+            // existsOrError(element.dt_limite_irpf, 'Data Limite IRPF não informada')
+            // existsOrError(element.certidao, 'Certidão não informada')
+            // existsOrError(element.cert_livro, 'Livro não informada')
+            // existsOrError(element.cert_folha, 'Folha não informada')
+            // existsOrError(element.dt_cert, 'Data da Certidão não informada')
+            // existsOrError(element.cart_vacinacao, 'Cartão de Vacinação não informado')
+            // existsOrError(element.declaracao_escolar, 'Declaração Escolar não informada')
+            if (element.dep_irrf == 1) {
+              existsOrError(element.cpf, "Se há Dedução pelo Imposto de Renda(IRRF) o CPF deverá ser informado");
+              cpfOrError(element.cpf, "CPF inválido");
+              const depExists = await app.db(tabelaDomain).where({ cpf: element.cpf })
+                .where(app.db.raw(`id_serv != ${element.id_serv}`)).first();
+              notExistsOrError(depExists, "CPF de dependente já informado para outro servidor");
+            }
+          } catch (error) {
+            respError.push(`Erro em dependente ${element.nome}: ${error}`)
+          }
 
-        await app
-          .db(tabelaDomain)
-          .update(element)
-          .where({ id: element.id })
-          .then((ret) => {
-            console.log(ret);
-            if (ret > 0) respSuccess.push(element);
-            else respError.push({'dependente': element.nome, 'error': element})
-          })
-          .catch((error) => {
-            app.api.logger.logError({
-              log: {
-                line: `Error in file: ${__filename}.${__function} ${error}`,
-                sConsole: true,
-              },
-            });
-            respError.push({'dependente': element.nome, 'error': error})
-          });
-      } else {
-        // Criação de um novo registro
-        const nextEventID = await app
-          .db("sis_events")
-          .select(app.db.raw("count(*) as count"))
-          .first();
-        element.evento = nextEventID.count + 1;
-        element.status = STATUS_ACTIVE;
-        element.created_at = new Date();
-        element.id_serv = id_serv;
-
-        await app
-          .db(tabelaDomain)
-          .insert(element)
-          .then((ret) => {
-            element.id = ret[0];
+          element = JSON.parse(JSON.stringify(element), removeAccentsObj);
+          element = JSON.parse(JSON.stringify(element), changeUpperCase);
+          if (element.id) {
+            // Variáveis da edição de um registro
             // registrar o evento na tabela de eventos
-            const { createEventIns } = app.api.sisEvents;
-            createEventIns({
+            const { createEventUpd } = app.api.sisEvents;
+            const evento = await createEventUpd({
               notTo: ["created_at", "evento"],
+              last: await app.db(tabelaDomain).where({ id: element.id }).first(),
               next: element,
               request: req,
               evento: {
-                evento: `Novo registro`,
+                evento: `Alteração de cadastro de ${tabela}`,
                 tabela_bd: tabela,
               },
             });
-            respSuccess.push(element);
-          })
-          .catch((error) => {
-            app.api.logger.logError({
-              log: {
-                line: `Error in file: ${__filename}.${__function} ${error}`,
-                sConsole: true,
-              },
-            });
-            respError.push({'dependente': element.nome, 'error': error})
-          });
+
+            element.evento = evento;
+            element.updated_at = new Date();
+
+            await app
+              .db(tabelaDomain)
+              .update(element)
+              .where({ id: element.id })
+              .then((ret) => {
+                if (ret > 0) respSuccess.push(element);
+                else respError.push({ 'dependente': element.nome, 'error': element })
+              })
+              .catch((error) => {
+                app.api.logger.logError({
+                  log: {
+                    line: `Error in file: ${__filename}.${__function} ${error}`,
+                    sConsole: true,
+                  },
+                });
+                respError.push({ 'dependente': element.nome, 'error': error })
+              });
+          } else {
+            // Criação de um novo registro
+            const nextEventID = await app
+              .db("sis_events")
+              .select(app.db.raw("count(*) as count"))
+              .first();
+            element.evento = nextEventID.count + 1;
+            element.status = STATUS_ACTIVE;
+            element.created_at = new Date();
+
+            await app
+              .db(tabelaDomain)
+              .insert(element)
+              .then((ret) => {
+                element.id = ret[0];
+                // registrar o evento na tabela de eventos
+                const { createEventIns } = app.api.sisEvents;
+                createEventIns({
+                  notTo: ["created_at", "evento"],
+                  next: element,
+                  request: req,
+                  evento: {
+                    evento: `Novo registro`,
+                    tabela_bd: tabela,
+                  },
+                });
+                respSuccess.push(element);
+              })
+              .catch((error) => {
+                app.api.logger.logError({
+                  log: {
+                    line: `Error in file: ${__filename}.${__function} ${error}`,
+                    sConsole: true,
+                  },
+                });
+                respError.push({ 'dependente': element.nome, 'error': error })
+              });
+          }
+        }
       }
     }
-    return res.send({success: respSuccess, erros: respError});
+    return res.send({ success: respSuccess, errors: respError });
   };
 
   const limit = 5; // usado para paginação

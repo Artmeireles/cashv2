@@ -110,9 +110,11 @@ module.exports = app => {
         else undefined
     }
 
+    function countOccurrences(str, term) { return str.split(term).length - 1 }
+
     return {
         capitalizeFirstLetter, titleCase, removeAccents, removeAccentsObj,
         numbersOrZero, changeUpperCase, diffInDays, encryptPassword, comparePassword,
-        convertESocialTextToJson, getIdParam, getIdCidade, getIdCargos
+        convertESocialTextToJson, getIdParam, getIdCidade, getIdCargos, countOccurrences
     }
 }

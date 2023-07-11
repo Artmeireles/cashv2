@@ -140,8 +140,6 @@ module.exports = app => {
             })
     }
 
-
-
     const getPonteId = async (req, res) => {
         const ret = app.db(tabela)
             .where({ dominio: 'root', meta: 'ponte' })
