@@ -59,10 +59,10 @@ module.exports = app => {
             body.telefone = bodyRaw.fonePrinc_103
             body.email = bodyRaw.emailPrinc_105
             // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
-            // body.mae = bodyRaw.mae
-            // body.pai = bodyRaw.pai
-            // body.naturalidade = bodyRaw.naturalidade
-            //body.dt_nascto = bodyRaw.dt_nascto
+            body.mae = bodyRaw.mae
+            body.pai = bodyRaw.pai
+            body.naturalidade = bodyRaw.naturalidade
+            body.dt_nascto = bodyRaw.dt_nascto
         }
 
         body.id_emp = req.params.id_emp
