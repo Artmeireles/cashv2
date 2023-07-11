@@ -46,12 +46,12 @@ serv_vinculo (
             "evento": 1538,
             "created_at": "0",
             "updated_at": "0",
-            "id_serv": "1",
+            "id_serv": "14",
             "id_vinc_principal":"1",
             "matricula":"541", 
             "sit_func":"541", 
             "tp_reg_prev":"1", 
-            "id_param_tp_prov":"553", 
+            "id_param_tp_prov":"110", 
             "data_exercicio":"05/04/2023", 
             "tp_plan_rp":"2", 
             "teto_rgps":"2", 
@@ -60,10 +60,10 @@ serv_vinculo (
             "d_ing_cargo":"05/04/2023", 
             "id_cargo":"1", 
             "acum_cargo":"1", 
-            "id_param_cod_categ":"622", 
+            "id_param_cod_categ":"147", 
             "qtd_hr_sem":"80", 
-            "id_param_tp_jor":"653", 
-            "id_param_tmp_parc":"658", 
+            "id_param_tp_jor":"103", 
+            "id_param_tmp_parc":"94", 
             "hr_noturno":"2", 
             "desc_jornd":"Segunda-feira das 08:00 às 13:00, Terça-feira das 08:00 às 13:00, Quarta-feira das 08:00 às 13:00", 
             "pis":"110154", 
@@ -80,3 +80,120 @@ serv_vinculo (
             "id_siap_pub":"1", 
             "id_param_grau_exp":"1" 
 }
+
+
+
+
+
+{
+    "matricula_108": "00000001",
+    "tpRegPrev_110": "2 ",
+    "tpProv_141": "1",
+    "dtExercicio_144": "1998-06-22",
+    "tpPlanRP_145": "0",
+    "indTetoRGPS_222": "S",
+    "indAbonoPerm_223": "N",
+    "nmCargo_225": "PROFESSOR  A",
+    "CBOCargo_226": "331205",
+    "codCateg_151": "301",
+    "qtdHrsSem_176": "25",
+    "tpJornada_177": "9",
+    "tmpParc_179": "0",
+    "horNoturno_241": "N",
+    "dscJorn_242": "Segunda-feira das 08:00 às 13:00,  Terça-feira das 08:00 às 13:00,  Quarta-feira das 08:00 às 13:00,  Quinta-feira das 08:00 às 13:00,  Sexta-feira das 08:00 às 13:00,  Sábado sem expediente e  Domingo sem expediente",
+    "grauExp_64": "1",
+    "SALVARS2200": ""
+}
+
+
+matricula_108=00000001
+tpRegPrev_110=2 
+tpProv_141=1
+dtExercicio_144=1998-06-22
+tpPlanRP_145=0
+indTetoRGPS_222=S
+indAbonoPerm_223=N
+nmCargo_225=PROFESSOR  A
+CBOCargo_226=331205
+codCateg_151=301
+qtdHrsSem_176=25
+tpJornada_177=9
+tmpParc_179=0
+horNoturno_241=N
+dscJorn_242=Segunda-feira das 08:00 às 13:00,  Terça-feira das 08:00 às 13:00,  Quarta-feira das 08:00 às 13:00,  Quinta-feira das 08:00 às 13:00,  Sexta-feira das 08:00 às 13:00,  Sábado sem expediente e  Domingo sem expediente
+grauExp_64=1
+SALVARS2200
+
+cpfcnpjtransmissor=12261228000114
+cpfcnpjempregador=12261228000114
+idgrupoeventos=2
+versaomanual=S.01.00.00
+ambiente=1
+INCLUIRS2200
+indRetif_4=2
+nrRecibo_5=1.1.0000000016575799154
+tpAmb_6=1
+procEmi_7=1
+verProc_8=S-1.0
+tpInsc_10=1
+nrInsc_11=12261228
+cpfTrab_13=58329021491
+nmTrab_15=ADEMIR LIMA FONTES
+sexo_16=M
+racaCor_17=3
+estCiv_18=1
+grauInstr_19=09
+dtNascto_23=1967-06-14
+paisNascto_26=105
+paisNac_27=105
+tpLograd_61=R
+dscLograd_62=RUA 15 DE NOVEMBRO
+nrLograd_63=526
+complemento_64=CASA
+bairro_65=CENTRO                                            
+cep_66=57445000
+codMunic_67=2708402
+uf_68=AL
+defFisica_83=N
+defVisual_84=N
+defAuditiva_85=N
+defMental_86=N
+defIntelectual_87=N
+reabReadap_88=N
+fonePrinc_103=82991565508
+emailPrinc_105=fontes.contruscoes11@hotmail.com
+matricula_108=00000001
+tpRegTrab_109=2
+tpRegPrev_110=2   
+cadIni_197=S
+tpProv_141=1
+dtExercicio_144=1998-06-22
+tpPlanRP_145=0
+indTetoRGPS_222=S
+indAbonoPerm_223=N
+nmCargo_225=PROFESSOR  A
+CBOCargo_226=331205
+acumCargo_230=N
+codCateg_151=301
+tpInsc_231=1
+nrInsc_232=12261228000114
+qtdHrsSem_176=25
+tpJornada_177=9
+tmpParc_179=0
+horNoturno_241=N
+dscJorn_242=Segunda-feira das 08:00 às 13:00,  Terça-feira das 08:00 às 13:00,  Quarta-feira das 08:00 às 13:00,  Quinta-feira das 08:00 às 13:00,  Sexta-feira das 08:00 às 13:00,  Sábado sem expediente e  Domingo sem expediente
+SALVARS2200
+id_vinc_principal=1
+sit_func=541
+pis=110154
+dt_pis=2023-04-05
+tempo_servico=10
+tempo_final=20
+titulo=541
+tit_uf=541
+tit_zona=541
+tit_secao=541
+dt_nomeacao=2023-04-05
+nom_edital=541
+nom_nr_inscr=541
+id_siap_pub=1

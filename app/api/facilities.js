@@ -89,8 +89,10 @@ module.exports = app => {
     }
 
     const getIdParam = async (meta, value) => {
+        console.log(meta, value);
         const tabelaDomain = `${dbPrefix}_app.params`
         let body = { id: 0 }
+        console.log(app.db(tabelaDomain).select('id').where({ 'meta': meta, 'value': value }).first().toString());
         const param = await app.db(tabelaDomain).select('id').where({ 'meta': meta, 'value': value }).first()
         if (param) return param.id
         else undefined
@@ -103,9 +105,9 @@ module.exports = app => {
         else undefined
     }
 
-    const getIdCargos = async (nome) => {
+    const getIdCargos = async (value) => {
         const tabelaDomain = `${dbPrefix}_cliente_ativos.aux_cargos`
-        const param = await app.db(tabelaDomain).select('id').where({ 'nome': nome }).first()
+        const param = await app.db(tabelaDomain).select('id').where({ 'nome': value }).first()
         if (param) return param.id
         else undefined
     }
