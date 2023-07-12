@@ -13,7 +13,7 @@ exports.up = function(knex) {
         table.string('complementar').default('000').comment("Complementar")
         table.string('ano_inf').notNull().comment("Ano Informação")
         table.string('mes_inf').notNull().comment("Mês Informação")
-        table.string('inf_complementar').default('000').comment("Informação Complementar")
+        table.string('complementar_inf').default('000').comment("Informação Complementar")
         table.string('descricao').comment("Descrição")
         table.string('mensagem').comment("Mensagem")
         table.string('mensagem_especial').comment("Mensagem Especial")
