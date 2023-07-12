@@ -31,7 +31,7 @@ module.exports = app => {
             existsOrError(body.complementar, 'Complementar não informada')
             existsOrError(body.ano_inf, 'Ano da Informação não informado')
             existsOrError(body.mes_inf, 'Mês da Informação não informado')
-            existsOrError(body.complementar_inf, 'Informação Complementar não informada')
+            existsOrError(body.inf_complementar, 'Informação Complementar não informada')
             // existsOrError(body.descricao, 'Descrição não informada')
             // existsOrError(body.mensagem, 'Mensagem não informada')
             // existsOrError(body.mensagem_especial, 'Mensagem Especial não informada')

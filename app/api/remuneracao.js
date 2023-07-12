@@ -5,6 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
+    const { convertESocialTextToJson, countOccurrences } = app.api.facilities;
     const tabela = 'remuneracao'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
@@ -25,6 +26,13 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
+
+        // Se a requisicao for do tipo text/plain, enviar para o saveBatch
+    const contentType = req.headers["content-type"];
+        if (contentType == "text/plain") {
+         return saveBatch(req, res);
+        }
+
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
@@ -117,86 +125,65 @@ module.exports = app => {
         } catch (error) {
           return res.status(401).send(error);
         }
+
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
-        const tabelaServidoresDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.servidores`;
+        const tabelaServidoresDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.serv_vinculos`;
         const { changeUpperCase, removeAccentsObj } = app.api.facilities;
         const bodyRaw = convertESocialTextToJson(req.body);
         // return res.send(bodyRaw)
         body = [];
         const respError = [];
         const respSuccess = [];
-        const id_serv = await app.db(tabelaServidoresDomain).select('id').where({ cpf_trab: bodyRaw.cpfTrab_13 }).first();
-        let ocorrencias = countOccurrences(JSON.stringify(bodyRaw), 'INCLUIRDEPENDENTE_91') + 
-                            countOccurrences(JSON.stringify(bodyRaw), 'INCLUIRDEPENDENTE_91') +
-                            countOccurrences(JSON.stringify(bodyRaw), 'INCLUIRDEPENDENTE_91');
-        if (bodyRaw.INCLUIRDEPENDENTE_91 && Array.isArray(bodyRaw.INCLUIRDEPENDENTE_91)) ocorrencias = bodyRaw.INCLUIRDEPENDENTE_91.length;
-        else if (bodyRaw.INCLUIRDEPENDENTE_91 && Array.isArray(bodyRaw.INCLUIRDEPENDENTE_91)) ocorrencias = bodyRaw.INCLUIRDEPENDENTE_91.length;
-        else if (bodyRaw.INCLUIRDEPENDENTE_91 && Array.isArray(bodyRaw.INCLUIRDEPENDENTE_91)) ocorrencias = bodyRaw.INCLUIRDEPENDENTE_91.length;
+        const id_serv_vinc = await app.db(tabelaServidoresDomain).select('id').where({ matricula: bodyRaw.matricula_108 }).first();
+        let ocorrencias = countOccurrences(JSON.stringify(bodyRaw), 'INCLUIRITENSREMUN_156') + 
+                            countOccurrences(JSON.stringify(bodyRaw), 'INCLUIRITENSREMUN_63') +
+                            countOccurrences(JSON.stringify(bodyRaw), 'INCLUIRITENSREMUN_55');
+        if (bodyRaw.INCLUIRITENSREMUN_156 && Array.isArray(bodyRaw.INCLUIRITENSREMUN_156)) ocorrencias = bodyRaw.INCLUIRITENSREMUN_156.length;
+        else if (bodyRaw.INCLUIRITENSREMUN_63 && Array.isArray(bodyRaw.INCLUIRITENSREMUN_63)) ocorrencias = bodyRaw.INCLUIRITENSREMUN_63.length;
+        else if (bodyRaw.INCLUIRITENSREMUN_55 && Array.isArray(bodyRaw.INCLUIRITENSREMUN_55)) ocorrencias = bodyRaw.INCLUIRITENSREMUN_55.length;
         console.log(ocorrencias);
-        if (id_serv && id_serv.id && ocorrencias > 0) {
+        if (id_serv_vinc && id_serv_vinc.id && ocorrencias > 0) {
           for (let index = 0; index < ocorrencias; index++) {
-            if ((bodyRaw.cpfDep_95 || (ocorrencias > 1 && bodyRaw.cpfDep_95[index]))) {
+            if ((bodyRaw.matricula_108 || (ocorrencias > 1 && bodyRaw.matricula_108[index]))) {
               body.push({
-                id_serv: id_serv.id,
-                id_param_tp_dep: (bodyRaw.tpDep_92) ? await getIdParam("tpDep", ocorrencias == 1 ? bodyRaw.tpDep_92[index] : bodyRaw.tpDep_92[index]) : undefined,
-                nome: ocorrencias > 1 ? bodyRaw.nmDep_93[index] : bodyRaw.nmDep_93,
-                data_nasc: ocorrencias > 1 ? bodyRaw.dtNascto_251[index] : bodyRaw.dtNascto_251,
-                cpf: ocorrencias > 1 ? bodyRaw.cpfDep_95[index] : bodyRaw.cpfDep_95,
-                dep_irrf: ocorrencias > 1 ? bodyRaw.depIRRF_96[index] : bodyRaw.depIRRF_96,
-                dep_sf: ocorrencias > 1 ? bodyRaw.depSF_97[index] : bodyRaw.depSF_97,
-                id_param_sexo: (bodyRaw.sexoDep_252) ? await getIdParam("sexo", ocorrencias > 1 ? bodyRaw.sexoDep_252[index] : bodyRaw.sexoDep_252) : undefined,
-                inc_trab: ocorrencias > 1 ? bodyRaw.incTrab_99[index] : bodyRaw.incTrab_99,
+                id_serv_vinc: id_serv_vinc.id,
+                id_remun_param: ocorrencias > 1 ? bodyRaw.id_remun_param[index] : bodyRaw.id_remun_param,
+                id_rubrica: ocorrencias > 1 ? bodyRaw.id_rubrica[index] : bodyRaw.id_rubrica,
+                id_ad_fg: ocorrencias > 1 ? bodyRaw.id_ad_fg[index] : bodyRaw.id_ad_fg,
+
+                qtd_rubr: ocorrencias > 1 ? (bodyRaw.qtdRubr_49[index] || bodyRaw.qtdRubr_49[index] || bodyRaw.qtdRubr_49[index]) : (bodyRaw.qtdRubr_49 || bodyRaw.qtdRubr_49 || bodyRaw.qtdRubr_49),
+                fator_rubr: ocorrencias > 1 ? bodyRaw.fatorRubr_50[index] : bodyRaw.fatorRubr_50,
+                valor_rubr: ocorrencias > 1 ? bodyRaw.vrRubr_52[index] : bodyRaw.vrRubr_52,
+                ind_apur_ir: ocorrencias > 1 ? bodyRaw.indApurIR_115[index] : bodyRaw.indApurIR_115,
                 // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
-                dt_limite_prev: ocorrencias > 1 ? bodyRaw.dt_limite_prev[index] : bodyRaw.dt_limite_prev,
-                dt_limite_irpf: ocorrencias > 1 ? bodyRaw.dt_limite_irpf[index] : bodyRaw.dt_limite_irpf,
-                certidao: ocorrencias > 1 ? bodyRaw.certidao[index] : bodyRaw.certidao,
-                cert_livro: ocorrencias > 1 ? bodyRaw.cert_livro[index] : bodyRaw.cert_livro,
-                cert_folha: ocorrencias > 1 ? bodyRaw.cert_folha[index] : bodyRaw.cert_folha,
-                dt_cert: ocorrencias > 1 ? bodyRaw.dt_cert[index] : bodyRaw.dt_cert,
-                cart_vacinacao: ocorrencias > 1 ? bodyRaw.cart_vacinacao[index] : bodyRaw.cart_vacinacao,
-                declaracao_escolar: ocorrencias > 1 ? bodyRaw.declaracao_escolar[index] : bodyRaw.declaracao_escolar,
+                prazo_i: ocorrencias > 1 ? bodyRaw.prazo_i[index] : bodyRaw.prazo_i,
+                prazo_f: ocorrencias > 1 ? bodyRaw.prazo_f[index] : bodyRaw.prazo_f,
               });
               console.log(body[index]);
             }
           }
-    
+
           for (let index = 0; index < body.length; index++) {
             let element = body[index];
-            if (element.cpf) {
+            if (element.id_serv_vinc) {
               try {
                 existsOrError(element.nome, "Nome não informado");
-                const tpl = await app.db(tabelaDomain).where({ id_serv: element.id_serv, cpf: element.cpf }).first();
+                const tpl = await app.db(tabelaDomain).where({ id_serv_vinc: element.id_serv_vinc }).first();
                 if (tpl && tpl.id) element.id = tpl.id;
-                existsOrError(element.id_param_tp_dep, "Tipo do Dependente não informado");
-                existsOrError(await isParamOrError("tpDep", element.id_param_tp_dep), "Tipo do Dependente selecionado não existe");
-                existsOrError(element.nome, "Nome não informado");
-                existsOrError(element.data_nasc, "Data de Nascimento não informada");
-    
-                if (moment(element.data_nasc, "DD/MM/YYYY") < moment("1890-01-01"))
-                  throw `A data de nascimento (${element.data_nasc}) não pode ser anterior à (01/01/1890)`;
-    
-                existsOrError(element.id_param_sexo, "Sexo não informado");
-                existsOrError(await isParamOrError("sexo", element.id_param_sexo), "Sexo selecionado não existe");
-                existsOrError(element.dep_irrf, "Dedução pelo Imposto de Renda não informado");
-                existsOrError(element.dep_sf, "Recebimento do Salário Família não informado");
-                existsOrError(element.inc_trab, "Incapacidade Física ou Mental não informada");
-                // existsOrError(element.dt_limite_prev, 'Data Limite Previdência não informada')
-                // existsOrError(element.dt_limite_irpf, 'Data Limite IRPF não informada')
-                // existsOrError(element.certidao, 'Certidão não informada')
-                // existsOrError(element.cert_livro, 'Livro não informada')
-                // existsOrError(element.cert_folha, 'Folha não informada')
-                // existsOrError(element.dt_cert, 'Data da Certidão não informada')
-                // existsOrError(element.cart_vacinacao, 'Cartão de Vacinação não informado')
-                // existsOrError(element.declaracao_escolar, 'Declaração Escolar não informada')
-                if (element.dep_irrf == 1) {
-                  existsOrError(element.cpf, "Se há Dedução pelo Imposto de Renda(IRRF) o CPF deverá ser informado");
-                  cpfOrError(element.cpf, "CPF inválido");
-                  const depExists = await app.db(tabelaDomain).where({ cpf: element.cpf })
-                    .where(app.db.raw(`id_serv != ${element.id_serv}`)).first();
-                  notExistsOrError(depExists, "CPF de dependente já informado para outro servidor");
-                }
+                existsOrError(body.id_remun_param, 'Parâmetros da Remuneração não informada')
+                existsOrError(body.id_rubrica, 'Rúbrica não informada')
+                existsOrError(body.id_ad_fg, 'Tipo da Remuneração não informado')
+                existsOrError(body.qtd_rubr, 'Quantidade não informada')
+                existsOrError(body.fator_rubr, 'Fator da Rúbrica não informada')
+                existsOrError(body.valor_rubr, 'Valor da Rúbrica não informada')
+                existsOrError(body.ind_apur_ir, 'Indicativo de Apuração não informado')
+                existsOrError(body.prazo_i, 'Prazo Inicial não informado')
+                existsOrError(body.prazo_f, 'Prazo Final não informado')
+            if (moment(body.prazo_f, "DD/MM/YYYY").format() < moment(body.prazo_i, "DD/MM/YYYY").format()) {
+                throw `O prazo inicial (${body.prazo_f}) não pode ser anterior à data do prazo final (${body.prazo_i})`
+            }                
               } catch (error) {
-                respError.push(`Erro em dependente ${element.nome}: ${error}`)
+                respError.push(`Erro na remuneração ${element.nome}: ${error}`)
               }
     
               element = JSON.parse(JSON.stringify(element), removeAccentsObj);
