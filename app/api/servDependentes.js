@@ -85,6 +85,7 @@ module.exports = (app) => {
     }
 
     delete body.hash;
+    body.id_serv = id_serv;
 
     const { changeUpperCase, removeAccentsObj } = app.api.facilities;
     body = JSON.parse(JSON.stringify(body), removeAccentsObj);
@@ -116,13 +117,8 @@ module.exports = (app) => {
           else res.status(200).send("Dependente não foi encontrado");
         })
         .catch((error) => {
-          app.api.logger.logError({
-            log: {
-              line: `Error in file: ${__filename}.${__function} ${error}`,
-              sConsole: true,
-            },
-          });
-          return res.status(500).send(error);
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error);
         });
     } else {
       // Criação de um novo registro
@@ -133,7 +129,6 @@ module.exports = (app) => {
       body.evento = nextEventID.count + 1;
       body.status = STATUS_ACTIVE;
       body.created_at = new Date();
-      body.id_serv = id_serv;
 
       await app
         .db(tabelaDomain)
@@ -154,13 +149,8 @@ module.exports = (app) => {
           return res.json(body);
         })
         .catch((error) => {
-          app.api.logger.logError({
-            log: {
-              line: `Error in file: ${__filename}.${__function} ${error}`,
-              sConsole: true,
-            },
-          });
-          return res.status(500).send(error);
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error);
         });
     }
   };
@@ -186,13 +176,13 @@ module.exports = (app) => {
     const id_serv = await app.db(tabelaServidoresDomain).select('id').where({ cpf_trab: bodyRaw.cpfTrab_13 }).first();
     let ocorrencias = countOccurrences(JSON.stringify(bodyRaw), 'INCLUIRDEPENDENTE_91');
     if (Array.isArray(bodyRaw.INCLUIRDEPENDENTE_91)) ocorrencias = bodyRaw.INCLUIRDEPENDENTE_91.length;
-    console.log(ocorrencias);
+    // console.log(ocorrencias);
     if (id_serv && id_serv.id && ocorrencias > 0) {
       for (let index = 0; index < ocorrencias; index++) {
         if ((bodyRaw.cpfDep_95 || (ocorrencias > 1 && bodyRaw.cpfDep_95[index]))) {
           body.push({
             id_serv: id_serv.id,
-            id_param_tp_dep: (bodyRaw.tpDep_92) ? await getIdParam("tpDep", ocorrencias == 1 ? bodyRaw.tpDep_92[index] : bodyRaw.tpDep_92[index]) : undefined,
+            id_param_tp_dep: (bodyRaw.tpDep_92) ? await getIdParam("tpDep", ocorrencias > 1 ? bodyRaw.tpDep_92[index] : bodyRaw.tpDep_92) : undefined,
             nome: ocorrencias > 1 ? bodyRaw.nmDep_93[index] : bodyRaw.nmDep_93,
             data_nasc: ocorrencias > 1 ? bodyRaw.dtNascto_251[index] : bodyRaw.dtNascto_251,
             cpf: ocorrencias > 1 ? bodyRaw.cpfDep_95[index] : bodyRaw.cpfDep_95,
@@ -210,7 +200,7 @@ module.exports = (app) => {
             cart_vacinacao: ocorrencias > 1 ? bodyRaw.cart_vacinacao[index] : bodyRaw.cart_vacinacao,
             declaracao_escolar: ocorrencias > 1 ? bodyRaw.declaracao_escolar[index] : bodyRaw.declaracao_escolar,
           });
-          console.log(body[index]);
+          // console.log(body[index]);
         }
       }
 
@@ -388,7 +378,9 @@ module.exports = (app) => {
             sConsole: true,
           },
         });
-        return res.status(500).send(error);
+        
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error);
       });
   };
 
@@ -427,7 +419,9 @@ module.exports = (app) => {
             sConsole: true,
           },
         });
-        return res.status(500).send(error);
+        
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error);
       });
   };
 

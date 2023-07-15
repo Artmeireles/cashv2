@@ -23,7 +23,7 @@ fin_rubricas (
             "updated_at": "0",
             "id_emp":"1", 
             "cod_rubr":"ABC",        
-            "ini_valid":"03/2023",            
+            "ini_valid":"2023-03",            
             "dsc_rubr":"Primeira",         
             "id_param_nat_rubr":"53",    
             "id_param_tipo":"208",

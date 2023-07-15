@@ -87,6 +87,8 @@ module.exports = app => {
                 })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
+                    
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
                     return res.status(500).send(error)
                 })
             existsOrError(rowsUpdated, 'Contrato não foi encontrado')
@@ -631,13 +633,17 @@ module.exports = app => {
                                         .then()
                                         .catch(error => {
                                             app.api.logger.logError({ log: { line: `Erro ao tentar efetuar update em: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                                            return res.status(500).send(error)
+                                            
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
                                         })
                                     batchMatch++
                                 })
                                 .catch(error => {
                                     app.api.logger.logError({ log: { line: `Erro ao tentar efetuar insert em: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                                    return res.status(500).send(error)
+                                    
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
                                 })
                         }
                     }
@@ -876,7 +882,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 
@@ -898,7 +906,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 
@@ -919,7 +929,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 
@@ -944,7 +956,9 @@ module.exports = app => {
         sql.then(body => res.json({ data: body }))
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 

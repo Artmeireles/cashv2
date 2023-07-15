@@ -29,7 +29,7 @@ module.exports = app => {
             existsOrError(body.nome, 'Nome não informado')
             existsOrError(body.cbo, 'CBO não informado')
         }
-         catch (error) {
+        catch (error) {
             return res.status(400).send(error)
         }
 
@@ -130,7 +130,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 
@@ -153,7 +155,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 

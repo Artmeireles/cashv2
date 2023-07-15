@@ -25,41 +25,42 @@ module.exports = (app) => {
     let body = { ...req.body };
     if (req.params.id) body.id = req.params.id;
     const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
+    const tabelaServidoresDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.servidores`;
     try {
       // Alçada para edição
-      if (body.id)
-        isMatchOrError(
-          uParams && uParams.cad_servidores >= 3,
-          `${noAccessMsg} "Edição de ${tabela}"`
-        );
+      if (body.id) isMatchOrError(uParams && uParams.cad_servidores >= 3, `${noAccessMsg} "Edição de ${tabela}"`);
       // Alçada para inclusão
-      else
-        isMatchOrError(
-          uParams && uParams.cad_servidores >= 1,
-          `${noAccessMsg} "Inclusão de ${tabela}"`
-        );
-    } catch (error) {
-      return res.status(401).send(error);
-    }
+      else isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`);
+    } catch (error) { return res.status(401).send(error); }
+
+    body.id_serv = req.params.id_serv
+
     const contentType = req.headers["content-type"];
     if (contentType == "text/plain") {
       const bodyRaw = convertESocialTextToJson(req.body);
-      //   return res.send(bodyRaw)
+      // return res.send(bodyRaw)
       body = {};
-
+      const id_serv = await app.db(tabelaServidoresDomain).select('id').where({ cpf_trab: bodyRaw.cpfTrab_13 }).first();
+      try {
+        existsOrError(id_serv, `Servidor não encontrado`)
+      } catch (error) {
+        console.log(error);
+        return res.status(400).send(error);
+      }
+      body.id_serv = id_serv.id
+      body.ini_valid = bodyRaw.ini_valid;
       body.matricula = bodyRaw.matricula_108;
-      //body.sit_func = bodyRaw.
       body.tp_reg_trab = bodyRaw.tpRegTrab_109;
       body.tp_reg_prev = bodyRaw.tpRegPrev_110;
       body.id_param_tp_prov = await getIdParam("tpProv", bodyRaw.tpProv_141);
       body.data_exercicio = bodyRaw.dtExercicio_144;
-      body.tp_plan_rp = bodyRaw.tpPlanRP_145; //obs
-      body.teto_rgps = bodyRaw.indTetoRGPS_222;
-      body.abono_perm = bodyRaw.indAbonoPerm_223;
+      body.tp_plan_rp = bodyRaw.tpPlanRP_145 || "0";
+      body.teto_rgps = bodyRaw.indTetoRGPS_222 || "N";
+      body.abono_perm = bodyRaw.indAbonoPerm_223 || "N";
       body.d_inicio_abono = bodyRaw.dtIniAbono_224;
       body.d_ing_cargo = bodyRaw.dtIngrCargo_227;
-      body.id_cargo = await getIdCargos(bodyRaw.nmCargo_225);
-      body.acum_cargo = bodyRaw.acumCargo_230;
+      body.id_cargo = await getIdCargos(bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228, { cliente: uParams.cliente, dominio: uParams.dominio });
+      body.acum_cargo = bodyRaw.acumCargo_230 || bodyRaw.acumCargo_230;
       body.id_param_cod_categ = await getIdParam(
         "codCatg",
         bodyRaw.codCateg_151
@@ -73,7 +74,7 @@ module.exports = (app) => {
       body.hr_noturno = bodyRaw.horNoturno_241;
       body.desc_jornd = bodyRaw.dscJorn_242;
       // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
-      body.id_param_grau_exp = await getIdParam("grauExp", bodyRaw.grau_exp);
+      body.id_param_grau_exp = await getIdParam("grauExp", bodyRaw.id_param_grau_exp);
       body.id_vinc_principal = bodyRaw.id_vinc_principal;
       body.sit_func = bodyRaw.sit_func;
       body.pis = bodyRaw.pis;
@@ -87,12 +88,10 @@ module.exports = (app) => {
       body.dt_nomeacao = bodyRaw.dt_nomeacao;
       body.nom_edital = bodyRaw.nom_edital;
       body.nom_nr_inscr = bodyRaw.nom_nr_inscr;
-      body.id_siap_pub = bodyRaw.id_siap_pub;
-      body.d_inicio_abono = bodyRaw.d_inicio_abono;
+      if (bodyRaw.id_siap_pub) body.id_siap_pub = bodyRaw.id_siap_pub;
     }
-    //return res.send(bodyRaw)
-    body.id_serv = req.params.id_serv
     try {
+      existsOrError(body.ini_valid, "Validade inicial do registro não informado");
       existsOrError(body.id_vinc_principal, "Vinculo Principal não informado");
       existsOrError(body.matricula, "Matrícula do Trabalhador não informada");
       existsOrError(body.sit_func, "Situação Funcional não informada");
@@ -107,18 +106,20 @@ module.exports = (app) => {
       existsOrError(body.tp_plan_rp, "Plano Segregação em Massa não informado");
       existsOrError(body.teto_rgps, "Teto RGPS não informado");
       existsOrError(body.abono_perm, "Abono Permanência não informado");
-      if (body.tp_reg_prev == "2")
+      if (body.abono_perm == 'S')
         existsOrError(
           body.d_inicio_abono,
           "Data Início do Abono não informado"
         );
-      existsOrError(
-        body.d_ing_cargo,
-        "Data de Ingressão do Cargo não informado"
-      );
-      if (body.tp_reg_trab == "2" && body.id_param_tp_prov == "2")
-      existsOrError(body.id_cargo, "Cargo não informado");
-      existsOrError(body.acum_cargo, "Cargo Acumulável não informado");
+      if (body.tp_reg_trab == "2" && body.id_param_tp_prov == "2") {
+        existsOrError(body.id_cargo, "Cargo não informado");
+        if (!(['1', '4'].includes.body.tp_reg_trab))
+          existsOrError(
+            body.d_ing_cargo,
+            "Data de Ingresso do Cargo não informado"
+          );
+        existsOrError(body.acum_cargo, "Cargo Acumulável não informado");
+      }
       existsOrError(
         body.id_param_cod_categ,
         "Código da Categoria não informado"
@@ -164,6 +165,7 @@ module.exports = (app) => {
         "Grau de Experiência selecionado não existe"
       );
     } catch (error) {
+      console.log(error);
       return res.status(400).send(error);
     }
     body.matricula = body.matricula.padStart(8, "0");
@@ -172,6 +174,11 @@ module.exports = (app) => {
     const { changeUpperCase, removeAccentsObj } = app.api.facilities;
     body = JSON.parse(JSON.stringify(body), removeAccentsObj);
     body = JSON.parse(JSON.stringify(body), changeUpperCase);
+
+    const tpl = await app.db(tabelaDomain).where({ 'id_serv': body.id_serv, 'ini_valid': body.ini_valid }).first()
+    if (tpl && tpl.id) {
+      body.id = tpl.id
+    }
 
     if (body.id) {
       // Variáveis da edição de um registro
@@ -200,12 +207,8 @@ module.exports = (app) => {
           else res.status(200).send("Rúbrica não foi encontrada");
         })
         .catch((error) => {
-          app.api.logger.logError({
-            log: {
-              line: `Error in file: ${__filename}.${__function} ${error}`,
-              sConsole: true,
-            },
-          });
+
+          app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
           return res.status(500).send(error);
         });
     } else {
@@ -239,12 +242,7 @@ module.exports = (app) => {
           return res.json(body);
         })
         .catch((error) => {
-          app.api.logger.logError({
-            log: {
-              line: `Error in file: ${__filename}.${__function} ${error}`,
-              sConsole: true,
-            },
-          });
+          app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
           return res.status(500).send(error);
         });
     }
@@ -307,6 +305,8 @@ module.exports = (app) => {
             sConsole: true,
           },
         });
+
+        app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
         return res.status(500).send(error);
       });
   };
@@ -346,6 +346,8 @@ module.exports = (app) => {
             sConsole: true,
           },
         });
+
+        app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
         return res.status(500).send(error);
       });
   };

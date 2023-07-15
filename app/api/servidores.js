@@ -103,6 +103,7 @@ module.exports = app => {
                 notExistsOrError(dataFromDB, 'Combinação de CPF já cadastrado')
             }
         } catch (error) {
+            console.log(error);
             return res.status(400).send(error)
         }
 
@@ -112,7 +113,6 @@ module.exports = app => {
         const { changeUpperCase, removeAccentsObj } = app.api.facilities
         body = (JSON.parse(JSON.stringify(body), removeAccentsObj));
         body = (JSON.parse(JSON.stringify(body), changeUpperCase));
-
 
         if (body.id) {
             // Variáveis da edição de um registro
@@ -225,7 +225,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 
@@ -248,7 +250,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 

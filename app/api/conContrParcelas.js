@@ -77,7 +77,9 @@ module.exports = app => {
                     })
                     .catch(error => {
                         app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                        return res.status(500).send(error)
+                        
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
                     })
                 existsOrError(rowsUpdated, 'Contrato não foi encontrado')
             } else if (recorrencia == "1") {
@@ -95,7 +97,9 @@ module.exports = app => {
                         .where({ id: element.id })
                         .catch(error => {
                             app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                            return res.status(500).send(error)
+                            
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
                         })
                 });
                 return res.status(200).send('Parcelas alteradas com sucesso')
@@ -139,6 +143,8 @@ module.exports = app => {
                 })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
+                    
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
                     return res.status(500).send(error)
                 })
         }
@@ -202,7 +208,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 
@@ -234,7 +242,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                return res.status(500).send(error)
+                
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                    return res.status(500).send(error)
             })
     }
 
@@ -356,6 +366,8 @@ module.exports = app => {
                 .then()
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
+                    
+                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
                     return res.status(500).send(error)
                 })
         });

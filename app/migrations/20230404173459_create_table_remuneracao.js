@@ -11,7 +11,7 @@ exports.up = function(knex) {
         table.integer('id_serv_vinc').notNull().unsigned().comment("Vinculos")
         table.integer('id_remun_param').notNull().unsigned().comment("Parâmetros da Remuneração")
         table.integer('id_rubrica').notNull().unsigned().comment("Rúbrica")
-        table.integer('id_ad_fg').notNull().unsigned().comment("1-Adicional; 2-Função Gratificada")
+        table.integer('id_ad_fg').unsigned().comment("1-Adicional; 2-Função Gratificada")
         table.string('qtd_rubr').comment("Quantidade")
         table.string('fator_rubr').comment("Fator da Rúbrica")
         table.string('valor_rubr').comment("Valor Total da Rúbrica")
