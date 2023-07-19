@@ -20,7 +20,7 @@ module.exports = app => {
 
     const save = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         const body = { ...req.body }
         try {
             // Alçada para edição de registro
@@ -343,7 +343,7 @@ module.exports = app => {
     const limitGetByIdCadas = 15 // usado para paginação
     const getByCadas = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         const cpf = req.query.cpf ? req.query.cpf : ''
         const id_cadas = req.params.id_cadas
         try {
@@ -410,7 +410,7 @@ module.exports = app => {
     const limit = 20
     const get = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         try {
             // Alçada para exibição
             isMatchOrError((uParams && (
@@ -525,7 +525,7 @@ module.exports = app => {
 
     const getById = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         try {
             // Alçada para exibição
             isMatchOrError((uParams && (
@@ -742,7 +742,7 @@ module.exports = app => {
 
     const remove = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         try {
             // Alçada para exclusão
             isMatchOrError(uParams && uParams.con_contratos >= 3, `${noAccessMsg} "Exclusão de contrato"`)

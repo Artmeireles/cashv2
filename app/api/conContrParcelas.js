@@ -15,7 +15,7 @@ module.exports = app => {
 
     const save = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         const body = { ...req.body }
         try {
             // Alçada para edição de registro
@@ -154,7 +154,7 @@ module.exports = app => {
     const limit = 10 // usado para paginação
     const get = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         const cpf = req.query.cpf ? req.query.cpf : ''
         try {
             // Alçada para exibição
@@ -216,7 +216,7 @@ module.exports = app => {
 
     const getById = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         const cpf = req.query.cpf ? req.query.cpf : ''
         try {
             // Alçada para exibição
@@ -250,7 +250,7 @@ module.exports = app => {
 
     const remove = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         try {
             // Alçada para exclusão
             isMatchOrError(uParams && uParams.con_contratos >= 2, `${noAccessMsg} "Exclusão de parcela"`)
@@ -306,7 +306,7 @@ module.exports = app => {
     // Gerar parcelas de contratos existentes do cliente
     const gPCE = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         const body = { ...req.body }
         try {
             // Alçada para edição de registro
@@ -377,7 +377,7 @@ module.exports = app => {
 
     const getImportToMGFolha = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         if (!(uParams.admin >= 1 || uParams.con_contratos >= 2)) return res.status(401).send('Unauthorized')
         // Recupera domínios do cliente
         const dominios = await app.db('params')

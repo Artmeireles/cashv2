@@ -857,7 +857,7 @@ module.exports = app => {
 
         const f_folha = new Date()
 
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         // Variáveis da edição de um registro
         // registrar o evento na tabela de eventos
         const { createEventUpd } = app.api.sisEvents
@@ -917,7 +917,7 @@ module.exports = app => {
         let user = req.user
         const page = req.query.page || 1
         const key = req.query.key ? req.query.key : undefined
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
 
         const sql = app.db({ us: tabela }).select(app.db.raw('count(*) as count'))
             .where(app.db.raw(`us.status = ${STATUS_ACTIVE}`))
@@ -982,7 +982,7 @@ module.exports = app => {
 
     const getById = async (req, res) => {
         let user = req.user
-        const uParams = await app.db('users').where({ id: user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         if (req.user.id != req.params.id && uParams.gestor < 1) return res.status(401).send('Unauthorized')
         app.db(tabela)
             // .select('users.id', 'users.status', 'users.evento', 'users.created_at', 'users.updated_at', 'dominio', 'cliente', 'email', 'telefone',

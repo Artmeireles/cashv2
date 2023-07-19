@@ -22,7 +22,7 @@ module.exports = app => {
         let user = req.user
         let userBody = undefined
         if (user) {
-            const uParams = await app.db('users').where({ id: user.id }).first();
+            const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
             delete uParams.password
             delete uParams.password_reset_token
             delete uParams.cpf
