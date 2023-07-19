@@ -86,7 +86,7 @@ module.exports = app => {
     function convertESocialTextToJson(body) {
         const querystring = require('querystring');
         const jsonData = querystring.parse(body, '\r\n', '=');
-        return JSON.parse(JSON.stringify(jsonData))
+        return JSON.parse(JSON.stringify(trimJsonProperties(jsonData)))
     }
 
     const getIdParam = async (meta, value) => {
@@ -151,11 +151,24 @@ module.exports = app => {
         return type == 'key' ? k : v;
     }
 
+    function trimJsonProperties(obj) {
+        const novoObjeto = {};
+        for (let prop in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                const valorOriginal = obj[prop];
+                const valorSemEspacos = typeof valorOriginal === 'string' ? valorOriginal.trim() : valorOriginal;
+                novoObjeto[prop.trim()] = valorSemEspacos;
+            }
+        }
+        return novoObjeto;
+
+    }
+
     return {
         capitalizeFirstLetter, titleCase, removeAccents, removeAccentsObj,
         numbersOrZero, changeUpperCase, diffInDays, encryptPassword, comparePassword,
         convertESocialTextToJson, getIdParam, getIdCidade, getIdCargos, getIdRubricas,
         countOccurrences, parseKeyValueFromString, getRawValueFromKeyPairString,
-        getValueFromKeyPairString
+        getValueFromKeyPairString, trimJsonProperties
     }
 }

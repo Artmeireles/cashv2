@@ -59,7 +59,15 @@ module.exports = (app) => {
       body.abono_perm = bodyRaw.indAbonoPerm_223 || "N";
       body.d_inicio_abono = bodyRaw.dtIniAbono_224;
       body.d_ing_cargo = bodyRaw.dtIngrCargo_227;
-      body.id_cargo = await getIdCargos(bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228, { cliente: uParams.cliente, dominio: uParams.dominio });
+      const id_cargo = await getIdCargos(bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228, { cliente: uParams.cliente, dominio: uParams.dominio });
+      if (id_cargo) body.id_cargo = id_cargo;
+      else {
+        const cargo = await app.db(`${dbPrefix}_${uParams.cliente}_${uParams.dominio}.aux_cargos`).insert({
+          evento: 1, created_at: moment(), nome: bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228,
+          cbo: bodyRaw.CBOCargo_226 || bodyRaw.CBOFuncao_229
+        });
+        body.id_cargo = cargo[0];
+      }
       body.acum_cargo = bodyRaw.acumCargo_230 || bodyRaw.acumCargo_230;
       body.id_param_cod_categ = await getIdParam(
         "codCatg",

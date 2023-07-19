@@ -51,7 +51,7 @@ module.exports = (app) => {
       existsOrError(body.id_param_tp_dep, "Tipo do Dependente não informado");
       existsOrError(await isParamOrError("tpDep", body.id_param_tp_dep), "Tipo do Dependente selecionado não existe");
       existsOrError(body.nome, "Nome não informado");
-      existsOrError(body.data_nasc, "Data de Nascimento não informada");
+      existsOrError(body.data_nasc, "Data de Nascimento do dependente não informada");
 
       if (moment(body.data_nasc, "DD/MM/YYYY") < moment("1890-01-01")) {
         throw `A data de nascimento (${body.data_nasc}) não pode ser anterior à (01/01/1890)`;
@@ -214,7 +214,7 @@ module.exports = (app) => {
             existsOrError(element.id_param_tp_dep, "Tipo do Dependente não informado");
             existsOrError(await isParamOrError("tpDep", element.id_param_tp_dep), "Tipo do Dependente selecionado não existe");
             existsOrError(element.nome, "Nome não informado");
-            existsOrError(element.data_nasc, "Data de Nascimento não informada");
+            existsOrError(element.data_nasc, "Data de Nascimento do dependente não informada");
 
             if (moment(element.data_nasc, "DD/MM/YYYY") < moment("1890-01-01"))
               throw `A data de nascimento (${element.data_nasc}) não pode ser anterior à (01/01/1890)`;

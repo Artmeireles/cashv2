@@ -80,7 +80,7 @@ module.exports = app => {
             existsOrError(await isParamOrError('estCiv', body.id_param_est_civ), 'Estado Civil selecionado não existe')
             existsOrError(body.id_param_grau_instr, 'Grau de Instrução não informado')
             existsOrError(await isParamOrError('grauInstr', body.id_param_grau_instr), 'Grau de Instrução selecionado não existe')
-            existsOrError(body.dt_nascto, 'Data de Nascimento não informada')
+            existsOrError(body.dt_nascto, 'Data de Nascimento do servidor não informada')
             existsOrError(body.id_param_p_nascto, 'País de Nascimento não informado')
             existsOrError(await isParamOrError('pais', body.id_param_p_nascto), 'País de Nascimento selecionado não existe')
             existsOrError(body.id_param_p_nacld, 'País de Nacionalidade não informado')

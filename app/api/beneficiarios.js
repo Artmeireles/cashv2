@@ -30,7 +30,7 @@ module.exports = app => {
             existsOrError(body.cpf_benef, 'CPF do Trabalhador não informado')
             cpfOrError(body.cpf_benef, 'CPF inválido')
             existsOrError(body.nome, 'Nome não informado')
-            existsOrError(body.dt_nascto, 'Data de Nascimento não informada')
+            existsOrError(body.dt_nascto, 'Data de Nascimento do beneficiário não informada')
             existsOrError(body.dt_inicio, 'Data início do cadastro não informada')
             existsOrError(body.id_param_sexo, 'Sexo não informado')
             existsOrError(await isParamOrError('sexo', body.id_param_sexo), 'Sexo selecionado não existe')

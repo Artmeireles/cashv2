@@ -43,7 +43,7 @@ module.exports = app => {
             existsOrError(body.logradouro, 'Logradouro não informado')
             existsOrError(body.nr, 'Número não informado')
             existsOrError(body.complemento, 'Complemento não informado')
-            //existsOrError(body.d_nascimento, 'Data de Nascimento não informada')
+            //existsOrError(body.d_nascimento, 'Data de Nascimento do responsável não informada')
             if (body.nr_insc) {
                 const dataFromDB = await app.db(tabelaDomain)
                     .where({ nr_insc: body.nr_insc })
