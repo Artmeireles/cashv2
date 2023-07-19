@@ -20,7 +20,7 @@ module.exports = app => {
     const tabela = `users`
     const tabelaKeys = 'users_keys'
     const tabelaParams = 'params'
-    const tabelaFinParametros = 'fin_parametros'
+    const tabelaRemunParams = 'remun_params'
 
     /** 
      * Esta função vai tratar as seguintes situações de signup
@@ -874,19 +874,28 @@ module.exports = app => {
 
         app.api.logger.logInfo({ log: { line: `Alteração de perfil de usuário! Usuário: ${user.name}`, sConsole: true } })
 
-        const tabelaFinParamsDomain = `${dbPrefix}_${user.cliente}_${user.dominio}.${tabelaFinParametros}`
-        const mesAtual = f_folha.getMonth().toString().padStart(2, "0")
-        let isMonth = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: user.f_mes }).first()
-        if (!isMonth)
-            isMonth = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: mesAtual }).first()
-        if (!isMonth)
-            isMonth = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano }).orderBy('mes', 'complementar').first()
+        const tabelaRemunParamsDomain = `${dbPrefix}_${user.cliente}_${user.dominio}.${tabelaRemunParams}`
+        let mesAtual = f_folha.getMonth() + 1
+        mesAtual = mesAtual.toString().padStart(2, "0")
+        let isMonth = await app.db(tabelaRemunParamsDomain).where({ ano: user.f_ano, mes: user.f_mes }).first()
+        if (!isMonth) {
+            isMonth = await app.db(tabelaRemunParamsDomain).where({ ano: user.f_ano, mes: mesAtual }).first()
+        }
+        if (!isMonth) {
+            isMonth = await app.db(tabelaRemunParamsDomain).where({ ano: user.f_ano }).orderBy('mes', 'complementar').first()
+        }
 
-        let isComplementary = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes, complementar: user.f_complementar }).first()
+        if (isMonth && isMonth.mes) isMonth.mes
+        else isMonth = { mes: mesAtual }
+
+        let isComplementary = await app.db(tabelaRemunParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes, complementar: user.f_complementar }).first()
         if (!isComplementary)
-            isComplementary = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes, complementar: '000' }).first()
+            isComplementary = await app.db(tabelaRemunParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes, complementar: '000' }).first()
         if (!isComplementary)
-            isComplementary = await app.db(tabelaFinParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes }).orderBy('complementar').first()
+            isComplementary = await app.db(tabelaRemunParamsDomain).where({ ano: user.f_ano, mes: isMonth.mes }).orderBy('complementar').first()
+
+        if (isComplementary && isComplementary.complementar) isComplementary.complementar
+        else isComplementary = { complementar: '000' }
 
         user.f_mes = isMonth.mes
         user.f_complementar = isComplementary.complementar
