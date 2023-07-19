@@ -140,6 +140,7 @@ module.exports = app => {
                     status: user.status,
                     cpf: user.cpf,
                     name: user.name,
+                    gestor: user.gestor,
                     telefone: user.telefone,
                     cliente: user.cliente,
                     dominio: user.dominio,
