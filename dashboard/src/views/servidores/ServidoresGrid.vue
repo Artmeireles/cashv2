@@ -13,7 +13,7 @@ const menu = ref();
 const gridData = ref(null);
 const itemData = ref(null);
 const loading = ref(true);
-const urlBase = ref(`${baseApiUrl}/cadastros`);
+const urlBase = ref(`${baseApiUrl}/servidores`);
 
 const initFilters = () => {
     filters.value = {

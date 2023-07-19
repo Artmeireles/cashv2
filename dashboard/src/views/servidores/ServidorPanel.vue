@@ -9,7 +9,7 @@ import ServidorForm from './ServidorForm.vue';
 const route = useRoute();
 const itemData = ref({});
 const loading = ref(true);
-const urlBase = ref(`${baseApiUrl}/cadastros`);
+const urlBase = ref(`${baseApiUrl}/servidores`);
 
 const loadData = async () => {
     itemData.value.id = route.params.id;

@@ -12,7 +12,7 @@ const dropdownItems = ref([
 const dropdownItem = ref(null);
 const itemData = ref({});
 const loading = ref(true);
-const urlBase = ref(`${baseApiUrl}/cadastros`);
+const urlBase = ref(`${baseApiUrl}/servidores`);
 const props = defineProps(['itemData']);
 
 const loadData = async () => {
