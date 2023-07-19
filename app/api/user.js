@@ -878,12 +878,10 @@ module.exports = app => {
         let mesAtual = f_folha.getMonth() + 1
         mesAtual = mesAtual.toString().padStart(2, "0")
         let isMonth = await app.db(tabelaRemunParamsDomain).where({ ano: user.f_ano, mes: user.f_mes }).first()
-        if (!isMonth) {
+        if (!isMonth)
             isMonth = await app.db(tabelaRemunParamsDomain).where({ ano: user.f_ano, mes: mesAtual }).first()
-        }
-        if (!isMonth) {
+        if (!isMonth)
             isMonth = await app.db(tabelaRemunParamsDomain).where({ ano: user.f_ano }).orderBy('mes', 'complementar').first()
-        }
 
         if (isMonth && isMonth.mes) isMonth.mes
         else isMonth = { mes: mesAtual }
