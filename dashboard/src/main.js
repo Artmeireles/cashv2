@@ -103,6 +103,8 @@ import VirtualScroller from 'primevue/virtualscroller';
 
 import CodeHighlight from '@/components/CodeHighlight.vue';
 import BlockViewer from '@/components/BlockViewer.vue';
+import Geolocation from '@/components/Geolocation.vue';
+
 
 import '@/assets/app.css';
 import '@/assets/styles.scss';
@@ -128,6 +130,7 @@ app.directive('styleclass', StyleClass);
 
 app.component('CodeHighlight', CodeHighlight);
 app.component('BlockViewer', BlockViewer);
+app.component('Geolocation', Geolocation);
 
 app.component('Accordion', Accordion);
 app.component('AccordionTab', AccordionTab);

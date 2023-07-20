@@ -1,4 +1,5 @@
 export const userKey = '__cash_user';
+export const glKey = '__gl_user';
 export const appName = 'Cash';
 export const softwareHouse = 'Mega Assessoria';
 export const dbPrefix = 'wwmgca';
@@ -79,6 +80,7 @@ export const TOKEN_VALIDE_MINUTES = 10; // 10 minutos de validade
 
 export default {
     userKey,
+    glKey,
     appName,
     dbPrefix,
     noPermissAccess,

@@ -6,7 +6,7 @@ const user = JSON.parse(json)
 
 axios.interceptors.request.use(config => {
     if (user && user.ip) {
-        config.headers['X-IP-Address'] = user.ip;
+        config.headers['x-ip-address'] = user.ip;
     }
     return config;
 });

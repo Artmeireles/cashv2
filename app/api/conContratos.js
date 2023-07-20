@@ -41,7 +41,7 @@ module.exports = app => {
         if (body.status == 10 && !uParams.averbaOnline) {
             try {
                 existsOrError(body.id_cadas, 'Cliente ainda não tem perfil de usuário')
-                const uProper = await app.db('users').where({ id_cadas: body.id_cadas, cliente: uParams.cliente }).first()
+                const uProper = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').where({ 'u.id_cadas': body.id_cadas, 'e.cliente': uParams.cliente }).first()
                 existsOrError(uProper.id, 'Cliente ainda não tem perfil de usuário')
                 // existsOrError(body.u_keypass, 'Senha do cliente não informada')
                 if (uProper && body.u_keypass) {
@@ -181,9 +181,9 @@ module.exports = app => {
                             .transacting(trx)
                             .catch(error => {
                                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                                return res.status(500).send(error)
                             })
                         existsOrError(parcelasUpdated, 'Não foram encontradas as parcelas do contrato')
                     }
@@ -195,9 +195,9 @@ module.exports = app => {
                             .transacting(trx)
                             .catch(error => {
                                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                                return res.status(500).send(error)
                             })
                     }
 
@@ -209,9 +209,9 @@ module.exports = app => {
                         })
                         .catch(error => {
                             app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                            
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                            app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                            return res.status(500).send(error)
                         })
                     existsOrError(rowsUpdated, 'Contrato não foi encontrado')
                     await trx.commit();
@@ -257,7 +257,7 @@ module.exports = app => {
                 })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                    
+
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
                     return res.status(500).send(error)
                 })
@@ -270,7 +270,7 @@ module.exports = app => {
      * @returns 
      */
     const getMargemConsignavel = async (req, res) => {
-        const uParams = await app.db('users').where({ id: req.user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').where({ 'u.id': req.user.id }).first();
         const body = { ...req.body }
         let margemConsignavel = {
             margemFolha: 0.0,
@@ -333,9 +333,9 @@ module.exports = app => {
             else return res.status(200).send({ margemFinal, maxFolha })
         } catch (error) {
             app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-            
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+            app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+            return res.status(500).send(error)
 
         }
     }
@@ -401,9 +401,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -517,9 +517,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -564,9 +564,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function}:${__line} ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -695,9 +695,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -714,9 +714,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -734,9 +734,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 

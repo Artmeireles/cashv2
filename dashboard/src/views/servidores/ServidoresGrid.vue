@@ -5,6 +5,9 @@ import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess, defaultWarn } from '@/toast';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/user';
+
+const store = useUserStore();
 
 const router = useRouter();
 
@@ -87,7 +90,7 @@ const getItem = (data) => {
     itemData.value = data;
 };
 const loadData = () => {
-    axios.get(urlBase.value).then((axiosRes) => {
+    axios.get(`${urlBase.value}/${store.userStore.id_emp}`).then((axiosRes) => {
         gridData.value = axiosRes.data.data;
         gridData.value.forEach((element) => {
             element.matricula = element.matricula.toString().padStart(8, '0');

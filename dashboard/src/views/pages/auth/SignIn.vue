@@ -36,6 +36,7 @@ const signin = async () => {
                 defaultError(store.userStore.msg);
             }
         } catch (error) {
+            console.log(error);
             defaultError('Aparentemente houve um erro ao tentar logar no sistema. Tente novamente...');
         }
         click.value = false;

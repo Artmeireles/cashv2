@@ -28,12 +28,12 @@ module.exports = app => {
             evento.id_user = !(request && request.user && request.user.id) ? last.id : request.user.id
             evento.classevento = evento.classevento || "Update"
             evento.ip = request.headers['x-ip-address']
-            evento.geo_lt = request.userGeoLt
-            evento.geo_ln = request.userGeoLn
+            evento.geo_lt = request.headers['x-geo-lt']
+            evento.geo_ln = request.headers['x-geo-ln']
             evento.id_registro = last.id
             evento.created_at = new Date()
             if (request.user && request.user.id) {
-                const user = await app.db({ u: 'users' }).select('cliente', 'dominio').where({ id: request.user.id }).first()
+                const user = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('cliente', 'dominio').where({ 'u.id': request.user.id }).first()
                 evento.cliente = user.cliente
                 evento.dominio = user.dominio
             }
@@ -67,12 +67,12 @@ module.exports = app => {
             evento.evento = `${evento.evento}: ${eventoDescr}`
             evento.classevento = evento.classevento || "Insert"
             evento.ip = request.headers['x-ip-address']
-            evento.geo_lt = request.userGeoLt
-            evento.geo_ln = request.userGeoLn
+            evento.geo_lt = request.headers['x-geo-lt']
+            evento.geo_ln = request.headers['x-geo-ln']
             evento.id_registro = next.id
             evento.created_at = new Date()
             if (request.user && request.user.id) {
-                const user = await app.db({ u: 'users' }).select('cliente', 'dominio').where({ id: request.user.id }).first()
+                const user = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('cliente', 'dominio').where({ 'u.id': request.user.id }).first()
                 evento.cliente = user.cliente
                 evento.dominio = user.dominio
             }
@@ -104,12 +104,12 @@ module.exports = app => {
             evento.id_user = !(request && request.user && request.user.id) ? last.id : request.user.id
             evento.classevento = evento.classevento || "Remove"
             evento.ip = request.headers['x-ip-address']
-            evento.geo_lt = request.userGeoLt
-            evento.geo_ln = request.userGeoLn
+            evento.geo_lt = request.headers['x-geo-lt']
+            evento.geo_ln = request.headers['x-geo-ln']
             evento.id_registro = last.id
             evento.created_at = new Date()
             if (request.user && request.user.id) {
-                const user = await app.db({ u: 'users' }).select('cliente', 'dominio').where({ id: request.user.id }).first()
+                const user = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('cliente', 'dominio').where({ 'u.id': request.user.id }).first()
                 evento.cliente = user.cliente
                 evento.dominio = user.dominio
             }
@@ -128,11 +128,11 @@ module.exports = app => {
         const request = req.request
         const evento = req.evento
         evento.ip = request.headers['x-ip-address']
-        evento.geo_lt = request.userGeoLt
-        evento.geo_ln = request.userGeoLn
+        evento.geo_lt = request.headers['x-geo-lt']
+        evento.geo_ln = request.headers['x-geo-ln']
         evento.created_at = new Date()
         if (request.user && request.user.id) {
-            const user = await app.db({ u: 'users' }).select('cliente', 'dominio').where({ id: request.user.id }).first()
+            const user = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('cliente', 'dominio').where({ 'u.id': request.user.id }).first()
             evento.cliente = user.cliente
             evento.dominio = user.dominio
         }
@@ -158,7 +158,7 @@ module.exports = app => {
         if (classevento)
             arrayOfClasses = classevento.split(",")
 
-        const uParams = await app.db('users').where({ id: req.user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').where({ 'u.id': req.user.id }).first();
 
         const sql = app.db({ se: tabelaSisEvents }).select(app.db.raw('count(*) as count'))
             .join({ us: 'users' }, { 'se.id_user': 'us.id', 'se.cliente': 'us.cliente', 'se.dominio': 'us.dominio' })
@@ -200,9 +200,9 @@ module.exports = app => {
         ret.then(sis_events => res.json({ data: sis_events, count, limit }))
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -216,9 +216,9 @@ module.exports = app => {
             .then(fields => res.json({ data: fields }))
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -231,9 +231,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 

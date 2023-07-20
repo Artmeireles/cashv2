@@ -27,7 +27,8 @@ module.exports = app => {
         }
 
         let user = await app.db({ 'u': tabela })
-            .select('u.id', 'u.name', 'u.cpf', 'u.telefone', 'u.email', 'u.id', 'u.time_to_pas_expires', 'u.status', 'u.cliente', 'u.dominio')
+            .join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id')
+            .select('u.id', 'u.name', 'u.cpf', 'u.telefone', 'u.email', 'u.id', 'u.time_to_pas_expires', 'u.status', 'e.cliente', 'e.dominio')
             .orWhere({ 'u.email': email })
             .orWhere({ 'u.name': email })
             .orWhere({ 'u.cpf': email.replace(/([^\d])+/gim, "") })
@@ -188,13 +189,13 @@ module.exports = app => {
     const validateToken = async (req, res) => {
         const userData = req.body || null
         try {
-            if (userData) {
+            if (userData && userData.token) {
                 const token = jwt.decode(userData.token, authSecret)
                 if (new Date(token.exp * 1000) > new Date() && userData.ipSignin == userData.ip) {
                     return res.send(true)
                 }
             }
-        } catch (error) { }
+        } catch (error) { console.log(error); }
 
         res.send(false)
     }

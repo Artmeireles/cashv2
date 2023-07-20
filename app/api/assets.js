@@ -4,12 +4,12 @@ const fs = require('fs');
 module.exports = app => {
     const { isMatchOrError, noAccessMsg, existsOrError } = app.api.validation
 
-    const getAsset = async(req, res) => {
-        const body = {...req.body }
+    const getAsset = async (req, res) => {
+        const body = { ...req.body }
         const root = body.root || undefined
         const asset = body.asset || undefined
         const extension = body.extension || undefined
-        const uParams = await app.db('users').where({ id: req.user.id }).first();
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').where({ 'u.id': req.user.id }).first();
         try {
             // Alçada para exibição
             isMatchOrError(uParams && uParams.id, `${noAccessMsg} "Exibição de arquivo do sistema"`)
@@ -38,11 +38,11 @@ module.exports = app => {
         }
         var type = mime[path.extname(file).slice(1)] || 'text/plain';
         var s = fs.createReadStream(file, { encoding: 'base64' });
-        s.on('open', function() {
+        s.on('open', function () {
             res.set('Content-Type', type);
             s.pipe(res);
         });
-        s.on('error', function() {
+        s.on('error', function () {
             res.set('Content-Type', 'text/plain');
             res.status(404).end('File not found');
         });

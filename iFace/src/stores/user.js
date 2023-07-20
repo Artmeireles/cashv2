@@ -32,7 +32,7 @@ export const useUserStore = defineStore('users', {
         this.ip = this.ipify.data.ip || undefined
         axios.interceptors.request.use(config => {
           if (this.ipify && this.ipify.data.ip) {
-            config.headers['X-IP-Address'] = this.ip;
+            config.headers['x-ip-address'] = this.ip;
           }
           return config;
         });
@@ -47,7 +47,7 @@ export const useUserStore = defineStore('users', {
             localStorage.setItem(userKey, JSON.stringify({ ...res.data, ip: this.ip }));
           } else {
             delete axios.defaults.headers.common['Authorization']
-            delete axios.defaults.headers.common['X-IP-Address']
+            delete axios.defaults.headers.common['x-ip-address']
             localStorage.removeItem(userKey);
           }
           return this.user
@@ -90,7 +90,7 @@ export const useUserStore = defineStore('users', {
     logout() {
       this.user = {}
       delete axios.defaults.headers.common['Authorization']
-      delete axios.defaults.headers.common['X-IP-Address']
+      delete axios.defaults.headers.common['x-ip-address']
       localStorage.removeItem(userKey);
     },
     async fetchGeolocation(ip) {

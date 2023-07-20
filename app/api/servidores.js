@@ -210,6 +210,20 @@ module.exports = app => {
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
 
+        
+            // registrar o evento na tabela de eventos
+            const { createEvent } = app.api.sisEvents
+            const evento = await createEvent({
+                "request": req,
+                "evento": {
+                    "ip": req.ip,
+                    "id_user": req.user.id,
+                    "evento": `teste de evento: ${req.headers['x-geo-lt']}, ${req.headers['x-geo-ln']}`,
+                    "classevento": `conContratos.createFolder`,
+                    "id_registro": null
+                }
+            })
+
         const ret = app.db({ tbl1: tabelaDomain })
             .select('tbl1.*', 'sv.matricula')
             .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
