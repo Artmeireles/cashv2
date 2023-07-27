@@ -42,10 +42,9 @@ exports.up = function(knex) {
         table.string('nom_edital').comment("Nome do Edital")
         table.string('nom_nr_inscr').comment("Número Inscrição")
         table.integer('id_siap_pub').unsigned().comment("Publicação")
-        table.integer('id_param_grau_exp').notNull().unsigned().comment("Grau de Exposição")
+        table.integer('id_param_grau_exp').unsigned().comment("Grau de Exposição")
 
-        table.unique(['ini_valid', 'id_serv'])
-        table.unique(['ini_valid', 'matricula'])
+        table.unique(['ini_valid', 'id_serv', 'matricula'])
         table.foreign('id_serv').references('id').inTable('servidores').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_tp_prov').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_cargo').references('id').inTable('aux_cargos').onUpdate('CASCADE').onDelete('NO ACTION')

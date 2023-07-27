@@ -118,7 +118,7 @@ module.exports = app => {
         const param = await app.db(tabelaDomain).select('id')
             .where(function () {
                 this.where('cod_rubr', value)
-                    .andWhere('ini_valid', '<=', `${perApur.substring(0, 4)}-${perApur.substring(5, 6)}`)
+                    .andWhere('ini_valid', '<=', `${perApur.substring(0, 4)}-${perApur.substring(5, 7)}`)
             }).first()
         if (param) return param.id
         else undefined

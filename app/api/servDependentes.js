@@ -22,7 +22,7 @@ module.exports = (app) => {
 
   const save = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db("users").where({ id: user.id }).first();
+    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
     let body = { ...req.body };
     delete body.id
     const id_serv = req.params.id_serv;
@@ -157,7 +157,7 @@ module.exports = (app) => {
 
   const saveBatch = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db("users").where({ id: user.id }).first();
+    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
     let body = { ...req.body };
     try {
       // Alçada para edição
@@ -329,7 +329,7 @@ module.exports = (app) => {
     let user = req.user;
     const id_serv = req.params.id_serv;
     const key = req.query.key ? req.query.key : "";
-    const uParams = await app.db("users").where({ id: user.id }).first();
+    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
     try {
       // Alçada para exibição
       isMatchOrError(
@@ -386,7 +386,7 @@ module.exports = (app) => {
 
   const getById = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db("users").where({ id: user.id }).first();
+    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
     try {
       // Alçada para exibição
       isMatchOrError(
@@ -427,7 +427,7 @@ module.exports = (app) => {
 
   const remove = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db("users").where({ id: user.id }).first();
+    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
     try {
       // Alçada para exibição
       isMatchOrError(

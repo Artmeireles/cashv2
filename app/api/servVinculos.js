@@ -21,7 +21,7 @@ module.exports = (app) => {
 
   const save = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db("users").where({ id: user.id }).first();
+    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
     let body = { ...req.body };
     if (req.params.id) body.id = req.params.id;
     const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
@@ -63,14 +63,14 @@ module.exports = (app) => {
       if (id_cargo) body.id_cargo = id_cargo;
       else {
         const cargo = await app.db(`${dbPrefix}_${uParams.cliente}_${uParams.dominio}.aux_cargos`).insert({
-          evento: 1, created_at: moment(), nome: bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228,
+          evento: 1, created_at: new Date(), nome: bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228,
           cbo: bodyRaw.CBOCargo_226 || bodyRaw.CBOFuncao_229
         });
         body.id_cargo = cargo[0];
       }
       body.acum_cargo = bodyRaw.acumCargo_230 || bodyRaw.acumCargo_230;
       body.id_param_cod_categ = await getIdParam(
-        "codCatg",
+        "codCateg",
         bodyRaw.codCateg_151
       );
       body.qtd_hr_sem = bodyRaw.qtdHrsSem_176;
@@ -82,7 +82,7 @@ module.exports = (app) => {
       body.hr_noturno = bodyRaw.horNoturno_241;
       body.desc_jornd = bodyRaw.dscJorn_242;
       // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
-      body.id_param_grau_exp = await getIdParam("grauExp", bodyRaw.id_param_grau_exp);
+      if (bodyRaw.id_param_grau_exp) body.id_param_grau_exp = await getIdParam("grauExp", bodyRaw.id_param_grau_exp);
       body.id_vinc_principal = bodyRaw.id_vinc_principal;
       body.sit_func = bodyRaw.sit_func;
       body.pis = bodyRaw.pis;
@@ -133,7 +133,7 @@ module.exports = (app) => {
         "Código da Categoria não informado"
       );
       existsOrError(
-        await isParamOrError("codCatg", body.id_param_cod_categ),
+        await isParamOrError("codCateg", body.id_param_cod_categ),
         "Código da Categoria selecionado não existe"
       );
       existsOrError(
@@ -164,14 +164,12 @@ module.exports = (app) => {
       // existsOrError(body.nom_edital, 'Nome do Edital não informado')
       // existsOrError(body.nom_nr_inscr, 'Número da Inscrição não informado')
       // existsOrError(body.id_siap_pub, 'Veículo Publicação não informado')
-      existsOrError(
-        body.id_param_grau_exp,
-        "Grau de Experiência não informado"
-      );
-      existsOrError(
-        await isParamOrError("grauExp", body.id_param_grau_exp),
-        "Grau de Experiência selecionado não existe"
-      );
+      // existsOrError(body.id_param_grau_exp,"Grau de Exposição não informado");
+      if (body.id_param_grau_exp)
+        existsOrError(
+          await isParamOrError("grauExp", body.id_param_grau_exp),
+          "Grau de Exposição selecionado não existe"
+        );
     } catch (error) {
       console.log(error);
       return res.status(400).send(error);
@@ -212,7 +210,7 @@ module.exports = (app) => {
       rowsUpdated
         .then((ret) => {
           if (ret > 0) res.status(200).send(body);
-          else res.status(200).send("Rúbrica não foi encontrada");
+          else res.status(201).send("Vinculo não encontrado");
         })
         .catch((error) => {
 
@@ -261,7 +259,7 @@ module.exports = (app) => {
     let user = req.user;
     const id_serv = req.params.id_serv;
     const key = req.query.key ? req.query.key : "";
-    const uParams = await app.db("users").where({ id: user.id }).first();
+    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
     try {
       // Alçada para exibição
       isMatchOrError(
@@ -321,7 +319,7 @@ module.exports = (app) => {
 
   const getById = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db("users").where({ id: user.id }).first();
+    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
     try {
       // Alçada para exibição
       isMatchOrError(
@@ -362,7 +360,7 @@ module.exports = (app) => {
 
   const remove = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db("users").where({ id: user.id }).first();
+    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
     try {
       // Alçada para exibição
       isMatchOrError(

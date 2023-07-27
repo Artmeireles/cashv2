@@ -33,7 +33,7 @@ module.exports = app => {
             existsOrError(await isParamOrError('indMov', body.id_param_ind_mv), 'Indicador de Desconto selecionado não existe')
             existsOrError(body.nr_insc, 'CPF ou CNPJ não informado')
             existsOrError(body.id_param_cod_categ, 'Código da Categoria não informado')
-            existsOrError(await isParamOrError('codCatg', body.id_param_cod_categ), 'Código da Categoria selecionado não existe')
+            existsOrError(await isParamOrError('codCateg', body.id_param_cod_categ), 'Código da Categoria selecionado não existe')
             existsOrError(body.vlr_remun_oe, 'Valor da Remuneração não informado')
         }
          catch (error) {

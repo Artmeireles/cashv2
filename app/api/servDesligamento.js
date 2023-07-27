@@ -5,6 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
+    const { getIdParam } = app.api.facilities;
     const tabela = 'serv_desligamentos'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
@@ -25,6 +26,13 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
+
+        // Se a requisicao for do tipo text/plain, enviar para o saveBatch
+        const contentType = req.headers["content-type"];
+        if (contentType == "text/plain") {
+            return saveBatch(req, res);
+        }
+
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
@@ -35,7 +43,7 @@ module.exports = app => {
             existsOrError(body.ind_pagto_ap, 'Pagamento de Aviso Prévio Indenizado não informado')
             existsOrError(body.obs, 'Observação não informada')
         }
-         catch (error) {
+        catch (error) {
             return res.status(400).send(error)
         }
 
@@ -100,6 +108,119 @@ module.exports = app => {
         }
     }
 
+    const saveBatch = async (req, res) => {
+        let user = req.user;
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
+        try {
+            // Alçada para edição
+            isMatchOrError(uParams && uParams.cad_servidores >= 3, `${noAccessMsg} "Edição de ${tabela}"`);
+        } catch (error) {
+            return res.status(401).send(error);
+        }
+
+        const { changeUpperCase, removeAccentsObj } = app.api.facilities;
+
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
+        const tabelaServidoresDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.servidores`;
+        const tabelaServVinculoDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.serv_vinculos`;
+
+        const bodyString = req.body.toString();
+        const lines = bodyString.split(/\r?\n/);
+        const bodyInputs = [];
+        let countInsert = 0;
+        let countUpdate = 0;
+        let errorsMsg = [];
+        // Variáveis de controle
+        let cpfTrab = null;
+        let matricula = null;
+        let servVinc = {}
+        // Variáveis do input
+        let mtvDeslig = null;
+        let dtDeslig = null;
+        let indPagtoAPI = null;
+
+        for (const line of lines) {
+            if (line.startsWith('cpfTrab_')) {
+                cpfTrab = line.split('=')[1];
+            } else if (line.startsWith('matricula_')) {
+                matricula = line.split('=')[1];
+                servVinc = await app.db({ 'v': tabelaServVinculoDomain })
+                    .select('v.id')
+                    .join({ 's': tabelaServidoresDomain }, 's.id', '=', 'v.id_serv')
+                    .where(function () {
+                        this.where('v.matricula', matricula)
+                            .andWhere('s.cpf_trab', cpfTrab)
+                            .andWhere('v.ini_valid', '<=', moment().format('YYYY-MM'))
+                    }).first()
+                if (servVinc && servVinc.id)
+                    servVinc = servVinc.id;
+                else {
+                    errorsMsg.push(`Registro de vínculo (CPF: ${cpfTrab} - Matrícula: ${matricula}) não encontrado`);
+                    break;
+                }
+            } else if (line.startsWith('mtvDeslig_')) {
+                mtvDeslig = await getIdParam("mtvDeslig", line.split('=')[1]);
+                if (!mtvDeslig) {
+                    errorsMsg.push(`Motivo desligamento (${line.split('=')[1]}) inválido`);
+                    break;
+                }
+            } else if (line.startsWith('dtDeslig_')) {
+                dtDeslig = line.split('=')[1];
+            } else if (line.startsWith('indPagtoAPI_')) {
+                indPagtoAPI = line.split('=')[1] == 'S' ? 1 : 0;
+                if (servVinc && mtvDeslig && dtDeslig) {
+                    const registro = await app.db(tabelaDomain)
+                        .select('id')
+                        .where({
+                            id_serv_vinc: servVinc,
+                            id_par_mt_dlg: mtvDeslig,
+                            dt_deslig: dtDeslig,
+                        }).first()
+                    currentGroup = {
+                        id: registro ? registro.id : undefined,
+                        status: STATUS_ACTIVE,
+                        evento: 1,
+                        created_at: new Date(),
+                        updated_at: new Date(),
+                        id_serv_vinc: servVinc,
+                        id_par_mt_dlg: mtvDeslig,
+                        dt_deslig: dtDeslig,
+                        ind_pagto_ap: indPagtoAPI
+                    }
+                    bodyInputs.push(currentGroup);
+                }
+            }
+        }
+
+
+        for (let element of bodyInputs) {
+            try {
+                if (element.id) {
+                    delete element.created_at
+                    await app.db(tabelaDomain).update(element).where({ id: element.id })
+                    countUpdate++;
+                } else {
+                    delete element.updated_at
+                    await app.db(tabelaDomain).insert(element)
+                    countInsert++;
+                }
+            } catch (error) {
+                errorsMsg.push(error)
+            }
+        }
+
+        return res.status(countInsert + countUpdate > 0 ? 200 : 201).send({
+            result: {
+                registrosIncluidos: countInsert,
+                registrosAlterados: countUpdate,
+                errors: errorsMsg
+            },
+            bodyInputs
+        })
+
+
+    };
+
     const limit = 20 // usado para paginação
     const get = async (req, res) => {
         let user = req.user
@@ -135,9 +256,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -160,9 +281,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
