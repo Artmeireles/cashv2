@@ -193,6 +193,8 @@ const router = createRouter({
     routes: routes
 });
 
+import { defaultWarn } from '@/toast';
+
 router.beforeEach((to, from, next) => {
     const nameUnblockedRoutes = ['welcome', 'signin', 'signup', 'u-token', 'not-found', 'request-password-reset', 'password-reset'];
     const json = localStorage.getItem(userKey);
@@ -206,11 +208,10 @@ router.beforeEach((to, from, next) => {
             });
         paths.push(element.path);
     });
-    // console.log('router: ', to.path, paths.includes(to.path.split('/:')[0]));
-    // next();
     const matchSize = to.matched.length - 1;
     if (matchSize < 0 || !paths.includes(to.matched[matchSize].path)) next({ path: '/not-found' });
     else if (user && user.id && (to.path == '/signin' || !to.path.startsWith(`/${user.cliente}/${user.dominio}`))) {
+        defaultWarn('O endereço ou operação solicitado não existe ou não está acessível ao seu usuário');
         next({ path: `/${user.cliente}/${user.dominio}/` });
     } else {
         if (!nameUnblockedRoutes.includes(to.name) && !(user && user.id)) next({ path: '/welcome' });
