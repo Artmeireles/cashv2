@@ -1,27 +1,27 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
+import router from '../../router';
 import { defaultSuccess, defaultWarn } from '@/toast';
 import ServidorForm from './ServidorForm.vue';
 
+import { useRoute } from 'vue-router';
 const route = useRoute();
+
 const itemData = ref({});
 const loading = ref(true);
-const urlBase = ref(`${baseApiUrl}/servidores`);
+const urlBase = ref(`${baseApiUrl}/servidores/${route.params.id}`);
 
 const loadData = async () => {
-    itemData.value.id = route.params.id;
-    const url = `${urlBase.value}/${itemData.value.id}`;
-    axios.get(url).then((res) => {
+    axios.get(urlBase.value).then((res) => {
         const body = res.data;
-        if (body && body.data.id) {
-            itemData.value = body.data;
+        if (body && body.id) {
+            itemData.value = body;
             loading.value = false;
         } else {
             defaultWarn('Registro não localizado');
-            history.back();
+            router.push(urlBase.value);
         }
     });
 };

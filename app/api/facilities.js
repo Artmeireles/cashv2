@@ -115,7 +115,7 @@ module.exports = app => {
 
     const getIdRubricas = async (value, schema, perApur) => {
         const tabelaDomain = `${dbPrefix}_${schema.cliente}_${schema.dominio}.fin_rubricas`
-        const param = await app.db(tabelaDomain).select('id')
+        let param = await app.db(tabelaDomain).select('id')
             .where(function () {
                 this.where('cod_rubr', value)
                     .andWhere('ini_valid', '<=', `${perApur.substring(0, 4)}-${perApur.substring(5, 7)}`)

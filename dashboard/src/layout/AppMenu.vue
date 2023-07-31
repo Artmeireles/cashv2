@@ -1,16 +1,18 @@
 <script setup>
 import { ref } from 'vue';
-
 import AppMenuItem from './AppMenuItem.vue';
+import { useUserStore } from '@/stores/user';
+
+const store = useUserStore();
 
 const model = ref([
     {
         // label: 'Home',
-        items: [{ label: 'Início', icon: 'pi pi-fw pi-home', to: '/' }]
+        items: [{ label: 'Início', icon: 'pi pi-fw pi-home', to: `/${store.userStore.cliente}/${store.userStore.dominio}` }]
     },
     {
         label: 'Cadastros',
-        items: [{ label: 'Gestão de Empregados', icon: 'pi pi-fw pi-id-card', to: '/servidores' }]
+        items: [{ label: 'Gestão de Empregados', icon: 'pi pi-fw pi-id-card', to: `/${store.userStore.cliente}/${store.userStore.dominio}/servidores` }]
     },
     {
         label: 'Outros órgãos (link externo)',

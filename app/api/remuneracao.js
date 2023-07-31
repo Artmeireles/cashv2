@@ -163,7 +163,8 @@ module.exports = app => {
       if (line.startsWith('INCLUIRS1207')) beneficiario = true
       else if (line.startsWith('perApur')) {
         perApur = line.split('=')[1];
-        let paramRemun = { 'ano': perApur.substring(0, 4), 'mes': perApur.substring(5, 7), 'complementar': '000' };
+        if (perApur.length == 4) perApur += '-12'
+        let paramRemun = { 'ano': perApur.substring(0, 4), 'mes': (perApur.substring(5, 7) ? perApur.substring(5, 7) : '13'), 'complementar': '000' };
         remunParam = await app.db(tabelaRemunParamDomain).where(paramRemun).first()
         if (remunParam) remunParam = remunParam.id
         else {
@@ -173,7 +174,7 @@ module.exports = app => {
             evento: 1,
             created_at: new Date(),
             ano_inf: perApur.substring(0, 4),
-            mes_inf: perApur.substring(5, 7),
+            mes_inf: (perApur.substring(5, 7) ? perApur.substring(5, 7) : '13'),
             complementar_inf: '000',
             descricao: `Remuneração ${perApur} criada dinamicamente na inclusão de um evento de remuneração do eSocial pelo PonteCashV2`,
           }
@@ -192,6 +193,7 @@ module.exports = app => {
         codRubr = await getIdRubricas(line.split('=')[1], { cliente: uParams.cliente, dominio: uParams.dominio }, perApur);
         if (!codRubr) {
           errorsMsg.push('Rubrica não encontrado');
+          console.log('Rubrica não encontrado: ', line.split('=')[1]);
           break;
         }
       } else if (line.startsWith('qtdRubr_')) {
@@ -202,7 +204,6 @@ module.exports = app => {
         vrRubr = line.split('=')[1];
       } else if (line.startsWith('indApurIR_')) {
         indApurIR = line.split('=')[1];
-
         // Executa update em serv_vinculos ou para a execução (break) caso não seja encontrado
         servVinc = await app.db({ 'v': tabelaServVinculoDomain })
           .select('v.id')
@@ -259,7 +260,6 @@ module.exports = app => {
         bodyRubricas.push(currentGroup);
       }
     }
-
 
     for (let element of bodyRubricas) {
       try {

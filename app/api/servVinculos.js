@@ -83,7 +83,7 @@ module.exports = (app) => {
       body.desc_jornd = bodyRaw.dscJorn_242;
       // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
       if (bodyRaw.id_param_grau_exp) body.id_param_grau_exp = await getIdParam("grauExp", bodyRaw.id_param_grau_exp);
-      body.id_vinc_principal = bodyRaw.id_vinc_principal;
+      body.id_vinc_principal = bodyRaw.id_vinc_principal || body.matricula;
       body.sit_func = bodyRaw.sit_func;
       body.pis = bodyRaw.pis;
       body.dt_pis = bodyRaw.dt_pis;
@@ -181,7 +181,7 @@ module.exports = (app) => {
     body = JSON.parse(JSON.stringify(body), removeAccentsObj);
     body = JSON.parse(JSON.stringify(body), changeUpperCase);
 
-    const tpl = await app.db(tabelaDomain).where({ 'id_serv': body.id_serv, 'ini_valid': body.ini_valid }).first()
+    const tpl = await app.db(tabelaDomain).where({ 'id_serv': body.id_serv, 'ini_valid': body.ini_valid, 'matricula': body.matricula }).first()
     if (tpl && tpl.id) {
       body.id = tpl.id
     }

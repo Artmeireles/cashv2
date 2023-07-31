@@ -29,12 +29,27 @@ module.exports = app => {
         const contentType = req.headers['content-type']
         if (contentType == "text/plain") {
             const bodyRaw = convertESocialTextToJson(req.body)
+            const bodyString = req.body.toString();
+            const lines = bodyString.split(/\r?\n/);
+            // Variáveis de controle
+            let cpfTrab = null;
+            try {
+                for (const line of lines) {
+                    if (line.startsWith('cpfTrab_')) {
+                        cpfTrab = line.split('=')[1];
+                        break;
+                    }
+                }
+            } catch (error) {
+                if (!cpfTrab) throw `CPF não informado`;
+                return res.status(400).send(error)
+            }
             body = {}
-            const tpl = await app.db(tabelaDomain).where({ 'cpf_trab': bodyRaw.cpfTrab_13 }).first()
+            const tpl = await app.db(tabelaDomain).where({ 'cpf_trab': cpfTrab }).first()
             if (tpl && tpl.id) {
                 body.id = tpl.id
             }
-            body.cpf_trab = bodyRaw.cpfTrab_13
+            body.cpf_trab = cpfTrab
             body.nome = bodyRaw.nmTrab_15
             body.id_param_sexo = await getIdParam('sexo', bodyRaw.sexo_16)
             body.id_param_raca_cor = await getIdParam('racaCor', bodyRaw.racaCor_17)
@@ -59,10 +74,9 @@ module.exports = app => {
             body.telefone = bodyRaw.fonePrinc_103
             body.email = bodyRaw.emailPrinc_105
             // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
-            body.mae = bodyRaw.mae
-            body.pai = bodyRaw.pai
-            body.naturalidade = bodyRaw.naturalidade
-            body.dt_nascto = bodyRaw.dt_nascto
+            body.mae = bodyRaw.mae || 'Nome da mão não informado'
+            body.pai = bodyRaw.pai || 'Nome do pai não informado'
+            body.naturalidade = bodyRaw.naturalidade || 'Naturalidade não informada'
         }
 
         body.id_emp = req.params.id_emp
@@ -178,7 +192,6 @@ module.exports = app => {
     const limit = 20 // usado para paginação
     const get = async (req, res) => {
         let user = req.user
-        const id_emp = req.params.id_emp
         const key = req.query.key ? req.query.key.trim() : ''
         let keyCpf = req.query.keyCpf ? req.query.keyCpf : ''
         let keyMat = req.query.keyMat ? req.query.keyMat : ''
@@ -198,44 +211,31 @@ module.exports = app => {
 
         const page = req.query.page || 1
 
-        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-            .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-            .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: req.params.id_emp })
-            .where(function () {
-                this.where({ 'sv.matricula': keyMat })
-                    .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
-                    .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
-            })
+        // let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
+        //     .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
+        //     .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: req.params.id_emp })
+        //     .where(function () {
+        //         this.where({ 'sv.matricula': keyMat })
+        //             .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
+        //             .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
+        //     })
 
-        sql = await app.db.raw(sql.toString())
-        const count = sql[0][0].count
-
-        
-            // registrar o evento na tabela de eventos
-            const { createEvent } = app.api.sisEvents
-            const evento = await createEvent({
-                "request": req,
-                "evento": {
-                    "ip": req.ip,
-                    "id_user": req.user.id,
-                    "evento": `teste de evento: ${req.headers['x-geo-lt']}, ${req.headers['x-geo-ln']}`,
-                    "classevento": `conContratos.createFolder`,
-                    "id_registro": null
-                }
-            })
+        // sql = await app.db.raw(sql.toString())
+        // const count = sql[0][0].count
 
         const ret = app.db({ tbl1: tabelaDomain })
-            .select('tbl1.*', 'sv.matricula')
+            .select('tbl1.id', 'tbl1.cpf_trab', 'tbl1.nome', 'sv.matricula')
             .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-            .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: req.params.id_emp })
+            .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: uParams.id_emp })
             .where(function () {
                 this.where({ 'sv.matricula': keyMat })
                     .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
                     .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
             })
-        ret.orderBy('nome').limit(limit).offset(page * limit - limit)
+        ret.orderBy('nome')//.limit(limit).offset(page * limit - limit)
         ret.then(body => {
-            return res.json({ data: body, count, limit })
+            // return res.json({ data: body, count, limit })
+            return res.json({ data: body })
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })

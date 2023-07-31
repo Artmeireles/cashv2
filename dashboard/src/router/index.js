@@ -8,17 +8,17 @@ const routes = [
         component: AppLayout,
         children: [
             {
-                path: '/',
+                path: '/:client/:domain',
                 name: 'dashboard',
                 component: () => import('@/views/Dashboard.vue')
             },
             {
-                path: '/servidores',
+                path: '/:client/:domain/servidores',
                 name: 'servidores',
                 component: () => import('@/views/servidores/ServidoresGrid.vue')
             },
             {
-                path: '/servidores/:id',
+                path: '/:client/:domain/servidores/:id',
                 name: 'servidor',
                 component: () => import('@/views/servidores/ServidorPanel.vue')
             },
@@ -210,8 +210,9 @@ router.beforeEach((to, from, next) => {
     // next();
     const matchSize = to.matched.length - 1;
     if (matchSize < 0 || !paths.includes(to.matched[matchSize].path)) next({ path: '/not-found' });
-    else if (user && user.id && to.path == '/signin') next({ path: '/' });
-    else {
+    else if (user && user.id && (to.path == '/signin' || !to.path.startsWith(`/${user.cliente}/${user.dominio}`))) {
+        next({ path: `/${user.cliente}/${user.dominio}/` });
+    } else {
         if (!nameUnblockedRoutes.includes(to.name) && !(user && user.id)) next({ path: '/welcome' });
         else next();
     }

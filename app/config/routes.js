@@ -183,11 +183,11 @@ module.exports = app => {
         .get(app.api.finRubricas.getById)
         .delete(app.api.finRubricas.remove)
 
-    app.route('/servidores/:id_emp')
+    app.route('/servidores')
         .all(app.config.passport.authenticate())
         .post(app.api.servidores.save)
         .get(app.api.servidores.get)
-    app.route('/servidores/:id_emp/:id')
+    app.route('/servidores/:id')
         .all(app.config.passport.authenticate())
         .put(app.api.servidores.save)
         .get(app.api.servidores.getById)

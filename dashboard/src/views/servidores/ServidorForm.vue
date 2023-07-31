@@ -4,6 +4,9 @@ import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess, defaultWarn } from '@/toast';
 
+import { useRoute } from 'vue-router';
+const route = useRoute();
+
 const dropdownItems = ref([
     { name: 'Option 1', code: 'Option 1' },
     { name: 'Option 2', code: 'Option 2' },
@@ -13,15 +16,14 @@ const dropdownItem = ref(null);
 const itemData = ref({});
 const loading = ref(true);
 const urlBase = ref(`${baseApiUrl}/servidores`);
-const props = defineProps(['itemData']);
 
 const loadData = async () => {
-    console.log(props.itemData);
-    const url = `${urlBase.value}/${props.itemData.id}`;
+    itemData.value.id = route.params.id;
+    const url = `${urlBase.value}/${itemData.value.id}`;
     axios.get(url).then((res) => {
         const body = res.data;
-        if (body && body.data.id) {
-            itemData.value = body.data;
+        if (body && body.id) {
+            itemData.value = body;
             loading.value = false;
         } else {
             defaultWarn('Registro não localizado');

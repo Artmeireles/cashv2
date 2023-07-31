@@ -65,7 +65,7 @@ const items = ref([
         label: 'Editar',
         icon: 'pi pi-pencil',
         command: () => {
-            router.push({ path: `/servidores/${itemData.value.id}` });
+            router.push({ path: `/${store.userStore.cliente}/${store.userStore.dominio}/servidores/${itemData.value.id}` });
         }
     },
     {
@@ -88,13 +88,11 @@ const toggle = (event) => {
 };
 const getItem = (data) => {
     itemData.value = data;
+    console.log(itemData);
 };
 const loadData = () => {
-    axios.get(`${urlBase.value}/${store.userStore.id_emp}`).then((axiosRes) => {
+    axios.get(`${urlBase.value}`).then((axiosRes) => {
         gridData.value = axiosRes.data.data;
-        gridData.value.forEach((element) => {
-            element.matricula = element.matricula.toString().padStart(8, '0');
-        });
         loading.value = false;
     });
 };
@@ -171,9 +169,9 @@ onMounted(() => {
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nome" />
                 </template>
             </Column>
-            <Column field="cpf" header="CPF" sortable style="min-width: 14rem">
+            <Column field="cpf_trab" header="CPF" sortable style="min-width: 14rem">
                 <template #body="{ data }">
-                    {{ data.cpf }}
+                    {{ data.cpf_trab }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por CPF" />
