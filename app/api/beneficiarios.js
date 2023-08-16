@@ -5,6 +5,7 @@ const { dbPrefix } = require("../.env")
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, cpfOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
+    const { convertESocialTextToJson, getIdParam, getIdCidade } = app.api.facilities
     const tabela = 'beneficiarios'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
@@ -14,16 +15,60 @@ module.exports = app => {
         const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         let body = { ...req.body }
         if (req.params.id) body.id = req.params.id
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         try {
             // Alçada para edição
             if (body.id)
-                isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Edição de ${tabela}"`)
+                isMatchOrError(uParams && uParams.cad_servidores >= 3, `${noAccessMsg} "Edição de ${tabela}"`)
             // Alçada para inclusão
-            else isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
+            else isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+        const contentType = req.headers['content-type']
+        if (contentType == "text/plain") {
+            const bodyRaw = convertESocialTextToJson(req.body)
+            //return res.send(bodyRaw)
+            const bodyString = req.body.toString();
+            const lines = bodyString.split(/\r?\n/);
+            // Variáveis de controle
+            let cpfBenef = null;
+            try {
+                for (const line of lines) {
+                    if (line.startsWith('cpfBenef_')) {
+                        cpfBenef = line.split('=')[1];
+                        break;
+                    }
+                }
+            } catch (error) {
+                if (!cpfBenef) throw `CPF não informado`;
+                return res.status(400).send(error)
+            }
+            body = {}
+            const tpl = await app.db(tabelaDomain).where({ 'cpf_benef': cpfBenef }).first()
+            if (tpl && tpl.id) {
+                body.id = tpl.id
+            }
+            body.id_emp = bodyRaw.id_emp
+            body.cpf_benef = bodyRaw.cpfBenef_10
+            body.nome = bodyRaw.nmBenefic_11
+            body.dt_nascto = bodyRaw.dtNascto_12
+            body.dt_inicio = bodyRaw.dtInicio_13
+            body.id_param_sexo = await getIdParam('sexo', bodyRaw.sexo_14)
+            body.id_param_raca_cor = await getIdParam('racaCor', bodyRaw.racaCor_15)
+            body.id_param_est_civ = await getIdParam('estCiv', bodyRaw.estCiv_16)
+            body.inc_fis_men = bodyRaw.incFisMen_17
+            //body.dt_inc_fis = bodyRaw.incFisMen_17
+            body.id_param_tplograd = await getIdParam('tpLograd', bodyRaw.tpLograd_19)
+            body.id_cidade = await getIdCidade(bodyRaw.codMunic_25)
+            body.cep = bodyRaw.cep_24
+            body.logradouro = bodyRaw.dscLograd_20
+            body.bairro = bodyRaw.bairro_23
+            body.nr = bodyRaw.nrLograd_21
+            body.complemento = bodyRaw.complemento_22
+        }
+        //body.id_emp = req.params.id_emp
+        
 
         try {
             existsOrError(body.id_emp, 'Órgão não informado')
@@ -55,6 +100,8 @@ module.exports = app => {
                 notExistsOrError(dataFromDB, 'Combinação de CPF já cadastrado')
         }
     } catch (error) {
+        
+        console.log(body.id_emp);
             return res.status(400).send(error)
         }
 
@@ -136,7 +183,7 @@ module.exports = app => {
             keyCpf = key.replace(/([^\d])+/gim, "").length <= 11 ? key.replace(/([^\d])+/gim, "") : ''
             keyMat = key.replace(/([^\d])+/gim, "").length <= 8 ? key.replace(/([^\d])+/gim, "").padStart(8, '0') : ''
         }
-        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
         try {
             // Alçada para exibição
             isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de financeiros"`)
@@ -148,22 +195,22 @@ module.exports = app => {
 
         const page = req.query.page || 1
 
-        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-            .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-            .where({ 'tbl1.status': STATUS_ACTIVE })
-            .where(function () {
-                this.where({ 'sv.matricula': keyMat })
-                    .orWhere(app.db.raw(`tbl1.cpf_benef like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
-                    .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
-            })
+        // let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
+        //     .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
+        //     .where({ 'tbl1.status': STATUS_ACTIVE })
+        //     .where(function () {
+        //         this.where({ 'sv.matricula': keyMat })
+        //             .orWhere(app.db.raw(`tbl1.cpf_benef like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
+        //             .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
+        //     })
 
-        sql = await app.db.raw(sql.toString())
-        const count = sql[0][0].count
+        // sql = await app.db.raw(sql.toString())
+        // const count = sql[0][0].count
 
         const ret = app.db({ tbl1: tabelaDomain })
             .select('tbl1.*', 'sv.matricula')
             .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-            .where({ 'tbl1.status': STATUS_ACTIVE })
+            .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: uParams.id_emp })
             .where(function () {
                 this.where({ 'sv.matricula': keyMat })
                     .orWhere(app.db.raw(`tbl1.cpf_benef like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
@@ -171,7 +218,7 @@ module.exports = app => {
             })
         ret.orderBy('nome').limit(limit).offset(page * limit - limit)
         ret.then(body => {
-            return res.json({ data: body, count, limit })
+            return res.json({ data: body, limit })
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })

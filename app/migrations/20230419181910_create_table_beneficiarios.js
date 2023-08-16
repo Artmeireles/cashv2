@@ -16,7 +16,7 @@ exports.up = function(knex) {
         table.integer('id_param_sexo').notNull().unsigned().comment("Sexo")
         table.integer('id_param_raca_cor').notNull().unsigned().comment("Raça/ Cor")
         table.integer('id_param_est_civ').notNull().unsigned().comment("Estado Civil")
-        table.boolean('inc_fis_men').notNull().comment("Doença incapacitante")
+        table.string('inc_fis_men', 1).notNull().comment("Doença incapacitante")
         table.specificType('dt_inc_fis', 'char(10)').comment("Data reconhecimento da incapacidade")
         table.integer('id_param_tplograd').notNull().unsigned().comment("Tipo de Logradouro")
         table.integer('id_cidade').notNull().unsigned().comment("Cidade")

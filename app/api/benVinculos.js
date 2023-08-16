@@ -4,29 +4,58 @@ const { dbPrefix } = require("../.env")
 
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
-    const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'ben_vinculos'
-    const STATUS_ACTIVE = 10
-    const STATUS_DELETE = 99
+    const { mailyCliSender } = app.api.mailerCli;
+    const { convertESocialTextToJson, getIdParam } = app.api.facilities;
+    const tabela = 'ben_vinculos';
+    const STATUS_ACTIVE = 10;
+    const STATUS_DELETE = 99;
 
     const save = async (req, res) => {
-        let user = req.user
+        let user = req.user;
         const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
-        let body = { ...req.body }
+        let body = { ...req.body };
+        if (req.params.id) body.id = req.params.id;
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
+        const tabelaBeneficiariosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.beneficiarios`;
+
         delete body.id_benef
         body.id_benef = req.params.id_benef
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
             if (body.id)
-                isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Edição de ${tabela}"`)
+                isMatchOrError(uParams && uParams.cad_servidores >= 3, `${noAccessMsg} "Edição de ${tabela}"`)
             // Alçada para inclusão
-            else isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
+            else isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
         } catch (error) {
-            return res.status(401).send(error)
+            return res.status(401).send(error);
         }
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
+        body.id_benef = req.params.id_benef
+
+    const contentType = req.headers["content-type"];
+    if (contentType == "text/plain") {
+      const bodyRaw = convertESocialTextToJson(req.body);
+      // return res.send(bodyRaw)
+      body = {};
+      const id_benef = await app.db(tabelaBeneficiariosDomain).select('id').where({ cpf_benef: bodyRaw.cpfBenef_10 }).first();
+      try {
+        existsOrError(id_benef, `Beneficiário não encontrado`)
+      } catch (error) {
+        console.log(error);
+        return res.status(400).send(error);
+      }
+      body.id_benef = id_benef.id
+      body.nr_beneficio = bodyRaw.nrBeneficio_15;
+      body.dt_ini_benef = bodyRaw.dtIniBeneficio_16;
+      body.id_param_tp_benef = await getIdParam("tpBenef", bodyRaw.tpBeneficio_18);
+      body.tp_plan_rp = bodyRaw.tpPlanRP_19 || "0";
+      // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
+      body.tp_pen_morte = bodyRaw.tp_pen_morte || 'Tipo de pensão por morte não informado'
+      body.cpf_inst = bodyRaw.cpf_inst || 'CPF do instituidor não informado'
+      body.dt_inst = bodyRaw.dt_inst || 'Data de óbito do instituidor não informado'
+    }
+    
         try {
             //existsOrError(body.id_benef, ' não informada')
             existsOrError(body.nr_beneficio, 'Número do Benefício não informada')
