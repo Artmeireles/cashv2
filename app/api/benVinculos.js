@@ -47,7 +47,6 @@ module.exports = app => {
       }
       body.id_benef = id_benef.id
       body.nr_beneficio = bodyRaw.nrBeneficio_15;
-      body.dt_ini_benef = bodyRaw.dtIniBeneficio_16;
       body.id_param_tp_benef = await getIdParam("tpBenef", bodyRaw.tpBeneficio_18);
       body.tp_plan_rp = bodyRaw.tpPlanRP_19 || "0";
       // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2

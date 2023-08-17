@@ -17,6 +17,7 @@ module.exports = app => {
         if (req.params.id) body.id = req.params.id;
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
         const tabelaBenVinculosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.ben_vinculos`;
+
         delete body.id_ben_vinc
         body.id_ben_vinc = req.params.id_ben_vinc
         if (req.params.id) body.id = req.params.id
@@ -31,12 +32,12 @@ module.exports = app => {
         }
             body.id_ben_vinc = req.params.id_ben_vinc
 
-            const contentType = req.headers["content-type"];
+    const contentType = req.headers["content-type"];
     if (contentType == "text/plain") {
       const bodyRaw = convertESocialTextToJson(req.body);
-      // return res.send(bodyRaw)
+      //return res.send(bodyRaw)
       body = {};
-      const id_ben_vinc = await app.db(tabelaBenVinculosDomain).select('id').where({ id_ben_vinc: bodyRaw.cpfBenef_15 }).first();
+      const id_ben_vinc = await app.db(tabelaBenVinculosDomain).select('id').where({ id_benef: bodyRaw.cpfBenef_15 }).first();
       try {
         existsOrError(id_ben_vinc, `Benefício não encontrado`)
       } catch (error) {
