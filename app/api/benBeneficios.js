@@ -37,7 +37,7 @@ module.exports = app => {
       const bodyRaw = convertESocialTextToJson(req.body);
       //return res.send(bodyRaw)
       body = {};
-      const id_ben_vinc = await app.db(tabelaBenVinculosDomain).select('id').where({ id_benef: bodyRaw.cpfBenef_15 }).first();
+      const id_ben_vinc = await app.db(tabelaBenVinculosDomain).select('id').where({ id_ben_vinc: bodyRaw.id_benef }).first();
       try {
         existsOrError(id_ben_vinc, `Benefício não encontrado`)
       } catch (error) {

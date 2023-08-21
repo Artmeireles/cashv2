@@ -4,28 +4,36 @@ const { dbPrefix } = require("../.env")
 
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError, cpfOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
-    const { mailyCliSender } = app.api.mailerCli
+    const { mailyCliSender } = app.api.mailerCli;
+    const { convertESocialTextToJson, getIdParam, countOccurrences } = app.api.facilities;
     const tabela = 'ben_dependentes'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
     const save = async (req, res) => {
-        let user = req.user
+        let user = req.user;
         const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
-        let body = { ...req.body }
-        delete body.id_benef
-        body.id_benef = req.params.id_benef
-        if (req.params.id) body.id = req.params.id
+        let body = { ...req.body };
+        delete body.id
+        const id_benef = req.params.id_benef;
+        if (req.params.id) body.id = req.params.id;
         try {
             // Alçada para edição
             if (body.id)
-                isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Edição de ${tabela}"`)
+                isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Edição de ${tabela}"`);
             // Alçada para inclusão
-            else isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
+            else isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`);
         } catch (error) {
             return res.status(401).send(error)
         }
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+         // Se a requisicao for do tipo text/plain, enviar para o saveBatch
+    const contentType = req.headers["content-type"];
+    if (contentType == "text/plain") {
+      return saveBatch(req, res);
+    }
+
+    // return res.send(body)
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
 
         try {
             existsOrError(body.id_param_tp_dep, 'Tipo do Dependente não informado')
@@ -55,7 +63,8 @@ module.exports = app => {
             return res.status(400).send(error)
         }
 
-        delete body.hash
+        delete body.hash;
+        body.id_benef = id_benef;
 
         const { changeUpperCase, removeAccentsObj } = app.api.facilities
         body = (JSON.parse(JSON.stringify(body), removeAccentsObj));
@@ -82,7 +91,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('Dependente não encontrado')
+                else res.status(200).send('Dependente não foi encontrado')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
