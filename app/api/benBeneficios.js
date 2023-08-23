@@ -17,6 +17,7 @@ module.exports = app => {
         if (req.params.id) body.id = req.params.id;
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
         const tabelaBenVinculosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.ben_vinculos`;
+        //const tabelaBeneficiariosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.beneficiarios`;
 
         delete body.id_ben_vinc
         body.id_ben_vinc = req.params.id_ben_vinc
@@ -37,14 +38,15 @@ module.exports = app => {
       const bodyRaw = convertESocialTextToJson(req.body);
       //return res.send(bodyRaw)
       body = {};
-      const id_ben_vinc = await app.db(tabelaBenVinculosDomain).select('id').where({ id_ben_vinc: bodyRaw.id_benef }).first();
+      const id_ben_vinc = await app.db(tabelaBenVinculosDomain).select('id').where({ id_benef: bodyRaw.id_benef }).first();
+      console.log(bodyRaw.id_benef);
       try {
         existsOrError(id_ben_vinc, `Benefício não encontrado`)
       } catch (error) {
-        console.log(error);
+        console.log('aqui', error);
         return res.status(400).send(error);
       }
-      body.id_emp = id_emp.id
+      body.id_emp = bodyRaw.id_emp.id
       body.id_ben_vinc = bodyRaw.id_ben_vinc;
       body.id_rubrica = bodyRaw.id_rubrica;
       body.ide_dm_dev = bodyRaw.ide_dm_dev;
