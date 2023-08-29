@@ -26,6 +26,8 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
+
+        // Recepção do eSocial
         const contentType = req.headers['content-type']
         if (contentType == "text/plain") {
             const bodyRaw = convertESocialTextToJson(req.body)
@@ -79,7 +81,8 @@ module.exports = app => {
             body.naturalidade = bodyRaw.naturalidade || 'Naturalidade não informada'
         }
 
-        body.id_emp = req.params.id_emp
+        if(!body.id_emp) body.id_emp = req.params.id_emp
+        delete body.uf
         try {
             existsOrError(body.id_emp, 'Órgão não informado')
             existsOrError(body.cpf_trab, 'CPF do Trabalhador não informado')
@@ -106,7 +109,7 @@ module.exports = app => {
             existsOrError(body.bairro, 'Bairro não informado')
             existsOrError(body.nr, 'Número não informado')
             existsOrError(body.logradouro, 'Logradouro não informado')
-            existsOrError(body.reab_readap, 'Reabilitado/Readaptado não informado')
+            existsOrError(String(body.reab_readap), 'Reabilitado/Readaptado não informado')
             existsOrError(body.mae, 'Nome da Mãe não informado')
             existsOrError(body.naturalidade, 'Naturalidade não informada')
             if (body.cpf_trab) {
@@ -211,18 +214,6 @@ module.exports = app => {
 
         const page = req.query.page || 1
 
-        // let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-        //     .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-        //     .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: req.params.id_emp })
-        //     .where(function () {
-        //         this.where({ 'sv.matricula': keyMat })
-        //             .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
-        //             .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
-        //     })
-
-        // sql = await app.db.raw(sql.toString())
-        // const count = sql[0][0].count
-
         const ret = app.db({ tbl1: tabelaDomain })
             .select('tbl1.id', 'tbl1.cpf_trab', 'tbl1.nome', 'sv.matricula')
             .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
@@ -232,9 +223,8 @@ module.exports = app => {
                     .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
                     .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
             })
-        ret.orderBy('nome')//.limit(limit).offset(page * limit - limit)
+        ret.orderBy('nome')
         ret.then(body => {
-            // return res.json({ data: body, count, limit })
             return res.json({ data: body })
         })
             .catch(error => {

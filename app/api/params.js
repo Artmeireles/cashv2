@@ -123,9 +123,9 @@ module.exports = app => {
             .then(ret => res.status(200).send({ data: ret[0] }))
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -138,11 +138,54 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
+
+    const getByFunction = async (req, res) => {
+        const func = req.params.func
+        switch (func) {
+            case 'gbf':
+                getByField(req, res)
+                break;
+            default:
+                res.status(404).send('Função inexitente')
+                break;
+        }
+    }
+
+    const getByField = async (req, res) => {
+        const fieldName = req.query.fld
+        const value = req.query.vl
+        const select = req.query.slct
+
+        const first = req.query.first && req.params.first == true
+        const ret = app.db(tabela)
+
+        if (select) {
+            // separar os campos e retirar os espaços
+            const selectArr = select.split(',').map(s => s.trim())
+            ret.select(selectArr)
+        }
+
+        ret.where(app.db.raw(`${fieldName} = '${value}'`))
+            .where({ status: STATUS_ACTIVE })
+
+        if (first) {
+            ret.first()
+        }
+
+        ret.then(body => {
+            return res.json({ data: body })
+        }).catch(error => {
+            app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
+            return res.status(500).send(error)
+        })
+    }
+
+
 
     const getPonteId = async (req, res) => {
         const ret = app.db(tabela)
@@ -153,9 +196,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -168,9 +211,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -183,9 +226,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -198,9 +241,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -245,5 +288,5 @@ module.exports = app => {
         }
     }
 
-    return { save, remove, get, getById, getPonteId, getSiapId, getESocialId, getESocialJarId }
+    return { save, remove, get, getById, getByFunction, getPonteId, getSiapId, getESocialId, getESocialJarId }
 }

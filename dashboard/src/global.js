@@ -57,13 +57,67 @@ export function capitalizeFirst(value) {
 }
 
 export function titleCase(str) {
-    let splitStr = str.toLowerCase().split(' ');
-    const pular = ['de', 'da', ''];
-    for (var i = 0; i < splitStr.length; i++) {
-        if (!pular.includes(splitStr[i])) splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
-    }
-    return splitStr.join(' ');
+    if (str) {
+        let splitStr = str.toLowerCase().split(' ');
+        const pular = ['de', 'da', 'do', 'e'];
+        for (var i = 0; i < splitStr.length; i++) {
+            if (!pular.includes(splitStr[i])) splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+        }
+        return splitStr.join(' ');
+    } else return str;
 }
+
+// TODO: criar uma função que converta de string "0" ou "1" para booleano
+export function stringToBoolean(string) {
+    switch (string.toLowerCase().trim()) {
+        case '1':
+            return true;
+        case '0':
+            return false;
+        default:
+            return undefined;
+    }
+}
+
+// Um array com todos os estados do Brasil
+export const UFS = [
+    { value: 'AC', label: 'Acre' },
+    { value: 'AL', label: 'Alagoas' },
+    { value: 'AP', label: 'Amapá' },
+    { value: 'AM', label: 'Amazonas' },
+    { value: 'BA', label: 'Bahia' },
+    { value: 'CE', label: 'Ceará' },
+    { value: 'DF', label: 'Distrito Federal' },
+    { value: 'ES', label: 'Espírito Santo' },
+    { value: 'GO', label: 'Goiás' },
+    { value: 'AC', label: 'Acre-AC' },
+    { value: 'AL', label: 'Alagoas-AL' },
+    { value: 'AM', label: 'Amazonas-AM' },
+    { value: 'AP', label: 'Amapa-AP' },
+    { value: 'BA', label: 'Bahia-BA' },
+    { value: 'CE', label: 'Ceara-CE' },
+    { value: 'DF', label: 'Distrito Federal-DF' },
+    { value: 'ES', label: 'Espirito Santo-ES' },
+    { value: 'GO', label: 'Goias-GO' },
+    { value: 'MA', label: 'Maranhao-MA' },
+    { value: 'MG', label: 'Minas Gerais-MG' },
+    { value: 'MS', label: 'Mato Grosso do Sul-MS' },
+    { value: 'MT', label: 'Mato Grosso-MT' },
+    { value: 'PA', label: 'Para-PA' },
+    { value: 'PB', label: 'Paraiba-PB' },
+    { value: 'PE', label: 'Pernambuco-PE' },
+    { value: 'PI', label: 'Piaui-PI' },
+    { value: 'PR', label: 'Parana-PR' },
+    { value: 'RJ', label: 'Rio de Janeiro-RJ' },
+    { value: 'RN', label: 'Rio Grande do Norte-RN' },
+    { value: 'RO', label: 'Rondonia-RO' },
+    { value: 'RR', label: 'Roraima-RR' },
+    { value: 'RS', label: 'Rio Grande do Sul-RS' },
+    { value: 'SC', label: 'Santa Catarina-SC' },
+    { value: 'SE', label: 'Sergipe-SE' },
+    { value: 'SP', label: 'Sao Paulo-SP' },
+    { value: 'TO', label: 'Tocantins-TO' }
+];
 
 /**
  * Tipos possívels de status de usuários
@@ -90,6 +144,7 @@ export default {
     downloadFile,
     setValidCep,
     titleCase,
+    stringToBoolean,
     STATUS_INACTIVE,
     STATUS_WAITING,
     STATUS_SUSPENDED_BY_TKN,
@@ -98,5 +153,6 @@ export default {
     STATUS_PASS_EXPIRED,
     STATUS_DELETE,
     MINIMUM_KEYS_BEFORE_CHANGE,
-    TOKEN_VALIDE_MINUTES
+    TOKEN_VALIDE_MINUTES,
+    UFS
 };

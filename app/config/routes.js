@@ -32,7 +32,6 @@ module.exports = app => {
     // Rotas utilizadas para envio do token por SMS e email
     app.route('/user-sms-unlock').patch(app.api.user.smsToken)
     app.route('/user-mail-unlock').patch(app.api.user.mailyToken)
-
     app.route('/users')
         .all(app.config.passport.authenticate())
         .post(gestor(app.api.user.save))
@@ -57,6 +56,12 @@ module.exports = app => {
     /**
      * Rotas administrativas
      */
+    app.route('/cidades').all(app.config.passport.authenticate()).get(app.api.cidades.getListaCidades)
+    app.route('/cidades-uf').all(app.config.passport.authenticate()).get(app.api.cidades.getUFByCidade)
+
+    /**
+     * Rotas administrativas
+     */
     app.route('/sis-events')
         .all(app.config.passport.authenticate())
         .post(app.api.sisEvents.createEventUpd)
@@ -68,6 +73,9 @@ module.exports = app => {
         .all(app.config.passport.authenticate())
         .post(app.api.params.save)
         .get(app.api.params.get)
+    app.route('/params/f-a/:func')
+        .all(app.config.passport.authenticate())
+        .get(app.api.params.getByFunction)
     app.route('/params/:id')
         .all(app.config.passport.authenticate())
         .put(app.api.params.save)
