@@ -3,29 +3,52 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, cnpjOrError, isMatchOrError, noAccessMsg } = app.api.validation
-    const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'ben_beneficios'
-    const STATUS_ACTIVE = 10
-    const STATUS_DELETE = 99
+    const { existsOrError, notExistsOrError, equalsOrError, cnpjOrError, isMatchOrError, noAccessMsg, isParamOrError } = app.api.validation
+    const { mailyCliSender } = app.api.mailerCli;
+    const { convertESocialTextToJson, getIdParam } = app.api.facilities;
+    const tabela = 'ben_beneficios';
+    const STATUS_ACTIVE = 10;
+    const STATUS_DELETE = 99;
 
     const save = async (req, res) => {
-        let user = req.user
+        let user = req.user;
         const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
-        const body = { ...req.body }
+        let body = { ...req.body };
+        if (req.params.id) body.id = req.params.id;
+        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
+        const tabelaBenVinculosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.ben_vinculos`;
+
         delete body.id_ben_vinc
         body.id_ben_vinc = req.params.id_ben_vinc
         if (req.params.id) body.id = req.params.id
         try {
             // Alçada para edição
             if (body.id)
-                isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Edição de ${tabela}"`)
+                isMatchOrError(uParams && uParams.cad_servidores >= 3, `${noAccessMsg} "Edição de ${tabela}"`)
             // Alçada para inclusão
-            else isMatchOrError(uParams && uParams.admin >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
+            else isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`)
         } catch (error) {
-            return res.status(401).send(error)
+            return res.status(401).send(error);
         }
-        const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
+            body.id_ben_vinc = req.params.id_ben_vinc
+
+    const contentType = req.headers["content-type"];
+    if (contentType == "text/plain") {
+      const bodyRaw = convertESocialTextToJson(req.body);
+      //return res.send(bodyRaw)
+      body = {};
+      const id_ben_vinc = await app.db(tabelaBenVinculosDomain).select('id').where({ id_ben_vinc: bodyRaw.id_ben_vinc }).first();
+      //console.log(bodyRaw.id_benef);
+      try {
+        existsOrError(id_ben_vinc, `Benefício não encontrado`)
+      } catch (error) {
+        return res.status(400).send(error);
+      }
+      body.id_emp = id_emp.id
+      body.id_ben_vinc = id_ben_vinc;
+      body.id_rubrica = id_rubrica;
+      body.ide_dm_dev = ide_dm_dev;
+        }
 
         try {
             //existsOrError(body.id_ben_vinc, 'Vinculo não informado')
@@ -36,6 +59,9 @@ module.exports = app => {
          catch (error) {
             return res.status(400).send(error)
         }
+        const { changeUpperCase, removeAccentsObj } = app.api.facilities
+        body = (JSON.parse(JSON.stringify(body), removeAccentsObj));
+        body = (JSON.parse(JSON.stringify(body), changeUpperCase));
 
         if (body.id) {
             // Variáveis da edição de um registro

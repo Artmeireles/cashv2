@@ -16,3 +16,63 @@ ben_beneficios(		1207
             "id_rub":"1", 
             "ide_dm_dev":"20/04/2023"
 }
+
+{
+    "cpfcnpjtransmissor": "04358384000170",
+    "cpfcnpjempregador": "04358384000170",
+    "idgrupoeventos": "3",
+    "versaomanual": "S.01.01.00",
+    "ambiente": "1",
+    "INCLUIRS1207": "",
+    "indRetif_4": "1",
+    "nrRecibo_5": "",
+    "indApuracao_6": "1",
+    "perApur_7": "2023-04",
+    "tpAmb_8": "1",
+    "procEmi_9": "1",
+    "verProc_10": "S.01.01.00",
+    "tpInsc_12": "1",
+    "nrInsc_13": "04358384",
+    "cpfBenef_15": "81573952400",
+    "INCLUIRDMDEV_50": "",
+    "ideDmDev_19": "04/2023",
+    "nrBeneficio_18": "00000092",
+    "SALVARDMDEV_50": "",
+    "INCLUIRIDEESTAB_51": "",
+    "tpInsc_20": "1",
+    "nrInsc_21": "04358384000170",
+    "SALVARIDEESTAB_51": "",
+    "INCLUIRITENSREMUN_52": [
+        "",
+        ""
+    ],
+    "codRubr_22": [
+        "001",
+        "193"
+    ],
+    "ideTabRubr_23": [
+        "001",
+        "193"
+    ],
+    "qtdRubr_24": [
+        "",
+        ""
+    ],
+    "fatorRubr_25": [
+        "1",
+        "1"
+    ],
+    "vrRubr_26": [
+        "1302",
+        "390.6"
+    ],
+    "indApurIR_27": [
+        "1",
+        "1"
+    ],
+    "SALVARITENSREMUN_52": [
+        "",
+        ""
+    ],
+    "SALVARS1207": ""
+}

@@ -17,3 +17,37 @@ beneficiarios( 2400
 	nr
 	complemento
 )
+
+
+{
+    "cpfcnpjtransmissor": "04358384000170",
+    "cpfcnpjempregador": "04358384000170",
+    "idgrupoeventos": "2",
+    "versaomanual": "S.01.00.00",
+    "ambiente": "1",
+    "INCLUIRS2400": "",
+    "indRetif_3": "1",
+    "nrRecibo_4": "",
+    "tpAmb_5": "1",
+    "procEmi_6": "1",
+    "verProc_7": "S-1.0",
+    "tpInsc_8": "1",
+    "nrInsc_9": "04358384",
+    "cpfBenef_10": "72368730478",
+    "nmBenefic_11": "MARIA MAURA CORREIA DOS SANTOS",
+    "dtNascto_12": "1970-03-11",
+    "dtInicio_13": "2022-11-01",
+    "sexo_14": "F",
+    "racaCor_15": "3",
+    "estCiv_16": "2",
+    "incFisMen_17": "N",
+    "tpLograd_19": "R",
+    "dscLograd_20": "AVENIDA ELISIO MAIA",
+    "nrLograd_21": "1003",
+    "complemento_22": "",
+    "bairro_23": "CENTRO",
+    "cep_24": "57445000",
+    "codMunic_25": "2708402",
+    "uf_26": "AL",
+    "SALVARS2400": ""
+}
