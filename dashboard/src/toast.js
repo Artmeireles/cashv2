@@ -1,12 +1,12 @@
 import { app } from './main';
 
-export function defaultToast(msg, severity) {
+export function defaultToast(msg, severity, clear) {
     let severityRes = severity || 'success';
     let msgTimeLife = 1;
     if (typeof msg == 'string') msgTimeLife = msg.split(' ').length;
     else console.log(msg);
 
-    app.config.globalProperties.$toast.removeAllGroups();
+    if (clear) app.config.globalProperties.$toast.removeAllGroups();
     if (typeof msg == 'object') {
         const lengths = [];
         msg.forEach((element) => {
@@ -21,18 +21,18 @@ export function defaultToast(msg, severity) {
     }
 }
 
-export function defaultSuccess(msg) {
-    return defaultToast(msg, 'success');
+export function defaultSuccess(msg, clear) {
+    return defaultToast(msg, 'success', clear);
 }
 
-export function defaultInfo(msg) {
-    return defaultToast(msg, 'info');
+export function defaultInfo(msg, clear) {
+    return defaultToast(msg, 'info', clear);
 }
 
-export function defaultError(msg) {
-    return defaultToast(msg, 'error');
+export function defaultError(msg, clear) {
+    return defaultToast(msg, 'error', clear);
 }
 
-export function defaultWarn(msg) {
-    return defaultToast(msg, 'warn');
+export function defaultWarn(msg, clear) {
+    return defaultToast(msg, 'warn', clear);
 }

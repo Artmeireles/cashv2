@@ -23,7 +23,7 @@ const initFilters = () => {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         matricula: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        cpf: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        cpf_trab: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 
@@ -60,7 +60,7 @@ const clearFilter = () => {
 //             return null;
 //     }
 // };
-const items = ref([
+const itemsButtons = ref([
     {
         label: 'Editar',
         icon: 'pi pi-pencil',
@@ -88,7 +88,6 @@ const toggle = (event) => {
 };
 const getItem = (data) => {
     itemData.value = data;
-    console.log(itemData);
 };
 const loadData = () => {
     axios.get(`${urlBase.value}`).then((axiosRes) => {
@@ -98,10 +97,11 @@ const loadData = () => {
 };
 onBeforeMount(() => {
     initFilters();
-});
-onMounted(() => {
     loadData();
 });
+// onMounted(() => {
+//     loadData();
+// });
 </script>
 
 <template>
@@ -117,7 +117,7 @@ onMounted(() => {
                     <Skeleton></Skeleton>
                 </template>
             </Column>
-            <Column field="cpf" header="CPF" style="min-width: 14rem">
+            <Column field="cpf_trab" header="CPF" style="min-width: 14rem">
                 <template #body>
                     <Skeleton></Skeleton>
                 </template>
@@ -141,7 +141,7 @@ onMounted(() => {
             :loading="loading"
             :filters="filters"
             responsiveLayout="scroll"
-            :globalFilterFields="['matricula', 'nome', 'cpf']"
+            :globalFilterFields="['matricula', 'nome', 'cpf_trab']"
         >
             <template #header>
                 <div class="flex justify-content-between">
@@ -180,7 +180,7 @@ onMounted(() => {
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
                 <template #body="{ data }">
                     <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" class="p-button-outlined" />
-                    <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+                    <Menu ref="menu" id="overlay_menu" :model="itemsButtons" :popup="true" />
                 </template>
             </Column>
         </DataTable>

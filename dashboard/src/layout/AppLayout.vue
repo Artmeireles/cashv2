@@ -84,7 +84,10 @@ const changeToPortuguese = () => {
     primevue.config.locale.equals = 'Igual';
     primevue.config.locale.notEquals = 'Diferente';
     primevue.config.locale.noFilter = 'Sem filtro';
-    primevue.config.locale.filter = 'Filtro';
+    primevue.config.locale.clear = 'Limpar';
+    primevue.config.locale.apply = 'Aplicar';
+    primevue.config.locale.addRule = 'Nova regra';
+    primevue.config.locale.removeRule = 'Aplicar';
 };
 onMounted(() => {
     applyScale();

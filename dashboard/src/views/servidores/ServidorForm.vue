@@ -1,14 +1,24 @@
 <script setup>
-import { onBeforeMount, ref, watchEffect } from 'vue';
+import { onBeforeMount, ref, watch, watchEffect } from 'vue';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess, defaultWarn } from '@/toast';
-import { UFS, titleCase, isValidEmail } from '@/global';
+import { UFS, titleCase, isValidEmail, validarDataPTBR } from '@/global';
+import moment from 'moment';
 
 import { Mask } from 'maska';
 const masks = ref({
     telefone: new Mask({
         mask: '(##) #####-####'
+    }),
+    cep: new Mask({
+        mask: '##.###-###'
+    }),
+    cpf_trab: new Mask({
+        mask: '###.###.###-##'
+    }),
+    dt_nascto: new Mask({
+        mask: '##/##/####'
     })
 });
 
@@ -19,9 +29,9 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 // Cookies de usuário
-import { userKey } from '@/global';
-const json = localStorage.getItem(userKey);
-const userData = JSON.parse(json);
+import { useUserStore } from '@/stores/user';
+
+const store = useUserStore();
 
 // Campos de formulário
 const itemData = ref({});
@@ -34,10 +44,7 @@ const mode = ref('view');
 // Aceite do formulário
 const accept = ref(false);
 // Mensages de erro
-const errorMessages = ref({
-    email: null,
-    telefone: null
-});
+const errorMessages = ref({});
 // Dropdowns
 const dropdownSexo = ref([]);
 const dropdownRacaCor = ref([]);
@@ -72,11 +79,15 @@ const loadData = async () => {
 
             itemData.value = body;
             itemDataComparision.value = { ...body };
+            if (itemData.value.cpf_trab) itemDataMasked.value.cpf_trab = masks.value.cpf_trab.masked(itemData.value.cpf_trab);
+            if (itemData.value.telefone) itemDataMasked.value.telefone = masks.value.telefone.masked(itemData.value.telefone);
+            if (itemData.value.cep) itemDataMasked.value.cep = masks.value.cep.masked(itemData.value.cep);
+            if (itemData.value.dt_nascto) itemDataMasked.value.dt_nascto = masks.value.dt_nascto.masked(moment(itemData.value.dt_nascto).format('DD/MM/YYYY'));
             getUF();
             loading.value.form = false;
         } else {
             defaultWarn('Registro não localizado');
-            router.push({ path: `/${userData.cliente}/${userData.dominio}/servidores` });
+            router.push({ path: `/${store.userStore.cliente}/${store.userStore.dominio}/servidores` });
         }
     });
 };
@@ -100,9 +111,16 @@ const formAccepted = () => {
 // Validar email
 const validateEmail = () => {
     if (itemData.value.email && !isValidEmail(itemData.value.email)) {
-        errorMessages.value.email = 'Email inválido';
+        errorMessages.value.email = 'Formato de email inválido';
     } else errorMessages.value.email = null;
     return !errorMessages.value.email;
+};
+// Validar CPF
+const validateCPF = () => {
+    if (itemDataMasked.value.cpf_trab && itemDataMasked.value.cpf_trab.length > 0 && !masks.value.cpf_trab.completed(itemDataMasked.value.cpf_trab)) {
+        errorMessages.value.cpf_trab = 'Formato de CPF inválido';
+    } else errorMessages.value.cpf_trab = null;
+    return !errorMessages.value.cpf_trab;
 };
 // Validar telefone
 const validateTelefone = () => {
@@ -111,16 +129,63 @@ const validateTelefone = () => {
     } else errorMessages.value.telefone = null;
     return !errorMessages.value.telefone;
 };
+// Validar Cep
+const validateCEP = () => {
+    if (itemDataMasked.value.cep && itemDataMasked.value.cep.length > 0 && !masks.value.cep.completed(itemDataMasked.value.cep)) {
+        errorMessages.value.cep = 'Formato de CEP inválido';
+    } else errorMessages.value.cep = null;
+    return !errorMessages.value.cep;
+};
+// Validar data de nascimento
+const validateDtNascto = () => {
+    if (itemDataMasked.value.dt_nascto && itemDataMasked.value.dt_nascto.length > 0 && !(masks.value.dt_nascto.completed(itemDataMasked.value.dt_nascto) && moment(itemDataMasked.value.dt_nascto, 'DD/MM/YYYY').isValid())) {
+        errorMessages.value.dt_nascto = 'Formato de data inválido';
+    } else errorMessages.value.dt_nascto = null;
+    return !errorMessages.value.dt_nascto;
+};
 // Validar formulário
 const formIsValid = () => {
-    return formAccepted() && validateEmail() && validateTelefone();
+    return formAccepted() && validateEmail() && validateTelefone() && validateCEP() && validateDtNascto() && validateCPF();
 };
 // Setar campos não mascarados
-const setUnMasked = () => {
-    if (validateTelefone()) itemData.value.telefone = masks.value.telefone.unmasked(itemDataMasked.value.telefone);
-    else {
-        itemData.value.telefone = itemDataComparision.value.telefone;
-        delete itemDataMasked.value.telefone;
+const setUnMasked = (field) => {
+    switch (field) {
+        case 'cpf_trab':
+            if (validateCPF()) itemData.value.cpf_trab = masks.value.cpf_trab.unmasked(itemDataMasked.value.cpf_trab);
+            else {
+                itemData.value.cpf_trab = itemDataComparision.value.cpf_trab;
+                itemDataMasked.value.cpf_trab = masks.value.cpf_trab.masked(itemDataComparision.value.cpf_trab);
+            }
+            break;
+        case 'telefone':
+            if (validateTelefone()) itemData.value.telefone = masks.value.telefone.unmasked(itemDataMasked.value.telefone);
+            else {
+                itemData.value.telefone = itemDataComparision.value.telefone;
+                itemDataMasked.value.telefone = masks.value.telefone.masked(itemDataComparision.value.telefone);
+            }
+            break;
+        case 'cep':
+            if (validateCEP()) {
+                itemData.value.cep = masks.value.cep.unmasked(itemDataMasked.value.cep);
+                consultarCep();
+            } else {
+                itemData.value.cep = itemDataComparision.value.cep;34
+                itemDataMasked.value.cep = masks.value.cep.masked(itemDataComparision.value.cep);
+            }
+            break;
+        case 'dt_nascto':
+            if (validateDtNascto()) itemData.value.dt_nascto = moment(itemDataMasked.value.dt_nascto, 'DD/MM/YYYY').format('YYYY-MM-DD');
+            else {
+                itemData.value.dt_nascto = itemDataComparision.value.dt_nascto;
+                itemDataMasked.value.dt_nascto = moment(itemDataComparision.value.dt_nascto).format('DD/MM/YYYY');
+            }
+            break;
+        case 'email':
+            if (!validateEmail()) itemData.value.email = itemDataComparision.value.email;
+            break;
+        default:
+            true;
+            break;
     }
 };
 // Salvar dados do formulário
@@ -252,6 +317,13 @@ onBeforeMount(() => {
 watchEffect(() => {
     isItemDataChanged();
 });
+// Observar alterações no campo uf do formulário
+watch(
+    () => itemData.value.uf,
+    () => {
+        getCidades();
+    }
+);
 </script>
 
 <template>
@@ -269,8 +341,8 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="cpf_trab">CPF</label>
-                        <!-- <InputMask :disabled="mode == 'view'" v-model="itemData.cpf_trab" id="cpf_trab" mask="999.999.999-99" placeholder="***.***.***-**" /> -->
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cpf_trab" id="cpf_trab" type="text" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="###.###.###-##" v-model="itemDataMasked.cpf_trab" id="cep" type="text" @input="validateCPF()" @blur="setUnMasked('cpf_trab')" />
+                        <small id="text-error" class="p-error">{{ errorMessages.cpf_trab || '&nbsp;' }}</small>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="id_param_sexo">Sexo</label>
@@ -286,8 +358,9 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="dt_nascto">Nascimento</label>
-                        <!-- <InputMask :disabled="mode == 'view'" v-model="itemData.dt_nascto" id="dt_nascto" mask="99/99/9999" slotChar="mm/dd/yyyy" placeholder="mm/dd/aaaa" /> -->
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_nascto" id="cpf_trab" type="text" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemDataMasked.dt_nascto" id="cep" type="text" @input="validateDtNascto()" @blur="setUnMasked('dt_nascto')" />
+                        <small id="text-error" class="p-error">{{ errorMessages.dt_nascto || '&nbsp;' }}</small>
+                        <p>{{ itemDataMasked.dt_nascto ? validarDataPTBR(itemDataMasked.dt_nascto) : '' }}</p>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="id_param_p_nascto">País de Nascimento</label>
@@ -307,12 +380,12 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="cep">CEP</label>
-                        <!-- <InputMask :disabled="mode == 'view'" v-model="itemData.cep" id="cep" mask="99.999-999" @input="consultarCep" placeholder="**.***-***" /> -->
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cep" id="cep" type="text" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##.###-###" v-model="itemDataMasked.cep" id="cep" type="text" @input="validateCEP()" @blur="setUnMasked('cep')" />
+                        <small id="text-error" class="p-error">{{ errorMessages.cep || '&nbsp;' }}</small>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="uf">UF</label>
-                        <Dropdown id="uf" filter showClear optionLabel="label" optionValue="value" :disabled="mode == 'view'" v-model="itemData.uf" :options="UFS" @input="getCidades" placeholder="Selecione..."> </Dropdown>
+                        <Dropdown id="uf" filter showClear optionLabel="label" optionValue="value" :disabled="mode == 'view'" v-model="itemData.uf" :options="UFS" @input="alert(itemData.uf)" placeholder="Selecione..."> </Dropdown>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="id_cidade">Cidade</label>
@@ -339,23 +412,23 @@ watchEffect(() => {
                         <label for="pai">Pai</label>
                         <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.pai" id="pai" type="text" />
                     </div>
-                    <div class="field col-12 md:col-4">
-                        <label for="pai">Pai</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.pai" id="pai" type="text" />
-                    </div>
-                    <div class="field col-12 md:col-3">
+                    <div class="field col-12 md:col-2">
                         <label for="naturalidade">Naturalidade</label>
                         <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.naturalidade" id="naturalidade" type="text" />
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="telefone">Telefone</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="(##) #####-####" v-model="itemDataMasked.telefone" id="telefone" type="text" @input="validateTelefone()" @blur="setUnMasked()" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="(##) #####-####" v-model="itemDataMasked.telefone" id="telefone" type="text" @input="validateTelefone()" @blur="setUnMasked('telefone')" />
                         <small id="text-error" class="p-error">{{ errorMessages.telefone || '&nbsp;' }}</small>
                     </div>
                     <div class="field col-12 md:col-3">
                         <label for="email">Email</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.email" id="email" type="text" @input="validateEmail()" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.email" id="email" type="text" @input="validateEmail()" @blur="setUnMasked('email')" />
                         <small id="text-error" class="p-error">{{ errorMessages.email || '&nbsp;' }}</small>
+                    </div>
+                    <div class="field col-12 md:col-9">
+                        <label for="observacao">Observação</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.observacao" id="observacao" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-12">
                         <div class="card">
@@ -382,7 +455,7 @@ watchEffect(() => {
                     <InputSwitch v-model="accept" @input="formAccepted" v-if="mode != 'view' && isItemDataChanged()" :class="{ 'p-invalid': errorMessages.accepted }" aria-describedby="text-error" />
                     <small id="text-error" class="p-error">{{ errorMessages.accepted || '&nbsp;' }}</small>
                     <Button type="button" v-if="mode == 'view'" label="Editar" icon="pi pi-pencil" text raised @click="mode = 'edit'" />
-                    <Button type="submit" v-if="mode != 'view'" label="Salvar" icon="pi pi-save" severity="success" text raised :disabled="!formIsValid()" />
+                    <Button type="submit" v-if="mode != 'view'" label="Salvar" icon="pi pi-save" severity="success" text raised :disabled="!isItemDataChanged() || !formIsValid()" />
                     <Button type="button" v-if="mode != 'view'" label="Cancelar" icon="pi pi-ban" severity="danger" text raised @click="reload" />
                 </div>
             </div>

@@ -86,6 +86,7 @@ module.exports = app => {
         try {
             existsOrError(body.id_emp, 'Órgão não informado')
             existsOrError(body.cpf_trab, 'CPF do Trabalhador não informado')
+            body.cpf_trab = body.cpf_trab.replace(/([^\d])+/gim, "")
             cpfOrError(body.cpf_trab, 'CPF inválido')
             existsOrError(body.nome, 'Nome não informado')
             //existsOrError(body.nome_social, 'Nome Social não informado')

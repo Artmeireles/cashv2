@@ -79,6 +79,19 @@ export function stringToBoolean(string) {
     }
 }
 
+import { parse, isValid } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
+
+export function validarDataPTBR(data) {
+    // Use o locale 'ptBR' para interpretar datas em português
+    if (data.length == 10) {
+        const parsedDate = parse(data, 'dd/MM/yyyy', new Date(), { locale: ptBR });
+
+        // Verifique se a data é válida
+        return isValid(parsedDate);
+    }
+}
+
 // Um array com todos os estados do Brasil
 export const UFS = [
     { value: 'AC', label: 'Acre' },
@@ -145,6 +158,7 @@ export default {
     setValidCep,
     titleCase,
     stringToBoolean,
+    validarDataPTBR,
     STATUS_INACTIVE,
     STATUS_WAITING,
     STATUS_SUSPENDED_BY_TKN,
