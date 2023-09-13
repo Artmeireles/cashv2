@@ -105,7 +105,7 @@ import CodeHighlight from '@/components/CodeHighlight.vue';
 import BlockViewer from '@/components/BlockViewer.vue';
 import Geolocation from '@/components/Geolocation.vue';
 
-import { vMaska } from "maska"
+import { vMaska } from 'maska';
 
 import '@/assets/app.css';
 import '@/assets/styles.scss';

@@ -17,6 +17,7 @@ exports.up = function(knex) {
         table.string('descricao').comment("Descrição")
         table.string('mensagem').comment("Mensagem")
         table.string('mensagem_especial').comment("Mensagem Especial")
+        table.unique(['ano', 'mes', 'complementar'])
     })
 };
 

@@ -4,12 +4,12 @@ export const appName = 'Cash';
 export const softwareHouse = 'Mega Assessoria';
 export const dbPrefix = 'wwmgca';
 export const noPermissAccess = 'Ops!!! Parece que seu perfil não dá acesso a essa operação';
-
+// TODO: criar uma função que valide o email
 export function isValidEmail(email) {
     const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
     return emailRegexp.test(email);
 }
-
+// TODO: criar uma função que faça o highlight de um texto
 export function highlight(value, markTxt) {
     let target = value;
     let targetMark = markTxt.toString().trim().replace(/\s\s+/g, ' ').split(' ');
@@ -18,11 +18,11 @@ export function highlight(value, markTxt) {
     });
     return target;
 }
-
+// TODO: criar uma função que remova a marcação de highlight
 export function removeMark(text) {
     return text.toString().replaceAll('<mark class="foundMark">', '').replaceAll('</mark>', '');
 }
-
+// TODO: criar uma função que faça o download de um arquivo
 export function downloadFile(linkSource, fileName) {
     const linkUrl = linkSource.replaceAll(' ', '%20');
     const file = fileName.replaceAll(' ', '%20');
@@ -31,7 +31,7 @@ export function downloadFile(linkSource, fileName) {
     downloadLink.download = file;
     downloadLink.click();
 }
-
+// TODO: criar uma função que valide o CEP
 export function setValidCep(cep) {
     const res = {
         cepClass: undefined,
@@ -51,11 +51,11 @@ export function setValidCep(cep) {
     }
     return res;
 }
-
+// TODO: criar uma função que capitalize a primeira letra de uma string
 export function capitalizeFirst(value) {
     return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 }
-
+// TODO: criar uma função que converta de string para titleCase
 export function titleCase(str) {
     if (str) {
         let splitStr = str.toLowerCase().split(' ');
@@ -89,6 +89,16 @@ export function validarDataPTBR(data) {
 
         // Verifique se a data é válida
         return isValid(parsedDate);
+    }
+}
+
+// Retorna o nome do mês por extenso
+export function getNomeMesPorExtenso(mes) {
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro', '13º'];
+    if (mes >= 1 && mes <= 13) {
+        return meses[mes - 1];
+    } else {
+        return 'Mês inválido';
     }
 }
 
@@ -159,6 +169,7 @@ export default {
     titleCase,
     stringToBoolean,
     validarDataPTBR,
+    getNomeMesPorExtenso,
     STATUS_INACTIVE,
     STATUS_WAITING,
     STATUS_SUSPENDED_BY_TKN,

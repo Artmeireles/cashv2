@@ -73,8 +73,8 @@ const applyMenuType = () => {
 };
 const changeToPortuguese = () => {
     const primevue = usePrimeVue();
-    primevue.config.locale.accept = 'Aceitar';
-    primevue.config.locale.reject = 'Rejeitar';
+    primevue.config.locale.accept = 'Sim';
+    primevue.config.locale.reject = 'Não';
     primevue.config.locale.matchAll = 'Comparar todos';
     primevue.config.locale.matchAny = 'Comparar alguns';
     primevue.config.locale.startsWith = 'Começa com';

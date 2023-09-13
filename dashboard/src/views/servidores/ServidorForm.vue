@@ -169,7 +169,8 @@ const setUnMasked = (field) => {
                 itemData.value.cep = masks.value.cep.unmasked(itemDataMasked.value.cep);
                 consultarCep();
             } else {
-                itemData.value.cep = itemDataComparision.value.cep;34
+                itemData.value.cep = itemDataComparision.value.cep;
+                34;
                 itemDataMasked.value.cep = masks.value.cep.masked(itemDataComparision.value.cep);
             }
             break;
@@ -191,9 +192,10 @@ const setUnMasked = (field) => {
 // Salvar dados do formulário
 const saveData = async () => {
     if (formIsValid()) {
-        const url = `${urlBase.value}/${itemData.value.id}`;
-        axios
-            .put(url, itemData.value)
+        const method = itemData.value.id ? 'put' : 'post';
+        const id = itemData.value.id ? `/${itemData.value.id}` : '';
+        const url = `${urlBase.value}${id}`;
+        axios[method](url, itemData.value)
             .then((res) => {
                 const body = res.data;
                 if (body && body.id) {

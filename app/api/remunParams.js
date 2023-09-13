@@ -32,14 +32,18 @@ module.exports = app => {
             existsOrError(body.ano_inf, 'Ano da Informação não informado')
             existsOrError(body.mes_inf, 'Mês da Informação não informado')
             existsOrError(body.complementar_inf, 'Informação Complementar não informada')
-            // existsOrError(body.descricao, 'Descrição não informada')
+            existsOrError(body.descricao, 'Descrição não informada')
             // existsOrError(body.mensagem, 'Mensagem não informada')
             // existsOrError(body.mensagem_especial, 'Mensagem Especial não informada')
+            if (!body.id) {
+                const unique = await app.db(tabelaDomain).where({ ano: body.ano, mes: body.mes, complementar: body.complementar }).first()
+                if (unique.id) throw 'Já existe um registro com esse ano, mês e complementar'
+            }
         }
-         catch (error) {
+        catch (error) {
             return res.status(400).send(error)
         }
-
+        delete body.hash
         if (body.id) {
             // Variáveis da edição de um registro
             // registrar o evento na tabela de eventos
@@ -126,6 +130,7 @@ module.exports = app => {
         const count = sql[0][0].count
 
         const ret = app.db({ tbl1: tabelaDomain })
+            .select(app.db.raw(`tbl1.*, SUBSTRING(SHA(CONCAT(id,'${tabela}')),8,6) as hash`))
             .where({ status: STATUS_ACTIVE })
             .where(function () {
                 this.where(app.db.raw(`tbl1.ano regexp('${key.toString().replace(' ', '.+')}')`))
@@ -137,9 +142,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -162,9 +167,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
