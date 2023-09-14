@@ -21,7 +21,7 @@ const password = ref('');
 const click = ref(false);
 
 const logoUrl = computed(() => {
-    return `assets/images/logo-app.svg`;
+    return `/assets/images/logo-app.svg`;
 });
 
 const signin = async () => {

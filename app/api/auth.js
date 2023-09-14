@@ -195,7 +195,7 @@ module.exports = app => {
                     return res.send(true)
                 }
             }
-        } catch (error) { console.log(error); }
+        } catch (error) { }
 
         res.send(false)
     }

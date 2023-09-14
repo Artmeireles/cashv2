@@ -15,11 +15,16 @@ const model = ref([
         items: [
             { label: 'Gestão de Empregados', to: `/${store.userStore.cliente}/${store.userStore.dominio}/servidores` },
             { label: 'Parâmetros Financeiros', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Orgão', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'Empresa', to: `/${store.userStore.cliente}/${store.userStore.dominio}/empresa` }
+        ]
+    },
+    {
+        label: 'Tabelas',
+        items: [
             { label: 'Rubricas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'INSS', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'RPPS', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'IRRF', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'IRRF', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
         ]
     },
     {
@@ -31,7 +36,7 @@ const model = ref([
             { label: 'Centros de custo', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Vinculos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'PCC', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Bancos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'Bancos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
         ]
     },
     {
@@ -39,7 +44,7 @@ const model = ref([
         items: [
             { label: 'Parâmetros', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Envios', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Rejeições', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'Rejeições', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
         ]
     },
     {
@@ -47,7 +52,7 @@ const model = ref([
         items: [
             { label: 'Relatórios', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Remessas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Consignações', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'Consignações', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
         ]
     },
     {
@@ -59,7 +64,7 @@ const model = ref([
             { label: 'RAIS', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'DIRF', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'MANAD', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Atuarial', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'Atuarial', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
         ]
     },
     {
@@ -74,7 +79,7 @@ const model = ref([
         label: 'Administração',
         items: [
             { label: 'Usuários', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Log de Eventos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'Log de Eventos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
         ]
     }
 ]);

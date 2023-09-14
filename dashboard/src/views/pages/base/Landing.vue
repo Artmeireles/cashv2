@@ -14,7 +14,7 @@ const smoothScroll = (id) => {
 };
 
 const logoUrl = computed(() => {
-    return `assets/images/logo-app.svg`;
+    return `/assets/images/logo-app.svg`;
 });
 </script>
 

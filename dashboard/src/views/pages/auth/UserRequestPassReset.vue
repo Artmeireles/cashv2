@@ -62,7 +62,7 @@ const click = ref(false)
 const urlRequest = ref(`${baseApiUrl}/request-password-reset/`)
 
 const logoUrl = computed(() => {
-    return `assets/images/logo-app.svg`;
+    return `/assets/images/logo-app.svg`;
 });
 
 

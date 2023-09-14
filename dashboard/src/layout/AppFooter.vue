@@ -6,7 +6,7 @@ import { softwareHouse } from '@/global';
 const { layoutConfig } = useLayout();
 
 const logoUrl = computed(() => {
-    return `assets/images/logo-app.svg`;
+    return `/assets/images/logo-app.svg`;
 });
 </script>
 

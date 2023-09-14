@@ -51,7 +51,7 @@ onBeforeUnmount(() => {
 });
 
 const logoUrl = computed(() => {
-    return `assets/images/logo-app.svg`;
+    return `/assets/images/logo-app.svg`;
 });
 
 const onTopBarMenuButton = () => {
@@ -121,7 +121,6 @@ const toggleAppConfig = () => {
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <Button type="button" label="Toggle" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
-                <span>Perfil</span>
             </Button>
             <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
             <button @click="toggleAppConfig()" class="p-link layout-topbar-button">

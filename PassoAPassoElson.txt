@@ -1,0 +1,15 @@
+1: Criar a rota em: dashboard/src/router/index.js
+2: Criar a opção no Menu em: dashboard/src/layout/AppMenu.vue
+3: Em dashboard/src/views criar uma pasta para conter os templates .vue
+	a) Se for uma cópia, renumear a pasta e os arquivos
+		i. Nesse momento talvez ocorrerá um erro caso o servidor do dashboard esteja ativo. Resolver os nomes dos arquivos poderá corrigir o erro
+4: Confirmar a rota para a api
+5: Ações no template Grid
+	Corrigir os nomes dos fields
+		i) initFilters
+		ii) globalFilterFields
+		iii) Columns
+	Verificar e corrigir as funções de load e delete
+	Implementar as funções particulares
+	Implementar as cargas de opções dos dropDowns
+	

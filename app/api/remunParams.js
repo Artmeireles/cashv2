@@ -35,16 +35,25 @@ module.exports = app => {
             existsOrError(body.descricao, 'Descrição não informada')
             // existsOrError(body.mensagem, 'Mensagem não informada')
             // existsOrError(body.mensagem_especial, 'Mensagem Especial não informada')
-            if (!body.id) {
-                const unique = await app.db(tabelaDomain).where({ ano: body.ano, mes: body.mes, complementar: body.complementar }).first()
-                if (unique.id) throw 'Já existe um registro com esse ano, mês e complementar'
-            }
         }
         catch (error) {
+            console.log(error);
             return res.status(400).send(error)
         }
         delete body.hash
         if (body.id) {
+            try {
+                const unique = await app.db(tabelaDomain)
+                    .where({ ano: body.ano, mes: body.mes, complementar: body.complementar })
+                    .whereNot({ id: body.id })
+                    .first()
+                if (unique && unique.id) throw 'Já existe um registro com esse ano, mês e complementar'
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(400).send(error)
+            }
+
             // Variáveis da edição de um registro
             // registrar o evento na tabela de eventos
             const { createEventUpd } = app.api.sisEvents
@@ -73,6 +82,16 @@ module.exports = app => {
                     return res.status(500).send(error)
                 })
         } else {
+            try {
+                const unique = await app.db(tabelaDomain)
+                    .where({ ano: body.ano, mes: body.mes, complementar: body.complementar })
+                    .first()
+                if (unique && unique.id) throw 'Já existe um registro com esse ano, mês e complementar'
+            }
+            catch (error) {
+                console.log(error);
+                return res.status(400).send(error)
+            }
             // Criação de um novo registro
             const nextEventID = await app.db('sis_events').select(app.db.raw('count(*) as count')).first()
 

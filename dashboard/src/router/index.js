@@ -26,6 +26,11 @@ const routes = [
                 path: '/:client/:domain/remun-params',
                 name: 'remun-params',
                 component: () => import('@/views/remuneracaoParams/ParametrosGrid.vue')
+            },
+            {
+                path: '/:client/:domain/empresa',
+                name: 'empresa',
+                component: () => import('@/views/remuneracaoParams/ParametrosGrid.vue')
             }
         ]
     },
