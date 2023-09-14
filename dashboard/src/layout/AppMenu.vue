@@ -78,6 +78,7 @@ const model = ref([
     {
         label: 'Administração',
         items: [
+            { label: 'Empresas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/empresas` },
             { label: 'Usuários', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Log de Eventos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
         ]

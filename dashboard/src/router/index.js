@@ -30,7 +30,12 @@ const routes = [
             {
                 path: '/:client/:domain/empresa',
                 name: 'empresa',
-                component: () => import('@/views/remuneracaoParams/ParametrosGrid.vue')
+                component: () => import('@/views/empresa/EmpresaForm.vue')
+            },
+            {
+                path: '/:client/:domain/empresas',
+                name: 'empresas',
+                component: () => import('@/views/empresa/EmpresasGrid.vue')
             }
         ]
     },

@@ -4,7 +4,6 @@ import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess, defaultWarn } from '@/toast';
 import { useRouter } from 'vue-router';
-import { getNomeMesPorExtenso } from '@/global';
 const router = useRouter();
 // Cookies de usuário
 import { useUserStore } from '@/stores/user';
@@ -22,24 +21,8 @@ const accept = ref(false);
 const errorMessages = ref({});
 // Emit do template
 const emit = defineEmits(['changed']);
-// Dropdowns
-const dropdownMes = ref([
-    { label: 'Janeiro', value: '01' },
-    { label: 'Fevereiro', value: '02' },
-    { label: 'Março', value: '03' },
-    { label: 'Abril', value: '04' },
-    { label: 'Maio', value: '05' },
-    { label: 'Junho', value: '06' },
-    { label: 'Julho', value: '07' },
-    { label: 'Agosto', value: '08' },
-    { label: 'Setembro', value: '09' },
-    { label: 'Outubro', value: '10' },
-    { label: 'Novembro', value: '11' },
-    { label: 'Dezembro', value: '12' },
-    { label: '13º', value: '13' }
-]);
 // Url base do form action
-const urlBase = ref(`${baseApiUrl}/remun-params`);
+const urlBase = ref(`${baseApiUrl}/empresa`);
 // Carragamento de dados do form
 const loadData = async () => {
     if (itemData.value && itemData.value.id) {
@@ -81,15 +64,6 @@ const saveData = async () => {
             });
     }
 };
-// Ao selecionar o mês, sugere o mes_inf e ano_inf como o período anterior e a descrição com o nome do mês
-const autoComplete = () => {
-    const mes = Number(itemData.value.mes);
-    const ano = Number(itemData.value.ano);
-    itemData.value.ano_inf = String(mes === 1 ? ano - 1 : ano);
-    itemData.value.mes_inf = String(mes === 1 ? 12 : mes - 1).padStart(2, '0');
-    const dataFormatada = getNomeMesPorExtenso(itemData.value.mes);
-    itemData.value.descricao = `Folha de pagamento de ${dataFormatada} de ${itemData.value.ano}`;
-};
 // Verifica se houve alteração nos dados do formulário
 const isItemDataChanged = () => {
     const ret = JSON.stringify(itemData.value) !== JSON.stringify(itemDataComparision.value);
@@ -124,41 +98,17 @@ watchEffect(() => {
         <form @submit.prevent="saveData">
             <div class="col-12">
                 <div class="p-fluid formgrid grid">
-                    <div class="field col-12 md:col-2">
-                        <label for="ano">Ano</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.ano" id="ano" type="text" maxlength="4" @blur="autoComplete" />
+                    <div class="field col-12 md:col-6">
+                        <label for="nr_insc">Nº Inscrição</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.nr_insc" id="nr_insc" type="text" maxlength="4"/>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="cnpj_efr">CNPJ Ente</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cnpj_efr" id="cnpj_efr" type="text" maxlength="3" />
                     </div>
                     <div class="field col-12 md:col-2">
-                        <label for="mes">Mês</label>
-                        <Dropdown id="mes" optionLabel="label" optionValue="value" :disabled="mode == 'view'" v-model="itemData.mes" :options="dropdownMes" @change="autoComplete" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="complementar">Complementar</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.complementar" id="complementar" type="text" maxlength="3" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="ano_inf">Ano Inf.</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.ano_inf" id="ano_inf" type="text" maxlength="4" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="mes_inf">Mês Inf.</label>
-                        <Dropdown id="mes_inf" optionLabel="label" optionValue="value" :disabled="mode == 'view'" v-model="itemData.mes_inf" :options="dropdownMes" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="complementar_inf">Complementar Inf.</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.complementar_inf" id="complementar_inf" type="text" maxlength="3" />
-                    </div>
-                    <div class="field col-12 md:col-12">
-                        <label for="descricao">Descrição</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.descricao" id="descricao" type="text" maxlength="255" />
-                    </div>
-                    <div class="field col-12 md:col-12">
-                        <label for="mensagem">Mensagem do contracheque</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.mensagem" id="mensagem" type="text" maxlength="255" />
-                    </div>
-                    <div class="field col-12 md:col-12">
-                        <label for="mensagem_especial">Mensagem ao aniversariante</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.mensagem_especial" id="mensagem_especial" type="text" maxlength="255" />
+                        <label for="razao_social">Razão Social</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.razao_social" id="razao_social" type="text" maxlength="3" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">

@@ -4,8 +4,7 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import ParametroForm from './ParametroForm.vue';
-import { getNomeMesPorExtenso } from '@/global';
+import EmpresaForm from './EmpresaForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const filters = ref(null);
@@ -17,15 +16,15 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/remun-params`);
+const urlBase = ref(`${baseApiUrl}/empresa`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        ano: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        mes: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        complementar: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        descricao: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        nr_insc: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        cnpj_efr: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        razao_social: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        // descricao: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -102,27 +101,11 @@ onBeforeMount(() => {
     initFilters();
     loadData();
 });
-const novoParametro = () => {
-    const dataAtual = new Date();
-    const mes = dataAtual.getMonth(); // Obtém o mês atual (0-11)
-    const ano = dataAtual.getFullYear(); // Obtém o ano atual (4 dígitos)
-    itemData.value = {
-        ano: String(ano),
-        mes: String(mes + 2).padStart(2, '0'),
-        complementar: '000'
-    };
-    itemData.value.ano_inf = String(mes === 0 ? ano - 1 : ano);
-    itemData.value.mes_inf = String(mes === 0 ? 11 : mes + 1).padStart(2, '0');
-    itemData.value.complementar_inf = '000';
-    const dataFormatada = getNomeMesPorExtenso(itemData.value.mes);
-    itemData.value.descricao = `Folha de pagamento de ${dataFormatada} de ${itemData.value.ano}`;
-    mode.value = 'new';
-};
 </script>
 
 <template>
     <div class="card">
-        <ParametroForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <EmpresaForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable
             ref="dt"
             :value="gridData"
@@ -135,7 +118,7 @@ const novoParametro = () => {
             v-model:filters="filters"
             filterDisplay="menu"
             :filters="filters"
-            :globalFilterFields="['ano', 'mes', 'complementar', 'descricao']"
+            :globalFilterFields="['nr_insc', 'cnpj_efr', 'razao_social']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
             scrollable
@@ -152,38 +135,38 @@ const novoParametro = () => {
                     </span>
                 </div>
             </template>
-            <Column field="ano" header="Ano" sortable>
+            <Column field="nr_insc" header="Nº Inscrição" sortable>
                 <template #body="{ data }">
-                    {{ data.ano }}
+                    {{ data.nr_insc }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por ano" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Nº Inscrição" />
                 </template>
             </Column>
-            <Column field="mes" header="Mes" sortable>
+            <Column field="cnpj_efr" header="CNPJ Ente" sortable>
                 <template #body="{ data }">
-                    {{ data.mes }}
+                    {{ data.cnpj_efr }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por mes" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por CNPJ Ente" />
                 </template>
             </Column>
-            <Column field="complementar" header="Complementar" sortable>
+           <Column field="razao_social" header="Razão Social" sortable>
                 <template #body="{ data }">
-                    {{ data.complementar }}
+                    {{ data.razao_social }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por complementar" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por razao_social" />
                 </template>
             </Column>
-            <Column field="descricao" header="Descricao" sortable style="min-width: 14rem">
+             <!--<Column field="descricao" header="Descricao" sortable style="min-width: 14rem">
                 <template #body="{ data }">
                     {{ data.descricao }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por descricao" />
                 </template>
-            </Column>
+            </Column> -->
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
                 <template #body="{ data }">
                     <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" class="p-button-outlined" />
