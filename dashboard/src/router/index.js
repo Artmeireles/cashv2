@@ -36,7 +36,13 @@ const routes = [
                 path: '/:client/:domain/empresas',
                 name: 'empresas',
                 component: () => import('@/views/empresa/EmpresasGrid.vue')
+            },
+            {
+                path: '/:client/:domain/aux-cargos',
+                name: 'aux-cargos',
+                component: () => import('@/views/auxCargos/AuxCargosGrid.vue')
             }
+        
         ]
     },
     {

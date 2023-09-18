@@ -32,7 +32,7 @@ const model = ref([
         items: [
             { label: 'Locações', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Local de Trabalho', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Cargos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'Cargos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/aux-cargos` },
             { label: 'Centros de custo', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Vinculos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'PCC', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
