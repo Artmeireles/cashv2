@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import AuxCargoForm from './AuxCargoForm.vue';
+import RemuneracaoForm from './RemuneracaoForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const filters = ref(null);
@@ -16,13 +16,13 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/aux-cargos`);
+const urlBase = ref(`${baseApiUrl}/remuneracao/:id_serv_vinc`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        cbo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        qtd_rubr: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        prazo_i: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -99,11 +99,12 @@ onBeforeMount(() => {
     initFilters();
     loadData();
 });
+
 </script>
 
 <template>
     <div class="card">
-        <AuxCargoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <RemuneracaoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable
             ref="dt"
             :value="gridData"
@@ -116,7 +117,7 @@ onBeforeMount(() => {
             v-model:filters="filters"
             filterDisplay="menu"
             :filters="filters"
-            :globalFilterFields="['nome', 'cbo']"
+            :globalFilterFields="['qtd_rubr', 'prazo_i']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
             scrollable
@@ -133,20 +134,20 @@ onBeforeMount(() => {
                     </span>
                 </div>
             </template>
-            <Column field="nome" header="Nome" sortable>
+            <Column field="qtd_rubr" header="Quantidade Rub" sortable>
                 <template #body="{ data }">
-                    {{ data.nome }}
+                    {{ data.qtd_rubr }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nome" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Quantidade Rub" />
                 </template>
             </Column>
-            <Column field="cbo" header="CBO" sortable>
+            <Column field="prazo_i" header="Prazo Inicial" sortable>
                 <template #body="{ data }">
-                    {{ data.cbo }}
+                    {{ data.prazo_i }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por cbo" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Prazo Inicial" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">

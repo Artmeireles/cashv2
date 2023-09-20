@@ -3,9 +3,9 @@ const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg } = app.api.validation
+    const { existsOrError, notExistsOrError, isMatchOrError, noAccessMsg } = app.api.validation
     const { mailyCliSender } = app.api.mailerCli
-    const tabela = 'aux_cargos'
+    const tabela = 'con_consign'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
 
@@ -26,14 +26,18 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
 
         try {
-            existsOrError(body.nome, 'Nome não informado')
-            existsOrError(body.cbo, 'CBO não informado')
+            existsOrError(body.id_cad_bancos, 'Banco não informado')
+            existsOrError(body.agencia, 'Agência não informada')
+            existsOrError(body.qmar, 'Quitação mínima não informado')
+            existsOrError(body.qmp, 'Quantidade máxima não informado')
+            existsOrError(body.averbar_online, 'Aceitar averbação online não informado')
+            existsOrError(body.apenas_efetivos, 'Apenas efetivos não informado')
         }
-        catch (error) {
+         catch (error) {
             return res.status(400).send(error)
         }
         delete body.hash
-        
+
         if (body.id) {
             // Variáveis da edição de um registro
             // registrar o evento na tabela de eventos
@@ -56,7 +60,7 @@ module.exports = app => {
                 .where({ id: body.id })
             rowsUpdated.then((ret) => {
                 if (ret > 0) res.status(200).send(body)
-                else res.status(200).send('O Parâmetro não foi encontrado')
+                else res.status(200).send('Orgão não foi encontrado')
             })
                 .catch(error => {
                     app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
@@ -102,7 +106,7 @@ module.exports = app => {
         const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         try {
             // Alçada para exibição
-            isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de financeiros"`)
+            isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de empresa"`)
         } catch (error) {
             return res.status(401).send(error)
         }
@@ -111,21 +115,18 @@ module.exports = app => {
         const page = req.query.page || 1
 
         let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-            .where({ status: STATUS_ACTIVE })
-            .where(function () {
-                this.where(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
-                this.orWhere(app.db.raw(`tbl1.cbo regexp('${key.toString().replace(' ', '.+')}')`))
-            })
+        .where({ status: STATUS_ACTIVE })
+        .where(function () {
+            this.where(app.db.raw(`tbl1.agencia regexp('${key.toString().replace(' ', '.+')}')`))
+        })
         sql = await app.db.raw(sql.toString())
         const count = sql[0][0].count
-
         const ret = app.db({ tbl1: tabelaDomain })
             .where({ status: STATUS_ACTIVE })
             .where(function () {
-                this.where(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
-                this.orWhere(app.db.raw(`tbl1.cbo regexp('${key.toString().replace(' ', '.+')}')`))
+                this.where(app.db.raw(`tbl1.agencia regexp('${key.toString().replace(' ', '.+')}')`))
             })
-        ret.orderBy('nome').limit(limit).offset(page * limit - limit)
+        ret.orderBy('agencia').limit(limit).offset(page * limit - limit)
         ret.then(body => {
             return res.json({ data: body, count, limit })
         })

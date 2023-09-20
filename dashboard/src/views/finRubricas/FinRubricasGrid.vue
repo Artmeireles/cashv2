@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import AuxCargoForm from './AuxCargoForm.vue';
+import FinRubricaForm from './FinRubricaForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const filters = ref(null);
@@ -16,13 +16,14 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/aux-cargos`);
+const urlBase = ref(`${baseApiUrl}/fin-rubricas/:id_emp`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        cbo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        cod_rubr: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        ini_valid: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        dsc_rubr: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -80,12 +81,13 @@ const toggle = (event) => {
 const getItem = (data) => {
     itemData.value = data;
 };
-// Carrrega os dados
+//Carrrega os dados
 const loadData = () => {
     axios.get(`${urlBase.value}`).then((axiosRes) => {
         gridData.value = axiosRes.data.data;
     });
 };
+
 // Exporta os dados
 const exportCSV = () => {
     dt.value.exportCSV();
@@ -103,7 +105,7 @@ onBeforeMount(() => {
 
 <template>
     <div class="card">
-        <AuxCargoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <FinRubricaForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable
             ref="dt"
             :value="gridData"
@@ -116,7 +118,7 @@ onBeforeMount(() => {
             v-model:filters="filters"
             filterDisplay="menu"
             :filters="filters"
-            :globalFilterFields="['nome', 'cbo']"
+            :globalFilterFields="['cod_rubr', 'ini_valid', 'dsc_rubr']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
             scrollable
@@ -133,20 +135,28 @@ onBeforeMount(() => {
                     </span>
                 </div>
             </template>
-            <Column field="nome" header="Nome" sortable>
+            <Column field="cod_rubr" header="Cod Rubrica" sortable>
                 <template #body="{ data }">
-                    {{ data.nome }}
+                    {{ data.cod_rubr }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nome" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Cod Rubrica" />
                 </template>
             </Column>
-            <Column field="cbo" header="CBO" sortable>
+            <Column field="ini_valid" header="Inicio Válidade" sortable>
                 <template #body="{ data }">
-                    {{ data.cbo }}
+                    {{ data.ini_valid }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por cbo" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Inicio Válidade" />
+                </template>
+            </Column>
+            <Column field="dsc_rubr" header="Descrição" sortable>
+                <template #body="{ data }">
+                    {{ data.dsc_rubr }}
+                </template>
+                <template #filter="{ filterModel }">
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por dsc_rubr" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">

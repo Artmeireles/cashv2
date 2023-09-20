@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import AuxCargoForm from './AuxCargoForm.vue';
+import EsEnvioForm from './EsEnvioForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const filters = ref(null);
@@ -16,13 +16,14 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/aux-cargos`);
+const urlBase = ref(`${baseApiUrl}/es-envios/:id_es_param`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        cbo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        id_es_param: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        es_lote: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        es_recibo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -99,11 +100,12 @@ onBeforeMount(() => {
     initFilters();
     loadData();
 });
+
 </script>
 
 <template>
     <div class="card">
-        <AuxCargoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <EsEnvioForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable
             ref="dt"
             :value="gridData"
@@ -116,7 +118,7 @@ onBeforeMount(() => {
             v-model:filters="filters"
             filterDisplay="menu"
             :filters="filters"
-            :globalFilterFields="['nome', 'cbo']"
+            :globalFilterFields="['id_es_param', 'es_lote', 'es_recibo']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
             scrollable
@@ -133,22 +135,33 @@ onBeforeMount(() => {
                     </span>
                 </div>
             </template>
-            <Column field="nome" header="Nome" sortable>
+            <Column field="id_es_param" header="Parâmetros" sortable>
                 <template #body="{ data }">
-                    {{ data.nome }}
+                    {{ data.id_es_param }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nome" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Parâmetros" />
                 </template>
             </Column>
-            <Column field="cbo" header="CBO" sortable>
+            <Column field="es_lote" header="Lote" sortable>
                 <template #body="{ data }">
-                    {{ data.cbo }}
+                    {{ data.es_lote }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por cbo" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Lote" />
                 </template>
             </Column>
+            <Column field="es_recibo" header="Recibo" sortable>
+                <template #body="{ data }">
+                    {{ data.es_recibo }}
+                </template>
+                <template #filter="{ filterModel }">
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Recibo" />
+                </template>
+            </Column>
+                <template #filter="{ filterModel }">
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por descricao" />
+                </template>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
                 <template #body="{ data }">
                     <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" class="p-button-outlined" />

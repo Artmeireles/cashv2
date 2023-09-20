@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import AuxCargoForm from './AuxCargoForm.vue';
+import CadBancoForm from './CadBancoForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
 const confirm = useConfirm();
 const filters = ref(null);
@@ -16,13 +16,14 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/aux-cargos`);
+const urlBase = ref(`${baseApiUrl}/cad-bancos`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        febraban: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        cbo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        nomeAbrev: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -103,7 +104,7 @@ onBeforeMount(() => {
 
 <template>
     <div class="card">
-        <AuxCargoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <CadBancoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable
             ref="dt"
             :value="gridData"
@@ -116,7 +117,7 @@ onBeforeMount(() => {
             v-model:filters="filters"
             filterDisplay="menu"
             :filters="filters"
-            :globalFilterFields="['nome', 'cbo']"
+            :globalFilterFields="['febraban', 'nome', 'nomeAbrev']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
             scrollable
@@ -133,7 +134,15 @@ onBeforeMount(() => {
                     </span>
                 </div>
             </template>
-            <Column field="nome" header="Nome" sortable>
+            <Column field="febraban" header="febraban" sortable>
+                <template #body="{ data }">
+                    {{ data.febraban }}
+                </template>
+                <template #filter="{ filterModel }">
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por febraban" />
+                </template>
+            </Column>
+            <Column field="nome" header="nome" sortable>
                 <template #body="{ data }">
                     {{ data.nome }}
                 </template>
@@ -141,12 +150,12 @@ onBeforeMount(() => {
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nome" />
                 </template>
             </Column>
-            <Column field="cbo" header="CBO" sortable>
+            <Column field="nomeAbrev" header="nomeAbrev" sortable>
                 <template #body="{ data }">
-                    {{ data.cbo }}
+                    {{ data.nomeAbrev }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por cbo" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nomeAbrev" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
