@@ -8,7 +8,7 @@ exports.up = function(knex) {
         table.integer('evento').notNull()
         table.string('created_at').notNull()
         table.string('updated_at')
-        table.integer('id_emp').notNull().unsigned().comment("Órgão")
+        table.integer('id_emp').notNull().unsigned().comment("Empresa")
         table.string('cod_rubr', 8).notNull().comment("Código da Rúbrica")
         table.string('ini_valid', 7).notNull().comment("Início da Validade das Informações")
         table.string('dsc_rubr', 100).notNull().comment("Descrição (nome) da Rubrica ")

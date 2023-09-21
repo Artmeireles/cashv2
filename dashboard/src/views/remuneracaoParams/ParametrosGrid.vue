@@ -102,7 +102,7 @@ onBeforeMount(() => {
     initFilters();
     loadData();
 });
-const novoParametro = () => {
+const novoRegistro = () => {
     const dataAtual = new Date();
     const mes = dataAtual.getMonth(); // Obtém o mês atual (0-11)
     const ano = dataAtual.getFullYear(); // Obtém o ano atual (4 dígitos)
@@ -145,7 +145,7 @@ const novoParametro = () => {
                 <div class="flex justify-content-end gap-3">
                     <Button icon="pi pi-external-link" label="Exportar" @click="exportCSV($event)" />
                     <Button type="button" icon="pi pi-filter-slash" label="Limpar filtro" outlined @click="clearFilter()" />
-                    <Button type="button" icon="pi pi-plus" label="Novo Registro" outlined @click="novoParametro" />
+                    <Button type="button" icon="pi pi-plus" label="Novo Registro" outlined @click="novoRegistro" />
                     <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model.lazy="filters['global'].value" placeholder="Pesquise..." />

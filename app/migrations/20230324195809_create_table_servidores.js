@@ -8,7 +8,7 @@ exports.up = function(knex) {
         table.integer('evento').notNull()
         table.string('created_at').notNull()
         table.string('updated_at')
-        table.integer('id_emp').notNull().unsigned().comment("Órgão")
+        table.integer('id_emp').notNull().unsigned().comment("Empresa")
         table.string('cpf_trab', 14).notNull().comment("CPF")
         table.string('nome', 70).notNull().comment("Nome do Trabalhador")
         table.string('nome_social', 70).comment("Nome Social")

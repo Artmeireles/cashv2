@@ -4,9 +4,8 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess, defaultWarn } from '@/toast';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-
 const store = useUserStore();
 
 const router = useRouter();

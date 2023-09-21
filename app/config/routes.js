@@ -390,4 +390,37 @@ module.exports = app => {
         .put(app.api.benBeneficios.save)
         .get(app.api.benBeneficios.getById)
         .delete(app.api.benBeneficios.remove)
+
+    app.route('/ben-beneficios/:id_ben_vinc')
+        .all(app.config.passport.authenticate())
+        .post(app.api.benBeneficios.save)
+        .get(app.api.benBeneficios.get)
+    app.route('/ben-beneficios/:id_ben_vinc/:id')
+        .all(app.config.passport.authenticate())
+        .put(app.api.benBeneficios.save)
+        .get(app.api.benBeneficios.getById)
+        .delete(app.api.benBeneficios.remove)
+
+    app.route('/tabelas-cc')
+        .all(app.config.passport.authenticate())
+        .post(app.api.tabelasCC.save)
+        .get(app.api.tabelasCC.get)
+    app.route('/tabelas-cc/:id')
+        .all(app.config.passport.authenticate())
+        .put(app.api.tabelasCC.save)
+        .get(app.api.tabelasCC.getById)
+        .delete(app.api.tabelasCC.remove)
+
+    app.route('/tabelas/:id_emp')
+        .all(app.config.passport.authenticate())
+        .post(app.api.tabelas.save)
+        .get(app.api.tabelas.get)
+    app.route('/tabelas/:id_emp/:id')
+        .all(app.config.passport.authenticate())
+        .put(app.api.tabelas.save)
+        .get(app.api.tabelas.getById)
+        .delete(app.api.tabelas.remove)
+
+    
+
 }

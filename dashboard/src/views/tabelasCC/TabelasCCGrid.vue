@@ -4,7 +4,7 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import FinRubricaForm from './FinRubricaForm.vue';
+import TabelaCCForm from './TabelaCCForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useUserStore } from '@/stores/user'
 const store = useUserStore();
@@ -19,14 +19,13 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/fin-rubricas`);
+const urlBase = ref(`${baseApiUrl}/tabelas-cc`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        cod_rubr: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        ini_valid: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        dsc_rubr: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        cod_tabela: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        dsc_tabela: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -86,7 +85,7 @@ const getItem = (data) => {
 };
 //Carrrega os dados
 const loadData = () => {
-    axios.get(`${urlBase.value}/${store.userStore.id_emp}`).then((axiosRes) => {
+    axios.get(`${urlBase.value}`).then((axiosRes) => {
         gridData.value = axiosRes.data.data;
     });
 };
@@ -105,24 +104,9 @@ onBeforeMount(() => {
     loadData();
 });
 const novoRegistro = () => {
-    const dataAtual = new Date();
-    const mes = dataAtual.getMonth(); // Obtém o mês atual (0-11)
-    const ano = dataAtual.getFullYear(); // Obtém o ano atual (4 dígitos)
     itemData.value = {
-        id_emp: store.userStore.id_emp,
-        cod_rubr: "",
-        ini_valid: `${ano}-${String(mes + 1).padStart(2, '0')}`,
-        dsc_rubr: "",
-        id_param_nat_rubr: 0,
-        id_param_tipo: 0,
-        id_param_cod_inc_cp: 0,
-        id_param_cod_inc_irrf: 0,
-        id_param_cod_inc_fgts: 0,
-        id_param_cod_inc_cprp: 0,
-        teto_remun: 0,
-        consignado: 0,
-        consignavel: 0,
-        observacao: ""
+        cod_tabela: "",
+        dsc_tabela: ""
     };
     mode.value = 'new';
 };
@@ -130,10 +114,10 @@ const novoRegistro = () => {
 
 <template>
     <div class="card">
-        <FinRubricaForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <TabelaCCForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable ref="dt" :value="gridData" :paginator="true" :rowsPerPageOptions="[5, 10, 20, 50]"
             tableStyle="min-width: 50rem" :rows="5" dataKey="id" :rowHover="true" v-model:filters="filters"
-            filterDisplay="menu" :filters="filters" :globalFilterFields="['cod_rubr', 'ini_valid', 'dsc_rubr']"
+            filterDisplay="menu" :filters="filters" :globalFilterFields="['cod_tabela', 'dsc_tabela']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros" scrollable scrollHeight="415px">
             <template #header>
@@ -147,31 +131,22 @@ const novoRegistro = () => {
                     </span>
                 </div>
             </template>
-            <Column field="cod_rubr" header="Cod Rubrica" sortable>
+            <Column field="cod_tabela" header="Cod da Tabela" sortable>
                 <template #body="{ data }">
-                    {{ data.cod_rubr }}
+                    {{ data.cod_tabela }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter"
-                        placeholder="Localize por Cod Rubrica" />
+                        placeholder="Localize por Cod da Tabela" />
                 </template>
             </Column>
-            <Column field="ini_valid" header="Inicio Válidade" sortable>
+            <Column field="dsc_tabela" header="Descrição da Tabela" sortable>
                 <template #body="{ data }">
-                    {{ data.ini_valid }}
+                    {{ data.dsc_tabela }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter"
-                        placeholder="Localize por Inicio Válidade" />
-                </template>
-            </Column>
-            <Column field="dsc_rubr" header="Descrição" sortable>
-                <template #body="{ data }">
-                    {{ data.dsc_rubr }}
-                </template>
-                <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter"
-                        placeholder="Localize por dsc_rubr" />
+                        placeholder="Localize por Descrição da Tabela" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">

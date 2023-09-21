@@ -44,7 +44,7 @@ const routes = [
             },
             {
                 path: '/:client/:domain/fin-rubricas/:id_emp',
-                name: 'fin-rubricas/:id_emp',
+                name: 'fin-rubricas',
                 component: () => import('@/views/finRubricas/FinRubricasGrid.vue')
             },
             {
@@ -54,23 +54,33 @@ const routes = [
             },
             {
                 path: '/:client/:domain/remuneracao/:id_serv_vinc',
-                name: '/remuneracao/:id_serv_vinc',
+                name: 'remuneracao',
                 component: () => import('@/views/remuneracao/RemuneracaoGrid.vue')
             },
             {
                 path: '/:client/:domain/es-params/:id_emp',
-                name: '/es-params/:id_emp',
+                name: 'es-params',
                 component: () => import('@/views/esParams/EsParamsGrid.vue')
             },
             {
                 path: '/:client/:domain/es-envios/:id_es_param',
-                name: '/es-envios/:id_es_param',
+                name: 'es-envios',
                 component: () => import('@/views/esEnvios/EsEnviosGrid.vue')
             },
             {
                 path: '/:client/:domain/es-rejeicoes/:id_es_envio',
-                name: '/es-rejeicoes/:id_es_envio',
+                name: 'es-rejeicoes',
                 component: () => import('@/views/esRejeicoes/EsRejeicoesGrid.vue')
+            },
+            {
+                path: '/:client/:domain/tabelas-cc/:id_emp_ua',
+                name: 'tabelas-cc',
+                component: () => import('@/views/tabelasCC/TabelasCCGrid.vue')
+            },
+            {
+                path: '/:client/:domain/tabelas/:id_emp',
+                name: 'tabelas',
+                component: () => import('@/views/tabelas/TabelasGrid.vue')
             }       
         ]
     },

@@ -21,8 +21,10 @@ const model = ref([
     {
         label: 'Tabelas',
         items: [
-            { label: 'Rubricas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/fin-rubricas/:id_emp` },//
-            { label: 'INSS', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remuneracao/:id_serv_vinc` },//
+            { label: 'Rubricas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/fin-rubricas/${store.userStore.id_emp}` },//
+            { label: 'Tabelas(CC)', to: `/${store.userStore.cliente}/${store.userStore.dominio}/tabelas-cc` },//
+            { label: 'Tabelas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/tabelas/${store.userStore.id_emp}` },//
+            { label: 'INSS', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remuneracao` },//
 
             { label: 'RPPS', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'IRRF', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
@@ -34,7 +36,7 @@ const model = ref([
             { label: 'Locações', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Local de Trabalho', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
 
-            { label: 'Cargos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/aux-cargos` },//
+            { label: 'Cargos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/aux-cargos` },
 
             { label: 'Centros de custo', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Vinculos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },

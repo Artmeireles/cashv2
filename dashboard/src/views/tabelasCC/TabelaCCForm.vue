@@ -22,7 +22,7 @@ const errorMessages = ref({});
 // Emit do template
 const emit = defineEmits(['changed']);
 // Url base do form action
-const urlBase = ref(`${baseApiUrl}/fin-rubricas/${store.userStore.id_emp}`);
+const urlBase = ref(`${baseApiUrl}/tabelas-cc`);
 // Carragamento de dados do form
 const loadData = async () => {
     if (itemData.value && itemData.value.id) {
@@ -99,56 +99,16 @@ watchEffect(() => {
             <div class="col-12">
                 <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-2">
-                        <label for="cod_rubr">Cod Rúbricas</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cod_rubr" id="cod_rubr" type="text" maxlength="6"/>
+                        <label for="id_emp_ua">Unidade Autonoma</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_emp_ua" id="id_emp_ua" type="text" maxlength="6"/>
                     </div>
                     <div class="field col-12 md:col-2">
-                        <label for="ini_valid">Início Válidade</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.ini_valid" id="ini_valid" type="text" maxlength="6"/>
+                        <label for="cod_tabela">Código da Tabela</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cod_tabela" id="cod_tabela" type="text" maxlength="6"/>
                     </div>
                     <div class="field col-12 md:col-2">
-                        <label for="dsc_rubr">Descrição</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dsc_rubr" id="dsc_rubr" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="id_param_nat_rubr">Natureza Rubrica</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_nat_rubr" id="id_param_nat_rubr" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="id_param_tipo">Tipo Rubrica</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_tipo" id="id_param_tipo" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="id_param_cod_inc_cp">Código de Incidência Tributária</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_cod_inc_cp" id="id_param_cod_inc_cp" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="id_param_cod_inc_irrf">Código de Incidência IRRF</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_cod_inc_irrf" id="id_param_cod_inc_irrf" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="id_param_cod_inc_fgts">Código de Incidência FGTS</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_cod_inc_fgts" id="id_param_cod_inc_fgts" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="id_param_cod_inc_cprp">Código de Incidência RPPS</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_cod_inc_cprp" id="id_param_cod_inc_cprp" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="teto_remun">Teto Remuneratório</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.teto_remun" id="teto_remun" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="consignado">Consignado</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.consignado" id="consignado" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="consignavel">Consignável</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.consignavel" id="consignavel" type="text" maxlength="6" />
-                    </div>
-                    <div class="field col-12 md:col-8">
-                        <label for="observacao">Observação</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.observacao" id="observacao" type="text" maxlength="6" />
+                        <label for="dsc_tabela">Descrição</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dsc_tabela" id="dsc_tabela" type="text" maxlength="6" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">
