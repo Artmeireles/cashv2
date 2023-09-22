@@ -171,7 +171,7 @@ const novoRegistro = () => {
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter"
-                        placeholder="Localize por dsc_rubr" />
+                        placeholder="Localize por Descrição" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">

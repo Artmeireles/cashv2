@@ -104,15 +104,15 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="tipo_tabela">Tipo da Tabela</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tipo_tabela" id="tipo_tabela" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tipo_tabela" id="tipo_tabela" type="text" maxlength="1"/>
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="cod_tabela">Código da Tabela</label>
                         <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cod_tabela" id="cod_tabela" type="text" maxlength="6" />
                     </div>
-                    <div class="field col-12 md:col-4">
+                    <div class="field col-12 md:col-12">
                         <label for="dsc_tabela">Descrição da Tabela</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dsc_tabela" id="dsc_tabela" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dsc_tabela" id="dsc_tabela" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="inicial1">Valor inicial da faixa</label>

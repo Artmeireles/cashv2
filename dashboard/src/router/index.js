@@ -58,6 +58,11 @@ const routes = [
                 component: () => import('@/views/remuneracao/RemuneracaoGrid.vue')
             },
             {
+                path: '/:client/:domain/remun-adfg',
+                name: 'remun-adfg',
+                component: () => import('@/views/remunADFG/RemunADFGGrid.vue')
+            },
+            {
                 path: '/:client/:domain/es-params/:id_emp',
                 name: 'es-params',
                 component: () => import('@/views/esParams/EsParamsGrid.vue')
@@ -73,7 +78,7 @@ const routes = [
                 component: () => import('@/views/esRejeicoes/EsRejeicoesGrid.vue')
             },
             {
-                path: '/:client/:domain/tabelas-cc/:id_emp_ua',
+                path: '/:client/:domain/tabelas-cc',
                 name: 'tabelas-cc',
                 component: () => import('@/views/tabelasCC/TabelasCCGrid.vue')
             },

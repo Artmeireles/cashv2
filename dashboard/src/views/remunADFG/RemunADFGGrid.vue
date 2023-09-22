@@ -4,11 +4,8 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import EsParamForm from './EsParamForm.vue';
+import RemunADFGForm from './RemunADFGForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
-import { useUserStore } from '@/stores/user';
-const store = useUserStore();
-
 const confirm = useConfirm();
 const filters = ref(null);
 const menu = ref();
@@ -19,14 +16,13 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/es-params`);
+const urlBase = ref(`${baseApiUrl}/remun-adfg`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        id_emp: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        cnpj_sh: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        cnpj_efr: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        tipo: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        nr_pub: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -86,7 +82,7 @@ const getItem = (data) => {
 };
 // Carrrega os dados
 const loadData = () => {
-    axios.get(`${urlBase.value}/${store.userStore.id_emp}`).then((axiosRes) => {
+    axios.get(`${urlBase.value}`).then((axiosRes) => {
         gridData.value = axiosRes.data.data;
     });
 };
@@ -103,15 +99,14 @@ onBeforeMount(() => {
     initFilters();
     loadData();
 });
+
 const novoRegistro = () => {
     itemData.value = {
-        id_emp: store.userStore.id_emp,
-        ambiente: "",
-        cnpj_sh: "",
-        token_sh: 0,
-        ver_process: 0,
-        cnpj_transmissor: "",
-        cnpj_efr: ""
+        tipo: "",
+        dt_inicio: "",
+        publicacao: "",
+        nr_pub: "",
+        id_param_vei_pub: ""
     };
     mode.value = 'new';
 };
@@ -120,7 +115,7 @@ const novoRegistro = () => {
 
 <template>
     <div class="card">
-        <EsParamForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <RemunADFGForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable
             ref="dt"
             :value="gridData"
@@ -133,7 +128,7 @@ const novoRegistro = () => {
             v-model:filters="filters"
             filterDisplay="menu"
             :filters="filters"
-            :globalFilterFields="['id_emp', 'cnpj_sh', 'cnpj_efr']"
+            :globalFilterFields="['tipo', 'nr_pub', 'id_param_vei_pub']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
             scrollable
@@ -143,40 +138,37 @@ const novoRegistro = () => {
                 <div class="flex justify-content-end gap-3">
                     <Button icon="pi pi-external-link" label="Exportar" @click="exportCSV($event)" />
                     <Button type="button" icon="pi pi-filter-slash" label="Limpar filtro" outlined @click="clearFilter()" />
-                    <Button type="button" icon="pi pi-plus" label="Novo Registro" outlined @click="novoRegistro()" />
+                    <Button type="button" icon="pi pi-plus" label="Novo Registro" outlined  @click="novoRegistro()"/>
                     <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model.lazy="filters['global'].value" placeholder="Pesquise..." />
                     </span>
                 </div>
             </template>
-            <Column field="id_emp" header="Empresa" sortable>
+            <Column field="tipo" header="Tipo" sortable>
                 <template #body="{ data }">
-                    {{ data.id_emp }}
+                    {{ data.tipo }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por id_emp" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Tipo" />
                 </template>
             </Column>
-            <Column field="cnpj_sh" header="CNPJ SH" sortable>
+            <Column field="nr_pub" header="Nº da Publicação" sortable>
                 <template #body="{ data }">
-                    {{ data.cnpj_sh }}
+                    {{ data.nr_pub }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por cnpj_sh" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Nº da Publicação" />
                 </template>
             </Column>
-            <Column field="cnpj_efr" header="CNPJ EFR" sortable>
+            <Column field="id_param_vei_pub" header="Veículo da Publicação" sortable>
                 <template #body="{ data }">
-                    {{ data.cnpj_efr }}
+                    {{ data.id_param_vei_pub }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por cnpj_efr" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Veículo da Publicação" />
                 </template>
             </Column>
-                <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por descricao" />
-                </template>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
                 <template #body="{ data }">
                     <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" class="p-button-outlined" />

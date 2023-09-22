@@ -22,7 +22,7 @@ const errorMessages = ref({});
 // Emit do template
 const emit = defineEmits(['changed']);
 // Url base do form action
-const urlBase = ref(`${baseApiUrl}/es-params`);
+const urlBase = ref(`${baseApiUrl}/es-params/${store.userStore.id_emp}`);
 // Carragamento de dados do form
 const loadData = async () => {
     if (itemData.value && itemData.value.id) {
@@ -37,7 +37,7 @@ const loadData = async () => {
                 loading.value = false;
             } else {
                 defaultWarn('Registro não localizado');
-                router.push({ path: `/${store.userStore.cliente}/${store.userStore.dominio}/cadastros` });
+                router.push({ path: urlBase.value });
             }
         });
     }
@@ -98,17 +98,33 @@ watchEffect(() => {
         <form @submit.prevent="saveData">
             <div class="col-12">
                 <div class="p-fluid formgrid grid">
-                    <div class="field col-12 md:col-2">
+                    <div class="field col-12 md:col-6">
                         <label for="id_emp">Empresa</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_emp" id="id_emp" type="text" maxlength="4" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_emp" id="id_emp" type="text" maxlength="10" />
                     </div>
                     <div class="field col-12 md:col-2">
+                        <label for="ambiente">Ambiente</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.ambiente" id="ambiente" type="text" maxlength="10" />
+                    </div>
+                    <div class="field col-12 md:col-6">
                         <label for="cnpj_sh">CNPJ SH</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cnpj_sh" id="cnpj_sh" type="text" maxlength="3" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cnpj_sh" id="cnpj_sh" type="text" maxlength="18" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="token_sh">Token SH</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.token_sh" id="token_sh" type="text" maxlength="3" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="cnpj_transmissor">CNPJ Transmissor</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cnpj_transmissor" id="cnpj_transmissor" type="text" maxlength="18" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="cnpj_efr">CNPJ EFR</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cnpj_efr" id="cnpj_efr" type="text" maxlength="18" />
                     </div>
                     <div class="field col-12 md:col-2">
-                        <label for="cnpj_efr">CNPJ EFR</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cnpj_efr" id="cnpj_efr" type="text" maxlength="3" />
+                        <label for="ver_process">Versão do Processo</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.ver_process" id="ver_process" type="text" maxlength="3" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">

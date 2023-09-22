@@ -15,7 +15,8 @@ const model = ref([
         items: [
             { label: 'Gestão de Empregados', to: `/${store.userStore.cliente}/${store.userStore.dominio}/servidores` },
             { label: 'Parâmetros Financeiros', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Empresa', to: `/${store.userStore.cliente}/${store.userStore.dominio}/empresa` }//
+            { label: 'Empresa', to: `/${store.userStore.cliente}/${store.userStore.dominio}/empresa` },//
+            { label: '(Remuneração ADFG)', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-adfg` },//
         ]
     },
     {
@@ -36,7 +37,7 @@ const model = ref([
             { label: 'Locações', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Local de Trabalho', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
 
-            { label: 'Cargos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/aux-cargos` },
+            { label: 'Cargos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/aux-cargos` },//
 
             { label: 'Centros de custo', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Vinculos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
@@ -48,9 +49,9 @@ const model = ref([
     {
         label: 'e-Social',
         items: [
-            { label: 'Parâmetros', to: `/${store.userStore.cliente}/${store.userStore.dominio}/es-params` },
-            { label: 'Envios', to: `/${store.userStore.cliente}/${store.userStore.dominio}/es-envios` },
-            { label: 'Rejeições', to: `/${store.userStore.cliente}/${store.userStore.dominio}/es-rejeicoes` }
+            { label: 'Parâmetros', to: `/${store.userStore.cliente}/${store.userStore.dominio}/es-params/${store.userStore.id_emp}` },//
+            { label: 'Envios', to: `/${store.userStore.cliente}/${store.userStore.dominio}/es-envios` },//
+            { label: 'Rejeições', to: `/${store.userStore.cliente}/${store.userStore.dominio}/es-rejeicoes` }//
         ]
     },
     {

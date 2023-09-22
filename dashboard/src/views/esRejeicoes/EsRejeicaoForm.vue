@@ -37,7 +37,7 @@ const loadData = async () => {
                 loading.value = false;
             } else {
                 defaultWarn('Registro não localizado');
-                router.push({ path: `/${store.userStore.cliente}/${store.userStore.dominio}/cadastros` });
+                router.push({ path: urlBase.value });
             }
         });
     }
@@ -98,17 +98,21 @@ watchEffect(() => {
         <form @submit.prevent="saveData">
             <div class="col-12">
                 <div class="p-fluid formgrid grid">
-                    <div class="field col-12 md:col-2">
-                        <label for="id_es_param">Parâmetros</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_es_param" id="id_es_param" type="text" maxlength="4" />
+                    <div class="field col-12 md:col-6">
+                        <label for="id_es_envio">ID Envio</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_es_envio" id="id_es_envio" type="text" maxlength="10" />
                     </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="es_lote">Lote</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.es_lote" id="es_lote" type="text" maxlength="3" />
+                    <div class="field col-12 md:col-6">
+                        <label for="rejeicao_id">Rejeição</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.rejeicao_id" id="rejeicao_id" type="text" maxlength="11" />
                     </div>
-                    <div class="field col-12 md:col-2">
-                        <label for="es_recibo">Recibo</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.es_recibo" id="es_recibo" type="text" maxlength="3" />
+                    <div class="field col-12 md:col-6">
+                        <label for="codigo">Código</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.codigo" id="codigo" type="text" maxlength="11" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <label for="ocorrencia">Ocorrência</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.ocorrencia" id="ocorrencia" type="text" maxlength="255" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">

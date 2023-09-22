@@ -22,7 +22,7 @@ const errorMessages = ref({});
 // Emit do template
 const emit = defineEmits(['changed']);
 // Url base do form action
-const urlBase = ref(`${baseApiUrl}/es-envios/:id_es_param`);
+const urlBase = ref(`${baseApiUrl}/remun-adfg`);
 // Carragamento de dados do form
 const loadData = async () => {
     if (itemData.value && itemData.value.id) {
@@ -37,7 +37,7 @@ const loadData = async () => {
                 loading.value = false;
             } else {
                 defaultWarn('Registro não localizado');
-                router.push({ path: `/${store.userStore.cliente}/${store.userStore.dominio}/cadastros` });
+                router.push({ path: urlBase.value });
             }
         });
     }
@@ -98,53 +98,25 @@ watchEffect(() => {
         <form @submit.prevent="saveData">
             <div class="col-12">
                 <div class="p-fluid formgrid grid">
-                    <div class="field col-12 md:col-6">
-                        <label for="id_es_param">Parâmetros</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_es_param" id="id_es_param" type="text" maxlength="10" />
+                    <div class="field col-12 md:col-2">
+                        <label for="tipo">Tipo</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tipo" id="tipo" type="text" maxlength="10" />
                     </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="es_lote">Lote</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.es_lote" id="es_lote" type="text" maxlength="255" />
+                    <div class="field col-12 md:col-2">
+                        <label for="dt_inicio">Data Inicio</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_inicio" id="dt_inicio" type="text" maxlength="10" />
                     </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="es_idevento">IDEvento</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.es_idevento" id="es_idevento" type="text" maxlength="255" />
+                    <div class="field col-12 md:col-2">
+                        <label for="publicacao">Publicação</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.publicacao" id="publicacao" type="text" maxlength="10" />
                     </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="es_evento">Evento</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.es_evento" id="es_evento" type="text" maxlength="255" />
+                    <div class="field col-12 md:col-2">
+                        <label for="nr_pub">Nº Publicação</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.nr_pub" id="nr_pub" type="text" maxlength="10" />
                     </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="es_recibo">Recibo</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.es_recibo" id="es_recibo" type="text" maxlength="255" />
-                    </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="es_status">Status</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.es_status" id="es_status" type="text" maxlength="11" />
-                    </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="exercicio">Exercício</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.exercicio" id="exercicio" type="text" maxlength="7" />
-                    </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="tabela">Tabela</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tabela" id="tabela" type="text" maxlength="255" />
-                    </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="tbl_field">Tabela field</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tbl_field" id="tbl_field" type="text" maxlength="25" />
-                    </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="tbl_id">Tabela id</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tbl_id" id="tbl_id" type="text" maxlength="500" />
-                    </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="ambiente">Ambiente</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.ambiente" id="ambiente" type="text" maxlength="1" />
-                    </div>
-                    <div class="field col-12 md:col-6">
-                        <label for="ver_process">Versão do Processo</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.ver_process" id="ver_process" type="text" maxlength="255" />
+                    <div class="field col-12 md:col-2">
+                        <label for="id_param_vei_pub">Veiculo da Publicação</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_vei_pub" id="id_param_vei_pub" type="text" maxlength="10" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">

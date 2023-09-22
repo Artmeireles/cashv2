@@ -100,6 +100,15 @@ onBeforeMount(() => {
     initFilters();
     loadData();
 });
+const novoRegistro = () => {
+    itemData.value = {
+        id_es_envio: "",
+        rejeicao_id: "",
+        codigo: "",
+        ocorrencia: "",
+    };
+    mode.value = 'new';
+};
 
 </script>
 
@@ -128,7 +137,7 @@ onBeforeMount(() => {
                 <div class="flex justify-content-end gap-3">
                     <Button icon="pi pi-external-link" label="Exportar" @click="exportCSV($event)" />
                     <Button type="button" icon="pi pi-filter-slash" label="Limpar filtro" outlined @click="clearFilter()" />
-                    <Button type="button" icon="pi pi-plus" label="Novo Registro" outlined />
+                    <Button type="button" icon="pi pi-plus" label="Novo Registro" outlined @click="novoRegistro()" />
                     <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model.lazy="filters['global'].value" placeholder="Pesquise..." />

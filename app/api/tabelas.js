@@ -27,39 +27,63 @@ module.exports = app => {
 
         try {
                 existsOrError(body.id_emp,'Empresa não informada')
-                existsOrError(body.tipo_tabela,'Tipo da Tabela não informada')
-                existsOrError(body.cod_tabela,'Código da Tabela não informada')
-                existsOrError(body.dsc_tabela,'Descrição da Tabela não informada')
-                existsOrError(body.inicial1,'Valor inicial da faixa não informada')
-                existsOrError(body.final1,'Valor final da faixa não informada')
-                existsOrError(body.aliquota1 ,'Aliquota da faixa não informada')
-                existsOrError(body.deduzir1,'Valor a deduzir da faixa  não informada')
-                existsOrError(body.inicial2,'Valor inicial da faixa não informada')
-                existsOrError(body.final2,'Valor final da faixa não informada')
-                existsOrError(body.aliquota2 ,'Aliquota da faixa não informada')
-                existsOrError(body.deduzir2,'Valor a deduzir da faixa não informada')
-                existsOrError(body.inicial3,'Valor inicial da faixa não informada')
-                existsOrError(body.final3,'Valor final da faixa não informada')
-                existsOrError(body.aliquota3 ,'Aliquota da faixa não informada')
-                existsOrError(body.deduzir3,'Valor a deduzir da faixa não informada')
-                existsOrError(body.inicial4,'Valor inicial da faixa não informada')
-                existsOrError(body.final4,'Valor final da faixa não informada')
-                existsOrError(body.aliquota4 ,'Aliquota da faixa não informada')
-                existsOrError(body.deduzir4,'Valor a deduzir da faixa não informada')
-                existsOrError(body.inicial5,'Valor inicial da faixa não informada')
-                existsOrError(body.final5,'Valor final da faixa não informada')
-                existsOrError(body.aliquota5 ,'Aliquota da faixa não informada')
-                existsOrError(body.deduzir5,'Valor a deduzir da faixa não informada')
-                existsOrError(body.patronal,'Aliquota patronal não informada')
-                existsOrError(body.patronal_e1,'Aliquota patronal não informada')
-                //existsOrError(body.id_cc_e1,'Centro de custo E1 não informada')
-                existsOrError(body.patronal_e2,'Aliquota patronal não informada')
-                //existsOrError(body.id_cc_e2,'Centro de custo E2 não informada')
-                existsOrError(body.teto,'Teto do INSS não informada')
-                existsOrError(body.rat,'Aliquota RAT não informada')
-                existsOrError(body.fap,'Aliquota FAP não informada')
-                existsOrError(body.deducao_dependente,'Valor da dedução por dependente não informada')
-                existsOrError(body.ini_valid ,'Início da Validade das Informações não informada')
+                existsOrError(body.tipo_tabela,'Tipo da Tabela não informado')
+                existsOrError(body.cod_tabela,'Código da Tabela não informado')
+                existsOrError(body.dsc_tabela,'Descrição da Tabela não informado')
+                existsOrError(body.inicial1,'Valor inicial da faixa não informado')
+                existsOrError(body.final1,'Valor final da faixa não informado')
+                existsOrError(body.aliquota1 ,'Aliquota da faixa não informado')
+                if(body.tipo_tabela == '0'){
+                existsOrError(body.deduzir1,'Valor a deduzir da faixa não informado')
+                }
+                existsOrError(body.inicial2,'Valor inicial da faixa não informado')
+                existsOrError(body.final2,'Valor final da faixa não informado')
+                existsOrError(body.aliquota2 ,'Aliquota da faixa não informado')
+                if(body.tipo_tabela == '0'){
+                existsOrError(body.deduzir2,'Valor a deduzir da faixa não informado')
+                }
+                existsOrError(body.inicial3,'Valor inicial da faixa não informado')
+                existsOrError(body.final3,'Valor final da faixa não informado')
+                existsOrError(body.aliquota3 ,'Aliquota da faixa não informado')
+                if(body.tipo_tabela == '0'){
+                existsOrError(body.deduzir3,'Valor a deduzir da faixa não informado')
+                }
+                existsOrError(body.inicial4,'Valor inicial da faixa não informado')
+                existsOrError(body.final4,'Valor final da faixa não informado')
+                existsOrError(body.aliquota4 ,'Aliquota da faixa não informado')
+                if(body.tipo_tabela == '0'){
+                existsOrError(body.deduzir4,'Valor a deduzir da faixa não informado')
+                }
+                if(body.tipo_tabela == '0'){
+                existsOrError(body.inicial5,'Valor inicial da faixa não informado')
+                }
+                if(body.tipo_tabela == '0'){
+                existsOrError(body.final5,'Valor final da faixa não informado')
+                }
+                if(body.tipo_tabela == '0'){
+                existsOrError(body.aliquota5 ,'Aliquota da faixa não informado')
+                }
+                if(body.tipo_tabela == '0'){
+                existsOrError(body.deduzir5,'Valor a deduzir da faixa não informado')
+                }
+                if(body.tipo_tabela == '0' || '2'){
+                existsOrError(body.patronal,'Aliquota patronal não informado')
+                }
+                if(body.tipo_tabela == '2'){
+                existsOrError(body.patronal_e1,'Aliquota patronal não informado')
+                }
+                //existsOrError(body.id_cc_e1,'Centro de custo E1 não informado')
+                if(body.tipo_tabela == '2'){
+                existsOrError(body.patronal_e2,'Aliquota patronal não informado')
+                }
+                //existsOrError(body.id_cc_e2,'Centro de custo E2 não informado')
+                if(body.tipo_tabela == '1' || '0'){
+                existsOrError(body.teto,'Teto do INSS não informado')
+                existsOrError(body.rat,'Aliquota RAT não informado')
+                existsOrError(body.fap,'Aliquota FAP não informado')
+                }
+                existsOrError(body.deducao_dependente,'Valor da dedução por dependente não informado')
+                existsOrError(body.ini_valid ,'Início da Validade das Informações não informado')
         }
         catch (error) {
             return res.status(400).send(error)

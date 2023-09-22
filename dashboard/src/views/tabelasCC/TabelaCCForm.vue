@@ -98,17 +98,17 @@ watchEffect(() => {
         <form @submit.prevent="saveData">
             <div class="col-12">
                 <div class="p-fluid formgrid grid">
-                    <div class="field col-12 md:col-2">
+                    <div class="field col-12 md:col-6">
                         <label for="id_emp_ua">Unidade Autonoma</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_emp_ua" id="id_emp_ua" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_emp_ua" id="id_emp_ua" type="text" maxlength="10"/>
                     </div>
-                    <div class="field col-12 md:col-2">
+                    <div class="field col-12 md:col-6">
                         <label for="cod_tabela">Código da Tabela</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cod_tabela" id="cod_tabela" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cod_tabela" id="cod_tabela" type="text" maxlength="8"/>
                     </div>
-                    <div class="field col-12 md:col-2">
+                    <div class="field col-12 md:col-12">
                         <label for="dsc_tabela">Descrição</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dsc_tabela" id="dsc_tabela" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dsc_tabela" id="dsc_tabela" type="text" maxlength="255" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">
