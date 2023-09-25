@@ -22,10 +22,8 @@ const masks = ref({
     })
 });
 
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
-
-import { useRouter } from 'vue-router';
 const router = useRouter();
 
 // Cookies de usuário
@@ -344,7 +342,7 @@ watch(
                     <div class="field col-12 md:col-2">
                         <label for="cpf_trab">CPF</label>
                         <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="###.###.###-##" v-model="itemDataMasked.cpf_trab" id="cep" type="text" @input="validateCPF()" @blur="setUnMasked('cpf_trab')" />
-                        <small id="text-error" class="p-error">{{ errorMessages.cpf_trab || '&nbsp;' }}</small>
+                        <small id="text-error" v-if="errorMessages.cpf_trab" class="p-error">{{ errorMessages.cpf_trab || '&nbsp;' }}</small>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="id_param_sexo">Sexo</label>
@@ -361,8 +359,7 @@ watch(
                     <div class="field col-12 md:col-2">
                         <label for="dt_nascto">Nascimento</label>
                         <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemDataMasked.dt_nascto" id="cep" type="text" @input="validateDtNascto()" @blur="setUnMasked('dt_nascto')" />
-                        <small id="text-error" class="p-error">{{ errorMessages.dt_nascto || '&nbsp;' }}</small>
-                        <p>{{ itemDataMasked.dt_nascto ? validarDataPTBR(itemDataMasked.dt_nascto) : '' }}</p>
+                        <small id="text-error" v-if="errorMessages.dt_nascto" class="p-error">{{ errorMessages.dt_nascto || '&nbsp;' }}</small>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="id_param_p_nascto">País de Nascimento</label>
@@ -383,7 +380,7 @@ watch(
                     <div class="field col-12 md:col-2">
                         <label for="cep">CEP</label>
                         <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##.###-###" v-model="itemDataMasked.cep" id="cep" type="text" @input="validateCEP()" @blur="setUnMasked('cep')" />
-                        <small id="text-error" class="p-error">{{ errorMessages.cep || '&nbsp;' }}</small>
+                        <small id="text-error" v-if="errorMessages.cep" class="p-error">{{ errorMessages.cep || '&nbsp;' }}</small>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="uf">UF</label>
@@ -421,12 +418,12 @@ watch(
                     <div class="field col-12 md:col-2">
                         <label for="telefone">Telefone</label>
                         <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="(##) #####-####" v-model="itemDataMasked.telefone" id="telefone" type="text" @input="validateTelefone()" @blur="setUnMasked('telefone')" />
-                        <small id="text-error" class="p-error">{{ errorMessages.telefone || '&nbsp;' }}</small>
+                        <small id="text-error" v-if="errorMessages.telefone" class="p-error">{{ errorMessages.telefone || '&nbsp;' }}</small>
                     </div>
                     <div class="field col-12 md:col-3">
                         <label for="email">Email</label>
                         <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.email" id="email" type="text" @input="validateEmail()" @blur="setUnMasked('email')" />
-                        <small id="text-error" class="p-error">{{ errorMessages.email || '&nbsp;' }}</small>
+                        <small id="text-error" v-if="errorMessages.email" class="p-error">{{ errorMessages.email || '&nbsp;' }}</small>
                     </div>
                     <div class="field col-12 md:col-9">
                         <label for="observacao">Observação</label>

@@ -38,7 +38,7 @@ const model = ref([
             { label: 'Local de Trabalho', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Cargos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/aux-cargos` },//
             { label: 'Centros de custo', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Vinculos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/serv-vinculos` },//
+            { label: 'Vinculos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'PCC', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
 
             { label: 'Bancos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/cad-bancos` }//

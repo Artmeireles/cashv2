@@ -4,8 +4,11 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import RemuneracaoForm from './RemuneracaoForm.vue';
+import ServVinculoForm from './ServVinculoForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
+import { useRoute, useRouter } from 'vue-router';
+const route = useRoute();
+const router = useRouter();
 const confirm = useConfirm();
 const filters = ref(null);
 const menu = ref();
@@ -16,13 +19,14 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/remuneracao`);
+const urlBase = ref(`${baseApiUrl}/serv-vinculos`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        qtd_rubr: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        prazo_i: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        id_serv: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        matricula: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        sit_func: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -61,7 +65,7 @@ const deleteRow = () => {
         rejectIcon: 'pi pi-times',
         acceptClass: 'p-button-danger',
         accept: () => {
-            axios.delete(`${urlBase.value}/${itemData.value.id}`).then(() => {
+            axios.delete(`${urlBase.value}/${route.params.id}/${itemData.value.id}`).then(() => {
                 defaultSuccess('Registro excluído com sucesso!');
                 loadData();
             });
@@ -82,7 +86,8 @@ const getItem = (data) => {
 };
 // Carrrega os dados
 const loadData = () => {
-    axios.get(`${urlBase.value}`).then((axiosRes) => {
+    const url = `${urlBase.value}/${route.params.id}`;
+    axios.get(`${url}`).then((axiosRes) => {
         gridData.value = axiosRes.data.data;
     });
 };
@@ -100,11 +105,20 @@ onBeforeMount(() => {
     loadData();
 });
 
+const novoRegistro = () => {
+    itemData.value = {
+        id_serv: "",
+        matricula: "",
+        sit_func: "",
+    };
+    mode.value = 'new';
+};
+
 </script>
 
 <template>
     <div class="card">
-        <RemuneracaoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <ServVinculoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable
             ref="dt"
             :value="gridData"
@@ -117,7 +131,7 @@ onBeforeMount(() => {
             v-model:filters="filters"
             filterDisplay="menu"
             :filters="filters"
-            :globalFilterFields="['qtd_rubr', 'prazo_i']"
+            :globalFilterFields="['id_serv', 'matricula', 'sit_func']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
             scrollable
@@ -127,27 +141,35 @@ onBeforeMount(() => {
                 <div class="flex justify-content-end gap-3">
                     <Button icon="pi pi-external-link" label="Exportar" @click="exportCSV($event)" />
                     <Button type="button" icon="pi pi-filter-slash" label="Limpar filtro" outlined @click="clearFilter()" />
-                    <Button type="button" icon="pi pi-plus" label="Novo Registro" outlined />
+                    <Button type="button" icon="pi pi-plus" label="Novo Registro" outlined @click="novoRegistro()" />
                     <span class="p-input-icon-left">
                         <i class="pi pi-search" />
                         <InputText v-model.lazy="filters['global'].value" placeholder="Pesquise..." />
                     </span>
                 </div>
             </template>
-            <Column field="qtd_rubr" header="Quantidade Rub" sortable>
+            <Column field="id_serv" header="Servidor" sortable>
                 <template #body="{ data }">
-                    {{ data.qtd_rubr }}
+                    {{ data.id_serv }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Quantidade Rub" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Servidor" />
                 </template>
             </Column>
-            <Column field="prazo_i" header="Prazo Inicial" sortable>
+            <Column field="matricula" header="Matricula" sortable>
                 <template #body="{ data }">
-                    {{ data.prazo_i }}
+                    {{ data.matricula }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Prazo Inicial" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Matricula" />
+                </template>
+            </Column>
+            <Column field="sit_func" header="Situação Funcional" sortable>
+                <template #body="{ data }">
+                    {{ data.sit_func }}
+                </template>
+                <template #filter="{ filterModel }">
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Situação Funcional" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">

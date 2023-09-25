@@ -23,14 +23,9 @@ const routes = [
                 component: () => import('@/views/servidores/ServidorPanel.vue')
             },
             {
-                path: '/:client/:domain/serv-vinculos/:id',
+                path: '/:client/:domain/serv-vinculos/:id_serv_vinc',
                 name: 'serv-vinculos',
-                component: () => import('@/views/servidores/ServidorPanel.vue')
-            },
-            {
-                path: '/:client/:domain/remun-params',
-                name: 'remun-params',
-                component: () => import('@/views/remuneracaoParams/ParametrosGrid.vue')
+                component: () => import('@/views/servidoresVinculos/ServVinculosGrid.vue')
             },
             {
                 path: '/:client/:domain/empresa',
@@ -57,6 +52,12 @@ const routes = [
                 name: 'cad-bancos',
                 component: () => import('@/views/cadBancos/CadBancosGrid.vue')
             },
+            //remuneração            
+            {
+                path: '/:client/:domain/remun-params',
+                name: 'remun-params',
+                component: () => import('@/views/remuneracaoParams/ParametrosGrid.vue')
+            },
             {
                 path: '/:client/:domain/remuneracao/:id_serv_vinc',
                 name: 'remuneracao',
@@ -67,6 +68,7 @@ const routes = [
                 name: 'remun-adfg',
                 component: () => import('@/views/remunADFG/RemunADFGGrid.vue')
             },
+            //e-social
             {
                 path: '/:client/:domain/es-params/:id_emp',
                 name: 'es-params',
