@@ -82,7 +82,7 @@ const toggle = (event) => {
 };
 // Seleciona o item
 const getItem = (data) => {
-    itemData.value = data;
+    itemData.value = { ...data };
 };
 //Carrrega os dados
 const loadData = () => {

@@ -22,7 +22,7 @@ const errorMessages = ref({});
 // Emit do template
 const emit = defineEmits(['changed']);
 // Url base do form action
-const urlBase = ref(`${baseApiUrl}/es-envios/:id_es_param`);
+const urlBase = ref(`${baseApiUrl}/es-envios`);
 // Carragamento de dados do form
 const loadData = async () => {
     if (itemData.value && itemData.value.id) {
@@ -37,7 +37,7 @@ const loadData = async () => {
                 loading.value = false;
             } else {
                 defaultWarn('Registro não localizado');
-                router.push({ path: `/${store.userStore.cliente}/${store.userStore.dominio}/cadastros` });
+                router.push({ path: urlBase.value });
             }
         });
     }

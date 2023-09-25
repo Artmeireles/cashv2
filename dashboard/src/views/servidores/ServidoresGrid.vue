@@ -86,7 +86,7 @@ const toggle = (event) => {
     menu.value.toggle(event);
 };
 const getItem = (data) => {
-    itemData.value = data;
+    itemData.value = { ...data };
 };
 const loadData = () => {
     axios.get(`${urlBase.value}`).then((axiosRes) => {

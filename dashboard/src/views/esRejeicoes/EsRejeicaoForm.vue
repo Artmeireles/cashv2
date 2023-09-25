@@ -22,7 +22,7 @@ const errorMessages = ref({});
 // Emit do template
 const emit = defineEmits(['changed']);
 // Url base do form action
-const urlBase = ref(`${baseApiUrl}/es-rejeicoes/:id_es_envio`);
+const urlBase = ref(`${baseApiUrl}/es-rejeicoes`);
 // Carragamento de dados do form
 const loadData = async () => {
     if (itemData.value && itemData.value.id) {

@@ -23,6 +23,11 @@ const routes = [
                 component: () => import('@/views/servidores/ServidorPanel.vue')
             },
             {
+                path: '/:client/:domain/serv-vinculos/:id',
+                name: 'serv-vinculos',
+                component: () => import('@/views/servidores/ServidorPanel.vue')
+            },
+            {
                 path: '/:client/:domain/remun-params',
                 name: 'remun-params',
                 component: () => import('@/views/remuneracaoParams/ParametrosGrid.vue')
@@ -68,12 +73,12 @@ const routes = [
                 component: () => import('@/views/esParams/EsParamsGrid.vue')
             },
             {
-                path: '/:client/:domain/es-envios/:id_es_param',
+                path: '/:client/:domain/es-envios',
                 name: 'es-envios',
                 component: () => import('@/views/esEnvios/EsEnviosGrid.vue')
             },
             {
-                path: '/:client/:domain/es-rejeicoes/:id_es_envio',
+                path: '/:client/:domain/es-rejeicoes',
                 name: 'es-rejeicoes',
                 component: () => import('@/views/esRejeicoes/EsRejeicoesGrid.vue')
             },

@@ -16,7 +16,7 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/es-envios/:id_es_param`);
+const urlBase = ref(`${baseApiUrl}/es-envios`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
@@ -79,7 +79,7 @@ const toggle = (event) => {
 };
 // Seleciona o item
 const getItem = (data) => {
-    itemData.value = data;
+    itemData.value = { ...data };
 };
 // Carrrega os dados
 const loadData = () => {

@@ -6,6 +6,9 @@ import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
 import EsRejeicaoForm from './EsRejeicaoForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
+import { useUserStore } from '@/stores/user';
+const store = useUserStore();
+
 const confirm = useConfirm();
 const filters = ref(null);
 const menu = ref();
@@ -16,7 +19,7 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/es-rejeicoes/:id_es_envio`);
+const urlBase = ref(`${baseApiUrl}/es-rejeicoes`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
@@ -79,7 +82,7 @@ const toggle = (event) => {
 };
 // Seleciona o item
 const getItem = (data) => {
-    itemData.value = data;
+    itemData.value = { ...data };
 };
 // Carrrega os dados
 const loadData = () => {
