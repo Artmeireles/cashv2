@@ -4,12 +4,11 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import RemuneracaoForm from './RemuneracaoForm.vue';
+import ServDependenteForm from './ServDependenteForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
-
 const confirm = useConfirm();
 const filters = ref(null);
 const menu = ref();
@@ -20,14 +19,14 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/remuneracao`);
+const urlBase = ref(`${baseApiUrl}/serv-dependentes`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        id_serv_vinc: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        id_rubrica: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        prazo_i: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        id_serv: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        id_param_tp_dep: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -92,11 +91,6 @@ const loadData = () => {
         gridData.value = axiosRes.data.data;
     });
 };
-// const loadData = () => {
-//     axios.get(`${urlBase.value}`).then((axiosRes) => {
-//         gridData.value = axiosRes.data.data;
-//     });
-// };
 // Exporta os dados
 const exportCSV = () => {
     dt.value.exportCSV();
@@ -113,9 +107,9 @@ onBeforeMount(() => {
 
 const novoRegistro = () => {
     itemData.value = {
-        id_serv_vinc: "",
-        id_remun_param: "",
-        id_rubrica: "",
+        id_serv: "",
+        nome: "",
+        id_param_tp_dep: "",
     };
     mode.value = 'new';
 };
@@ -124,7 +118,7 @@ const novoRegistro = () => {
 
 <template>
     <div class="card">
-        <RemuneracaoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <ServDependenteForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable
             ref="dt"
             :value="gridData"
@@ -137,7 +131,7 @@ const novoRegistro = () => {
             v-model:filters="filters"
             filterDisplay="menu"
             :filters="filters"
-            :globalFilterFields="['id_serv_vinc', 'id_rubrica', 'prazo_i']"
+            :globalFilterFields="['id_serv', 'nome', 'id_param_tp_dep']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
             scrollable
@@ -154,28 +148,28 @@ const novoRegistro = () => {
                     </span>
                 </div>
             </template>
-            <Column field="id_serv_vinc" header="Vinculo Servidor" sortable>
+            <Column field="id_serv" header="Servidor" sortable>
                 <template #body="{ data }">
-                    {{ data.id_serv_vinc }}
+                    {{ data.id_serv }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Servidor" />
                 </template>
             </Column>
-            <Column field="id_rubrica" header="Rubrica" sortable>
+            <Column field="nome" header="Nome" sortable>
                 <template #body="{ data }">
-                    {{ data.id_rubrica }}
+                    {{ data.nome }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Rubrica" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nome" />
                 </template>
             </Column>
-            <Column field="prazo_i" header="Prazo Inicial" sortable>
+            <Column field="id_param_tp_dep" header="Tipo Dependente" sortable>
                 <template #body="{ data }">
-                    {{ data.prazo_i }}
+                    {{ data.id_param_tp_dep }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Prazo Inicial" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Tipo Dependente" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">

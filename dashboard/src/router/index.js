@@ -28,6 +28,11 @@ const routes = [
                 component: () => import('@/views/servidoresVinculos/ServVinculosGrid.vue')
             },
             {
+                path: '/:client/:domain/serv-afastamentos/:id_serv_vinc',
+                name: 'serv-afastamentos',
+                component: () => import('@/views/servidoresAfastamentos/ServAfastamentosGrid.vue')
+            },
+            {
                 path: '/:client/:domain/empresa',
                 name: 'empresa',
                 component: () => import('@/views/empresa/EmpresaForm.vue')
