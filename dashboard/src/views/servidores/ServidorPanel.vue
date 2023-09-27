@@ -6,7 +6,7 @@ import router from '../../router';
 import { defaultSuccess, defaultWarn } from '@/toast';
 import ServidorForm from './ServidorForm.vue';
 import ServVinculosGrid from '../servidoresVinculos/ServVinculosGrid.vue';
-import RemuneracaoGrid from '../remuneracao/RemuneracaoGrid.vue';
+import RemuneracoesGrid from '../remuneracao/RemuneracoesGrid.vue';
 import ServDependentesGrid from '../servidoresDependentes/ServDependentesGrid.vue';
 import ServAfastamentosGrid from '../servidoresAfastamentos/ServAfastamentosGrid.vue';
 
@@ -84,7 +84,7 @@ onMounted(() => {
                             <i class="pi pi-fw pi-id-card mr-2"></i>
                             <span>Remuneração</span>
                         </template>
-                        <RemuneracaoGrid />
+                        <RemuneracoesGrid />
                     </TabPanel>
                     <TabPanel>
                         <template #header>

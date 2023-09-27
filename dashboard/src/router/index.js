@@ -66,7 +66,7 @@ const routes = [
             {
                 path: '/:client/:domain/remuneracao/:id_serv_vinc',
                 name: 'remuneracao',
-                component: () => import('@/views/remuneracao/RemuneracaoGrid.vue')
+                component: () => import('@/views/remuneracao/RemuneracoesGrid.vue')
             },
             {
                 path: '/:client/:domain/remun-adfg',

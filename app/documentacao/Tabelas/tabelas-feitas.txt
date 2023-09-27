@@ -1,0 +1,37 @@
+- aux_cargos
+ben_beneficios
+ben_dependentes
+ben_vinculos
+beneficiarios
+- cad_bancos
+cad_contatos
+con_consign
+con_contratos
+con_parcelas
+emp_resp
+emp_resp_contatos
+emp_ua
+- es_envios
+- es_params
+- es_rejeicoes
+- fin_rubricas
+local_params
+- remun_ad_fg
+- remun_oe
+- remun_params
+- remuneracao
+- serv_afastamentos
+- serv_cessao
+- serv_dependentes
+- serv_desligamentos
+- serv_ferias
+- serv_reintegracao
+- serv_vinculos
+- servidores
+siafic_apropriacao
+siafic_desapropriacao
+siafic_empenho
+siafic_transmissoes
+siap_publicacoes
+- tabelas
+- tabelas_cc
