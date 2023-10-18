@@ -17,6 +17,7 @@ const model = ref([
             { label: 'Parâmetros Financeiros', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Empresa', to: `/${store.userStore.cliente}/${store.userStore.dominio}/empresa` },//
             { label: '(Remuneração ADFG)', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-adfg` },//
+            { label: 'Gestão de Beneficiários', to: `/${store.userStore.cliente}/${store.userStore.dominio}/beneficiarios` },//
         ]
     },
     {

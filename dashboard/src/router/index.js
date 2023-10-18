@@ -98,7 +98,17 @@ const routes = [
                 path: '/:client/:domain/tabelas/:id_emp',
                 name: 'tabelas',
                 component: () => import('@/views/tabelas/TabelasGrid.vue')
-            }       
+            },
+            {
+                path: '/:client/:domain/beneficiarios',
+                name: 'beneficiarios',
+                component: () => import('@/views/beneficiarios/BeneficiariosGrid.vue')
+            },    
+            {
+                path: '/:client/:domain/ben-vinculos/:id_ben_vinc',
+                name: 'ben-vinculos',
+                component: () => import('@/views/beneficiariosVinculos/BenVinculosGrid.vue')
+            },   
         ]
     },
     {
