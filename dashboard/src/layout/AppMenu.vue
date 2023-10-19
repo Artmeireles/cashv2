@@ -58,7 +58,7 @@ const model = ref([
         items: [
             { label: 'Relatórios', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Remessas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Consignações', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
+            { label: 'Consignações', to: `/${store.userStore.cliente}/${store.userStore.dominio}/con-consign` }
         ]
     },
     {

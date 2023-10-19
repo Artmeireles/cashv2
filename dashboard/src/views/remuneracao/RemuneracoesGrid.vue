@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, provide } from 'vue';
+import { ref, onBeforeMount, provide, defineProps } from 'vue';
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
@@ -9,6 +9,8 @@ import { useConfirm } from 'primevue/useconfirm';
 import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
+
+const props = defineProps(['selectedMatricula'])
 
 const confirm = useConfirm();
 const filters = ref(null);
@@ -125,6 +127,7 @@ const novoRegistro = () => {
 <template>
     <div class="card">
         <RemuneracaoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <p>Matrícula {{ props.selectedMatricula }}</p>
         <DataTable
             ref="dt"
             :value="gridData"

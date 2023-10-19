@@ -3,8 +3,7 @@ import { inject, onBeforeMount, ref, watchEffect } from 'vue';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess, defaultWarn } from '@/toast';
-import { useRoute, useRouter } from 'vue-router';
-const route = useRoute();
+import { useRouter } from 'vue-router';
 const router = useRouter();
 // Cookies de usuário
 import { useUserStore } from '@/stores/user';
@@ -23,11 +22,11 @@ const errorMessages = ref({});
 // Emit do template
 const emit = defineEmits(['changed']);
 // Url base do form action
-const urlBase = ref(`${baseApiUrl}/ben-beneficios`);
+const urlBase = ref(`${baseApiUrl}/con-consign`);
 // Carragamento de dados do form
 const loadData = async () => {
     if (itemData.value && itemData.value.id) {
-        const url = `${urlBase.value}/${route.params.id}/${itemData.value.id}`;
+        const url = `${urlBase.value}/${itemData.value.id}`;
         loading.value = true;
         await axios.get(url).then((res) => {
             const body = res.data;
@@ -42,14 +41,13 @@ const loadData = async () => {
             }
         });
     }
-    itemData.value.id_ben_vinc = route.params.id
 };
 // Salvar dados do formulário
 const saveData = async () => {
     if (formIsValid()) {
         const method = itemData.value.id ? 'put' : 'post';
         const id = itemData.value.id ? `/${itemData.value.id}` : '';
-        const url = `${urlBase.value}/${route.params.id}${id}`;
+        const url = `${urlBase.value}${id}`;
         axios[method](url, itemData.value)
             .then((res) => {
                 const body = res.data;
@@ -99,19 +97,32 @@ watchEffect(() => {
     <div class="grid">
         <form @submit.prevent="saveData">
             <div class="col-12">
+                <h5 v-if="itemData.id_cad_bancos">Banco {{ itemData.id_cad_bancos }}</h5>
                 <div class="p-fluid formgrid grid">
-                    <div class="field col-12 md:col-4">
-                        <label for="id_ben_vinc">Vínculo</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_ben_vinc" id="id_ben_vinc" type="text" maxlength="10" />
+                    <div class="field col-12 md:col-2">
+                        <label for="id_cad_bancos">Banco</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_cad_bancos" id="id_cad_bancos" type="text" maxlength="6"/>
                     </div>
-                    <div class="field col-12 md:col-4">
-                        <label for="id_rub">Rúbrica</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_rub" id="id_rub" type="text" maxlength="255" />
+                    <div class="field col-12 md:col-2">
+                        <label for="agencia">Agência</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.agencia" id="agencia" type="text" maxlength="6"/>
                     </div>
-                    <div class="field col-12 md:col-4">
-                        <label for="ide_dm_dev">Demonstrativo de Valor</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.ide_dm_dev" id="ide_dm_dev" type="text" maxlength="255" />
+                    <div class="field col-12 md:col-2">
+                        <label for="qmar">Quitação mínima</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.qmar" id="qmar" type="text" maxlength="6"/>
                     </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="qmp">Quantidade máxima</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.qmp" id="qmp" type="text" maxlength="6" />
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="averbar_online">Averbação online</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.averbar_online" id="averbar_online" type="text" maxlength="6" />
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="apenas_efetivos">Apenas efetivos</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.apenas_efetivos" id="apenas_efetivos" type="text" maxlength="6" />
+                    </div> 
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">
                     <div v-if="mode != 'view' && isItemDataChanged()">Desejo registrar os dados inseridos.<br />Os dados serão transferidos para o eSocial ao salvar</div>

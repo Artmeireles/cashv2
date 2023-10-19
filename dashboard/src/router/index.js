@@ -109,6 +109,11 @@ const routes = [
                 name: 'ben-vinculos',
                 component: () => import('@/views/beneficiariosVinculos/BenVinculosGrid.vue')
             },   
+            {
+                path: '/:client/:domain/con-consign',
+                name: 'con-consign',
+                component: () => import('@/views/conConsign/ConConsignsGrid.vue')
+            },
         ]
     },
     {

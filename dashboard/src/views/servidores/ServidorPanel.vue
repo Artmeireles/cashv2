@@ -29,6 +29,12 @@ const loadData = async () => {
         }
     });
 };
+const selectedMatricula = ref('')
+const vinculos = ref([
+    {value: "0", label: 'Mat 0'},
+    {value: "1", label: 'Mat 1'},
+    {value: "2", label: 'Mat 2'},
+])
 
 onMounted(() => {
     loadData();
@@ -39,7 +45,10 @@ onMounted(() => {
     <div class="grid">
         <div class="col-12">
             <div class="card">
-                <h5>Servidor {{ itemData.nome }}</h5>
+                <div class="card flex justify-content-between">
+                    <h5>Servidor {{ itemData.nome }}</h5>
+                    <span>Selecione uma: <Dropdown v-model="selectedMatricula" :options="vinculos" optionValue="value" optionLabel="label" placeholder="Matrícula..." class="w-full md:w-14rem" /></span>
+                </div>
                 <TabView>
                     <TabPanel>
                         <template #header>
@@ -68,23 +77,23 @@ onMounted(() => {
                     <TabPanel>
                         <template #header>
                             <i class="pi pi-fw pi-id-card mr-2"></i>
-                            <span>Movimentações</span>
-                        </template>
-                        <ServAfastamentosGrid />
-                    </TabPanel>
-                    <TabPanel>
-                        <template #header>
-                            <i class="pi pi-fw pi-id-card mr-2"></i>
                             <span>Vinculos</span>
                         </template>
                         <ServVinculosGrid />
                     </TabPanel>
-                    <TabPanel>
+                    <TabPanel v-if="selectedMatricula">
+                        <template #header>
+                            <i class="pi pi-fw pi-id-card mr-2"></i>
+                            <span>Movimentações</span>
+                        </template>
+                        <ServAfastamentosGrid :selectedMatricula="selectedMatricula" />
+                    </TabPanel>
+                    <TabPanel v-if="selectedMatricula">
                         <template #header>
                             <i class="pi pi-fw pi-id-card mr-2"></i>
                             <span>Remuneração</span>
                         </template>
-                        <RemuneracoesGrid />
+                        <RemuneracoesGrid :selectedMatricula="selectedMatricula" />
                     </TabPanel>
                     <TabPanel>
                         <template #header>

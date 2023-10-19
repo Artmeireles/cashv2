@@ -4,11 +4,11 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import BenDependenteForm from './BenDependenteForm.vue';
+import ConConsignForm from './ConConsignForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
-import { useRoute, useRouter } from 'vue-router';
-const route = useRoute();
-const router = useRouter();
+import { useUserStore } from '@/stores/user';
+const store = useUserStore();
+
 const confirm = useConfirm();
 const filters = ref(null);
 const menu = ref();
@@ -19,14 +19,14 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/ben-dependentes`);
+const urlBase = ref(`${baseApiUrl}/con-consign`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        id_benef: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        cpf: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        agencia: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        qmar: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        qmp: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -65,7 +65,7 @@ const deleteRow = () => {
         rejectIcon: 'pi pi-times',
         acceptClass: 'p-button-danger',
         accept: () => {
-            axios.delete(`${urlBase.value}/${route.params.id}/${itemData.value.id}`).then(() => {
+            axios.delete(`${urlBase.value}/${itemData.value.id}`).then(() => {
                 defaultSuccess('Registro excluído com sucesso!');
                 loadData();
             });
@@ -86,11 +86,11 @@ const getItem = (data) => {
 };
 // Carrrega os dados
 const loadData = () => {
-    const url = `${urlBase.value}/${route.params.id}`;
-    axios.get(`${url}`).then((axiosRes) => {
+    axios.get(`${urlBase.value}`).then((axiosRes) => {
         gridData.value = axiosRes.data.data;
     });
 };
+
 // Exporta os dados
 const exportCSV = () => {
     dt.value.exportCSV();
@@ -104,39 +104,27 @@ onBeforeMount(() => {
     initFilters();
     loadData();
 });
-
 const novoRegistro = () => {
     itemData.value = {
-        id_benef: "",
-        nome: "",
-        cpf: "",
+        id_cad_bancos:"",
+        agencia: "",
+        qmar: "",
+        qmp: "",
+        averbar_online: 0,
+        apenas_efetivos: 0
     };
     mode.value = 'new';
 };
-
 </script>
 
 <template>
     <div class="card">
-        <BenDependenteForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
-        <DataTable
-            ref="dt"
-            :value="gridData"
-            :paginator="true"
-            :rowsPerPageOptions="[5, 10, 20, 50]"
-            tableStyle="min-width: 50rem"
-            :rows="5"
-            dataKey="id"
-            :rowHover="true"
-            v-model:filters="filters"
-            filterDisplay="menu"
-            :filters="filters"
-            :globalFilterFields="['id_benef', 'nome', 'cpf']"
+        <ConConsignForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <DataTable ref="dt" :value="gridData" :paginator="true" :rowsPerPageOptions="[5, 10, 20, 50]"
+            tableStyle="min-width: 50rem" :rows="5" dataKey="id" :rowHover="true" v-model:filters="filters"
+            filterDisplay="menu" :filters="filters" :globalFilterFields="['agencia', 'qmar', 'qmp']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-            currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
-            scrollable
-            scrollHeight="415px"
-        >
+            currentPageReportTemplate="{first} a {last} de {totalRecords} registros" scrollable scrollHeight="415px">
             <template #header>
                 <div class="flex justify-content-end gap-3">
                     <Button icon="pi pi-external-link" label="Exportar" @click="exportCSV($event)" />
@@ -148,33 +136,37 @@ const novoRegistro = () => {
                     </span>
                 </div>
             </template>
-            <Column field="id_benef" header="Beneficiário" sortable>
+            <Column field="agencia" header="Agência" sortable>
                 <template #body="{ data }">
-                    {{ data.id_benef }}
+                    {{ data.agencia }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Beneficiário" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter"
+                        placeholder="Localize por Agência" />
                 </template>
             </Column>
-            <Column field="nome" header="Nome" sortable>
+            <Column field="qmar" header="Quitação" sortable>
                 <template #body="{ data }">
-                    {{ data.nome }}
+                    {{ data.qmar }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por nome" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter"
+                        placeholder="Localize por Quitação" />
                 </template>
             </Column>
-            <Column field="cpf" header="CPF" sortable>
+            <Column field="qmp" header="Quantidade" sortable>
                 <template #body="{ data }">
-                    {{ data.cpf }}
+                    {{ data.qmp }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por CPF" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter"
+                        placeholder="Localize por Quantidade" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
                 <template #body="{ data }">
-                    <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" class="p-button-outlined" />
+                    <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle"
+                        aria-haspopup="true" aria-controls="overlay_menu" class="p-button-outlined" />
                     <Menu ref="menu" id="overlay_menu" :model="itemsButtons" :popup="true" />
                 </template>
             </Column>

@@ -36,7 +36,7 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const tabelaConvenios = `${dbPrefix}_app.con_convenios`
         const tabelaParcelasDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_parcelas`
-        const tabelaConsignatariosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.consignatarios`
+        const tabelaConsignatariosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_consign`
         if (req.params.id) body.id = req.params.id
         if (body.status == 10 && !uParams.averbaOnline) {
             try {
@@ -62,14 +62,14 @@ module.exports = app => {
         delete body.id_parcela
         try {
             existsOrError(body.id_user, 'Usuário consignatário não informado')
-            existsOrError(body.id_consignatario, 'Consignatário não informado')
-            existsOrError(body.id_cad_servidores, 'Servidor(cliente) não informado')
+            existsOrError(body.id_consign, 'Consignatário não informado')
+            existsOrError(body.id_serv, 'Servidor(cliente) não informado')
             existsOrError(body.contrato, 'Número de contrato não informado')
-            if (body.id_consignatario == "1" && body.contrato.length > 9) throw 'O Número de contrato não pode ter mais que 9(nove) dígitos'
-            if (body.id_consignatario == "2" && body.contrato.length > 19) throw 'O Número de contrato não pode ter mais que 19(dezenove) dígitos'
+            if (body.id_consign == "1" && body.contrato.length > 9) throw 'O Número de contrato não pode ter mais que 9(nove) dígitos'
+            if (body.id_consign == "2" && body.contrato.length > 19) throw 'O Número de contrato não pode ter mais que 19(dezenove) dígitos'
             const contratosServidor = await app.db(tabelaDomain)
                 .where({
-                    'id_cad_servidores': body.id_cad_servidores,
+                    'id_serv': body.id_serv,
                     'status': STATUS_ACTIVE
                 })
                 .whereNot({ 'id': body.id || 0 })
@@ -78,7 +78,7 @@ module.exports = app => {
                 const percent = 94.7
                 if (levenshtein(element.contrato, body.contrato) > percent) throw `O contrato informado (${body.contrato}) é muito parecido com algum contrato ativo. Verifique antes de continuar.`
             });
-            existsOrError(body.id_con_eventos, 'Evento da folha não informado')
+            //existsOrError(body.id_con_eventos, 'Evento da folha não informado')
             existsOrError(body.primeiro_vencimento, 'Primeiro vencimento não informado')
             existsOrError(body.valor_parcela, 'Valor da parcela não informada')
             valueOrError(body.valor_parcela, 'Valor da parcela inválido')
@@ -96,7 +96,7 @@ module.exports = app => {
                 const tabelaFinSFuncionalDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.fin_sfuncional`
                 const vinculoFuncional = await app.db(tabelaFinSFuncionalDomain)
                     .select({ id_vinculo: 'id_vinculo', vinculo: app.db.raw(`${dbPrefix}_app.getVinculoLabel(id_vinculo)`) })
-                    .where({ id_cad_servidores: body.id_cad_servidores })
+                    .where({ id_serv: body.id_serv })
                     .orderBy('ano', 'desc')
                     .orderBy('mes', 'desc')
                     .first()
@@ -290,7 +290,7 @@ module.exports = app => {
             const maxFolha = await app.db({ fr: tabelaDomainRubricas })
                 .select('fr.ano', 'fr.mes')
                 .join({ fe: tabelaDomainEventos }, 'fe.id', '=', 'fr.id_fin_eventos')
-                .where({ 'fr.id_cad_servidores': body.id_cad_servidores, 'fe.tipo': '0' })
+                .where({ 'fr.id_serv': body.id_serv, 'fe.tipo': '0' })
                 .whereNot({ 'fr.mes': '13' })
                 .orderBy('fr.ano', 'DESC')
                 .orderBy('fr.mes', 'DESC')
@@ -305,7 +305,7 @@ module.exports = app => {
                 .select(app.db.raw('SUM(fr.valor) valor'), 'fe.consignavel', 'fe.consignado')
                 .join({ fe: tabelaDomainEventos }, 'fe.id', '=', 'fr.id_fin_eventos')
                 .where({
-                    'fr.id_cad_servidores': body.id_cad_servidores,
+                    'fr.id_serv': body.id_serv,
                     'fr.ano': folha.ano,
                     'fr.mes': folha.mes,
                     'fr.complementar': '000'
@@ -317,7 +317,7 @@ module.exports = app => {
             // Contratos no CPF
             const contratos = await app.db({ cc: tabelaDomainContratos })
                 .select(app.db.raw('COALESCE(SUM(cc.valor_parcela),0) valor_parcela'))
-                .where({ 'cc.id_cad_servidores': body.id_cad_servidores, 'cc.status': STATUS_ACTIVE }).first()
+                .where({ 'cc.id_serv': body.id_serv, 'cc.status': STATUS_ACTIVE }).first()
             let consignavel = 0
             let margem = 0
             let somaContratos = contratos.valor_parcela
@@ -357,7 +357,7 @@ module.exports = app => {
         const tabelaServidores = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_servidores`
         const tabelaConEventos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_eventos`
         const tabelaEventos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.fin_eventos`
-        const tabelaConsignatarios = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.consignatarios`
+        const tabelaConsignatarios = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_consign`
         const tabelaConvenios = `${dbPrefix}_app.con_convenios`
         const tabelaBancos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_bancos`
 
@@ -367,11 +367,11 @@ module.exports = app => {
             .select(app.db.raw('count(*) as count'))
             .leftJoin({ ce: `${tabelaConEventos}` }, `ce.id`, `=`, `tb1.id_con_eventos`)
             .leftJoin({ fe: `${tabelaEventos}` }, `fe.id`, `=`, `ce.id_fin_eventos`)
-            .leftJoin({ co: `${tabelaConsignatarios}` }, `co.id`, `=`, `tb1.id_consignatario`)
+            .leftJoin({ co: `${tabelaConsignatarios}` }, `co.id`, `=`, `tb1.id_consign`)
             .leftJoin({ cv: `${tabelaConvenios}` }, `cv.id`, `=`, `co.id_convenio`)
-            .leftJoin(tabelaServidores, `${tabelaServidores}.id`, `=`, `tb1.id_cad_servidores`)
+            .leftJoin(tabelaServidores, `${tabelaServidores}.id`, `=`, `tb1.id_serv`)
             .leftJoin({ cb: `${tabelaBancos}` }, `cb.id`, `=`, `co.id_cad_bancos`)
-            .where({ 'tb1.id_cad_servidores': id_cadas })
+            .where({ 'tb1.id_serv': id_cadas })
             .whereIn('tb1.status', [STATUS_NONACTIVE, STATUS_ACTIVE, STATUS_FINISHED])
         // if (uParams.tipoUsuario < 2) // Se não for operador
         //     sql.andWhere(app.db.raw(idConsignatario ? `co.id = ${idConsignatario}` : '1=1'))
@@ -385,11 +385,11 @@ module.exports = app => {
                 `cv.qmp`)
             .leftJoin({ ce: `${tabelaConEventos}` }, `ce.id`, `=`, `tb1.id_con_eventos`)
             .leftJoin({ fe: `${tabelaEventos}` }, `fe.id`, `=`, `ce.id_fin_eventos`)
-            .leftJoin({ co: `${tabelaConsignatarios}` }, `co.id`, `=`, `tb1.id_consignatario`)
+            .leftJoin({ co: `${tabelaConsignatarios}` }, `co.id`, `=`, `tb1.id_consign`)
             .leftJoin({ cv: `${tabelaConvenios}` }, `cv.id`, `=`, `co.id_convenio`)
-            .leftJoin({ cs: `${tabelaServidores}` }, `cs.id`, `=`, `tb1.id_cad_servidores`)
+            .leftJoin({ cs: `${tabelaServidores}` }, `cs.id`, `=`, `tb1.id_serv`)
             .leftJoin({ cb: `${tabelaBancos}` }, `cb.id`, `=`, `co.id_cad_bancos`)
-            .where({ 'tb1.id_cad_servidores': id_cadas })
+            .where({ 'tb1.id_serv': id_cadas })
             .whereIn('tb1.status', [STATUS_NONACTIVE, STATUS_ACTIVE, STATUS_FINISHED])
         // if (uParams.tipoUsuario < 2) // Se não for operador
         //     ret.andWhere(app.db.raw(idConsignatario ? `co.id = ${idConsignatario}` : '1=1'))
@@ -421,7 +421,7 @@ module.exports = app => {
         }
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const tabelaCadastrosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_servidores`
-        const tabelaConsignatarioDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.consignatarios`
+        const tabelaConsignatarioDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_consign`
         const tabelaBancosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_bancos`
         const tabelaParcelasDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_parcelas`
 
@@ -438,8 +438,8 @@ module.exports = app => {
         if (page > 0) {
             let sql = app.db({ tb1: `${tabelaDomain}` })
                 .select(app.db.raw('count(*) as count'))
-                .join({ 'cs': tabelaCadastrosDomain }, 'cs.id', '=', 'tb1.id_cad_servidores')
-                .join({ 'co': tabelaConsignatarioDomain }, 'co.id', '=', 'tb1.id_consignatario')
+                .join({ 'cs': tabelaCadastrosDomain }, 'cs.id', '=', 'tb1.id_serv')
+                .join({ 'co': tabelaConsignatarioDomain }, 'co.id', '=', 'tb1.id_consign')
                 .join({ 'cb': tabelaBancosDomain }, 'cb.id', '=', 'co.id_cad_bancos')
                 .join({ 'cp': tabelaParcelasDomain }, function () {
                     this.on('cp.id_con_contratos', '=', 'tb1.id')
@@ -475,9 +475,9 @@ module.exports = app => {
         }
         let ret = app.db({ tb1: `${tabelaDomain}` })
             // .select('tb1.*', { 'id_parcela': 'cp.id' }, 'cb.febraban', 'cs.cpf', 'cs.nome', 'cp.parcela')
-            .select('cs.matricula', 'cb.febraban', 'cp.parcela', 'tb1.parcelas', 'tb1.valor_parcela', 'tb1.id', 'cs.nome', 'tb1.id_consignatario', 'cs.cpf', 'tb1.contrato', 'tb1.primeiro_vencimento', 'tb1.status', { 'id_parcela': 'cp.id' })
-            .join({ 'cs': tabelaCadastrosDomain }, 'cs.id', '=', 'tb1.id_cad_servidores')
-            .join({ 'co': tabelaConsignatarioDomain }, 'co.id', '=', 'tb1.id_consignatario')
+            .select('cs.matricula', 'cb.febraban', 'cp.parcela', 'tb1.parcelas', 'tb1.valor_parcela', 'tb1.id', 'cs.nome', 'tb1.id_consign', 'cs.cpf', 'tb1.contrato', 'tb1.primeiro_vencimento', 'tb1.status', { 'id_parcela': 'cp.id' })
+            .join({ 'cs': tabelaCadastrosDomain }, 'cs.id', '=', 'tb1.id_serv')
+            .join({ 'co': tabelaConsignatarioDomain }, 'co.id', '=', 'tb1.id_consign')
             .join({ 'cb': tabelaBancosDomain }, 'cb.id', '=', 'co.id_cad_bancos')
             .leftJoin({ 'cp': tabelaParcelasDomain }, function () {
                 this.on('cp.id_con_contratos', '=', 'tb1.id')
@@ -538,7 +538,7 @@ module.exports = app => {
         const tabelaServidores = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_servidores`
         const tabelaConEventos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_eventos`
         const tabelaEventos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.fin_eventos`
-        const tabelaConsignatarios = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.consignatarios`
+        const tabelaConsignatarios = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_consign`
         const tabelaBancos = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.cad_bancos`
         const tabelaUsers = `users`
         let ret = app.db({ tb1: `${tabelaDomain}` })
@@ -547,8 +547,8 @@ module.exports = app => {
                 app.db.raw(`${dbPrefix}_app.getStatusLabel(tb1.status) as status_label`))
             .leftJoin({ ce: `${tabelaConEventos}` }, `ce.id`, `=`, `tb1.id_con_eventos`)
             .leftJoin({ fe: `${tabelaEventos}` }, `fe.id`, `=`, `ce.id_fin_eventos`)
-            .leftJoin({ co: `${tabelaConsignatarios}` }, `co.id`, `=`, `tb1.id_consignatario`)
-            .leftJoin({ cs: `${tabelaServidores}` }, `cs.id`, `=`, `tb1.id_cad_servidores`)
+            .leftJoin({ co: `${tabelaConsignatarios}` }, `co.id`, `=`, `tb1.id_consign`)
+            .leftJoin({ cs: `${tabelaServidores}` }, `cs.id`, `=`, `tb1.id_serv`)
             .leftJoin({ cb: `${tabelaBancos}` }, `cb.id`, `=`, `co.id_cad_bancos`)
             .whereIn('tb1.status', [STATUS_NONACTIVE, STATUS_ACTIVE, STATUS_FINISHED])
         if (req.query && req.query.tkn) {
@@ -606,21 +606,21 @@ module.exports = app => {
         const body = { ...req.body }
 
         try {
-            existsOrError(body.id_cad_servidores, 'Servidor não informado')
+            existsOrError(body.id_serv, 'Servidor não informado')
         } catch (error) {
             return res.status(400).send(error)
         }
 
         const ceil = await app.db(tabelaContratosDomain)
             .select(app.db.raw('CEIL(AVG(LENGTH(contrato))) as ceil'))
-            .where({ 'id_consignatario': uParams.consignatario }).first()
+            .where({ 'id_consign': uParams.consignatario }).first()
 
         const contrato = await app.db(tabelaContratosDomain)
             .select('contrato')
             .where(app.db.raw(`LENGTH(contrato) < ${ceil.ceil}`))
             .where({
-                'id_consignatario': uParams.consignatario,
-                'id_cad_servidores': body.id_cad_servidores,
+                'id_consign': uParams.consignatario,
+                'id_serv': body.id_serv,
                 'status': STATUS_ACTIVE
             }).first()
 
@@ -630,7 +630,7 @@ module.exports = app => {
     const getDataCorte = async (req, res) => {
         const uParams = await app.db('users').where({ id: req.user.id }).first();
         const tabelaConvenios = `${dbPrefix}_app.con_convenios`
-        const tabelaConsignatariosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.consignatarios`
+        const tabelaConsignatariosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.con_consign`
 
         const convenio = await app.db({ 'cv': tabelaConvenios })
             .select('dia_corte', 'mes_corte')
@@ -667,19 +667,19 @@ module.exports = app => {
         const contNAverbs = await app.db({ cc: tabelaDomain })
             .select(app.db.raw('cc.id id_contrato, u.id, u.name, u.email, DATE_FORMAT(cc.`created_at`, "%d/%m/%Y") created_at, cc.contrato, c.matricula, c.nome, CONCAT("https://mgcash.app.br/servidor-panel/",c.matricula) link'))
             .join({ u: 'wwmgca_api.users' }, 'u.id', '=', 'cc.id_user')
-            .join({ c: tabelaDomainCadastros }, 'c.id', '=', 'cc.id_cad_servidores')
+            .join({ c: tabelaDomainCadastros }, 'c.id', '=', 'cc.id_serv')
             .where({ 'cc.status': 9 })
             .where(function () {
-                if (uParams.admin == 0) this.where({ 'id_consignatario': uParams.consignatario })
+                if (uParams.admin == 0) this.where({ 'id_consign': uParams.consignatario })
             })
             .andWhere(app.db.raw(uParams.gestor >= 1 ? '1=1' : `u.id = ${req.user.id}`))
         const ret = app.db({ cc: `${tabelaDomain}` }).count('cc.id')
             .join({ u: 'wwmgca_api.users' }, 'u.id', '=', 'cc.id_user')
             .where({ 'cc.status': _status })
             // if (uParams.admin == 0)
-            //     ret.where({ 'id_consignatario': uParams.consignatario })
+            //     ret.where({ 'id_consign': uParams.consignatario })
             .where(function () {
-                if (uParams.admin == 0) this.where({ 'id_consignatario': uParams.consignatario })
+                if (uParams.admin == 0) this.where({ 'id_consign': uParams.consignatario })
             })
         ret.andWhere(app.db.raw(uParams.gestor >= 1 ? '1=1' : `u.id = ${req.user.id}`))
             .first()
@@ -707,7 +707,7 @@ module.exports = app => {
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
         const id_servidor = req.body.id
         const ret = app.db({ tb1: `${tabelaDomain}` })
-            .select(app.db.raw('SUM(valor_parcela) soma_parcelas')).where({ status: STATUS_ACTIVE, id_cad_servidores: id_servidor })
+            .select(app.db.raw('SUM(valor_parcela) soma_parcelas')).where({ status: STATUS_ACTIVE, id_serv: id_servidor })
             .first()
         ret.then(body => {
             return res.json({ data: body })
