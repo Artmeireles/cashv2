@@ -18,6 +18,7 @@ const model = ref([
             { label: 'Empresa', to: `/${store.userStore.cliente}/${store.userStore.dominio}/empresa` },//
             { label: '(Remuneração ADFG)', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-adfg` },//
             { label: 'Gestão de Beneficiários', to: `/${store.userStore.cliente}/${store.userStore.dominio}/beneficiarios` },//
+            { label: 'Beneficiários Vínculos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/ben-vinculos` },//
         ]
     },
     {
@@ -58,13 +59,13 @@ const model = ref([
         items: [
             { label: 'Relatórios', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'Remessas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
-            { label: 'Consignações', to: `/${store.userStore.cliente}/${store.userStore.dominio}/con-consign` }
+            { label: 'Consignações', to: `/${store.userStore.cliente}/${store.userStore.dominio}/con-consign` }//
         ]
     },
     {
         label: 'Exportações',
         items: [
-            { label: 'SIAP', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'SIAP', to: `/${store.userStore.cliente}/${store.userStore.dominio}/siap-publicacoes` },//
             { label: 'SEFIP', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'SIOPE', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
             { label: 'RAIS', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
@@ -84,8 +85,8 @@ const model = ref([
     {
         label: 'Administração',
         items: [
-            { label: 'Empresas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/empresas` },
-            { label: 'Usuários', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` },
+            { label: 'Empresas', to: `/${store.userStore.cliente}/${store.userStore.dominio}/empresas` },//
+            { label: 'Usuários', to: `/${store.userStore.cliente}/${store.userStore.dominio}/emp-resp/${store.userStore.id_emp}` },
             { label: 'Log de Eventos', to: `/${store.userStore.cliente}/${store.userStore.dominio}/remun-params` }
         ]
     }

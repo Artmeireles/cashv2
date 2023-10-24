@@ -105,7 +105,7 @@ const routes = [
                 component: () => import('@/views/beneficiarios/BeneficiariosGrid.vue')
             },    
             {
-                path: '/:client/:domain/ben-vinculos/:id_ben_vinc',
+                path: '/:client/:domain/ben-vinculos',
                 name: 'ben-vinculos',
                 component: () => import('@/views/beneficiariosVinculos/BenVinculosGrid.vue')
             },   
@@ -113,6 +113,16 @@ const routes = [
                 path: '/:client/:domain/con-consign',
                 name: 'con-consign',
                 component: () => import('@/views/conConsign/ConConsignsGrid.vue')
+            },  
+            {
+                path: '/:client/:domain/emp-resp',
+                name: 'emp-resp',
+                component: () => import('@/views/empresasResp/EmpRespForm.vue')
+            },
+            {
+                path: '/:client/:domain/siap-publicacoes',
+                name: 'siap-publicacoes',
+                component: () => import('@/views/siapPublicacoes/SiapPubsGrid.vue')
             },
         ]
     },

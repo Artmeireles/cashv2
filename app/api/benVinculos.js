@@ -47,29 +47,24 @@ module.exports = app => {
       }
       body.id_benef = id_benef.id
       body.nr_beneficio = bodyRaw.nrBeneficio_15;
+      body.dt_ini_benef = bodyRaw.dtIniBeneficio_16 || 'Data de início do benefício não informado';
       body.id_param_tp_benef = await getIdParam("tpBenef", bodyRaw.tpBeneficio_18);
       body.tp_plan_rp = bodyRaw.tpPlanRP_19 || "0";
       // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
       body.tp_pen_morte = bodyRaw.tp_pen_morte || 'Tipo de pensão por morte não informado'
-      body.cpf_inst = bodyRaw.cpf_inst || 'CPF do instituidor não informado'
       body.dt_inst = bodyRaw.dt_inst || 'Data de óbito do instituidor não informado'
     }
     
         try {
             //existsOrError(body.id_benef, ' não informada')
             existsOrError(body.nr_beneficio, 'Número do Benefício não informada')
+            existsOrError(body.dt_ini_benef, 'Data Início não informado')
             existsOrError(body.id_param_tp_benef, 'Tipo de Benefício não informado')
             existsOrError(await isParamOrError('tpBenef', body.id_param_tp_benef), 'Tipo de Benefício selecionado não existe')
             existsOrError(body.tp_plan_rp, 'Plano Segregação em Massa não informado')
             existsOrError(body.tp_pen_morte, 'Tipo Pensão por Morte não informado')
+            existsOrError(body.id_serv_inst, 'Tipo Pensão por Morte não informado')
             existsOrError(body.dt_inst, 'Data óbito do instituidor não informado')
-            if (body.cpf_inst) {
-                const dataFromDB = await app.db(tabelaDomain)
-                    .where({ cpf_inst: body.cpf_inst })
-                    .andWhere(app.db.raw(body.id ? (`id != '${body.id}'`) : '1=1'))
-                    .first()
-                notExistsOrError(dataFromDB, 'Combinação de CPF já cadastrado')
-            }
         } catch (error) {
             return res.status(400).send(error)
         }

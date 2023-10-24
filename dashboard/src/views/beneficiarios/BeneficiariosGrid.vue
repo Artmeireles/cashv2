@@ -24,8 +24,8 @@ const urlBase = ref(`${baseApiUrl}/beneficiarios`);
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        cpf_benef: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        nome: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        id_serv: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        dt_inicio: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         //dsc_rubr: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
@@ -109,24 +109,10 @@ const novoRegistro = () => {
     const mes = dataAtual.getMonth(); // Obtém o mês atual (0-11)
     const ano = dataAtual.getFullYear(); // Obtém o ano atual (4 dígitos)
     itemData.value = {
-        id_emp: store.userStore.id_emp,
-        cpf_benef: "",
-        nome: "",
-        //dsc_rubr: "",
-        dt_nascto: "",
+        id_serv: "",
         dt_inicio: "",
-        id_param_sexo: 0,
-        id_param_raca_cor: 0,
-        id_param_est_civ: 0,
         inc_fis_men: "",
-        dt_inc_fis: "",
-        id_param_tplograd: 0,
-        id_cidade: 0,
-        cep: "",
-        bairro: "",
-        logradouro: "",
-        nr: "",
-        complemento: ""
+        inc_fis_men: ""
     };
     mode.value = 'new';
 };
@@ -137,7 +123,7 @@ const novoRegistro = () => {
         <BeneficiarioForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
         <DataTable ref="dt" :value="gridData" :paginator="true" :rowsPerPageOptions="[5, 10, 20, 50]"
             tableStyle="min-width: 50rem" :rows="5" dataKey="id" :rowHover="true" v-model:filters="filters"
-            filterDisplay="menu" :filters="filters" :globalFilterFields="['cpf_benef', 'nome']"
+            filterDisplay="menu" :filters="filters" :globalFilterFields="['id_serv', 'dt_inicio']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
             currentPageReportTemplate="{first} a {last} de {totalRecords} registros" scrollable scrollHeight="415px">
             <template #header>
@@ -151,33 +137,24 @@ const novoRegistro = () => {
                     </span>
                 </div>
             </template>
-            <Column field="cpf_benef" header="CPF" sortable>
+            <Column field="id_serv" header="Servidor" sortable>
                 <template #body="{ data }">
-                    {{ data.cpf_benef }}
+                    {{ data.id_serv }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter"
-                        placeholder="Localize por CPF" />
+                        placeholder="Localize por Servidor" />
                 </template>
             </Column>
-            <Column field="nome" header="Nome" sortable>
+            <Column field="dt_inicio" header="Data Início" sortable>
                 <template #body="{ data }">
-                    {{ data.nome }}
+                    {{ data.dt_inicio }}
                 </template>
                 <template #filter="{ filterModel }">
                     <InputText v-model="filterModel.value" type="text" class="p-column-filter"
-                        placeholder="Localize por Nome" />
+                        placeholder="Localize por Data Início" />
                 </template>
             </Column>
-            <!-- <Column field="dsc_rubr" header="Descrição" sortable>
-                <template #body="{ data }">
-                    {{ data.dsc_rubr }}
-                </template>
-                <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter"
-                        placeholder="Localize por Descrição" />
-                </template>
-            </Column> -->
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
                 <template #body="{ data }">
                     <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle"

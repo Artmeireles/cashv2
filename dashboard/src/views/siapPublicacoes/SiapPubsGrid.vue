@@ -4,11 +4,11 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess } from '@/toast';
-import BenVinculoForm from './BenVinculoForm.vue';
+import SiapPubForm from './SiapPubForm.vue';
 import { useConfirm } from 'primevue/useconfirm';
-import { useRoute, useRouter } from 'vue-router';
-const route = useRoute();
-const router = useRouter();
+import { useUserStore } from '@/stores/user';
+const store = useUserStore();
+
 const confirm = useConfirm();
 const filters = ref(null);
 const menu = ref();
@@ -19,13 +19,14 @@ const gridData = ref([]);
 // Dados do item selecionado
 const itemData = ref({});
 // Url base das requisições
-const urlBase = ref(`${baseApiUrl}/ben-vinculos`);
+const urlBase = ref(`${baseApiUrl}/siap-publicacoes`);
 // Inicializa os filtros
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        id_benef: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        nr_beneficio: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
+        nr_pub: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        data_pub: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        id_param_v_pub: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }
     };
 };
 // Ref do gridData
@@ -64,7 +65,7 @@ const deleteRow = () => {
         rejectIcon: 'pi pi-times',
         acceptClass: 'p-button-danger',
         accept: () => {
-            axios.delete(`${urlBase.value}/${route.params.id}/${itemData.value.id}`).then(() => {
+            axios.delete(`${urlBase.value}/${itemData.value.id}`).then(() => {
                 defaultSuccess('Registro excluído com sucesso!');
                 loadData();
             });
@@ -85,11 +86,11 @@ const getItem = (data) => {
 };
 // Carrrega os dados
 const loadData = () => {
-    const url = `${urlBase.value}/${route.params.id}`;
-    axios.get(`${url}`).then((axiosRes) => {
+    axios.get(`${urlBase.value}`).then((axiosRes) => {
         gridData.value = axiosRes.data.data;
     });
 };
+
 // Exporta os dados
 const exportCSV = () => {
     dt.value.exportCSV();
@@ -103,44 +104,24 @@ onBeforeMount(() => {
     initFilters();
     loadData();
 });
-
 const novoRegistro = () => {
     itemData.value = {
-        id_benef: "",
-        nr_beneficio: "",
-        dt_ini_benef: "",
-        id_param_tp_benef: "",
-        tp_plan_rp: "",
-        tp_pen_morte: "",
-        id_serv_inst: "",
-        dt_inst: "",
+        nr_pub: "",
+        data_pub: "",
+        id_param_v_pub: ""
     };
     mode.value = 'new';
 };
-
 </script>
 
 <template>
     <div class="card">
-        <BenVinculoForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
-        <DataTable
-            ref="dt"
-            :value="gridData"
-            :paginator="true"
-            :rowsPerPageOptions="[5, 10, 20, 50]"
-            tableStyle="min-width: 50rem"
-            :rows="5"
-            dataKey="id"
-            :rowHover="true"
-            v-model:filters="filters"
-            filterDisplay="menu"
-            :filters="filters"
-            :globalFilterFields="['id_benef', 'nr_beneficio']"
+        <SiapPubForm @changed="loadData" v-if="['new', 'edit'].includes(mode)" />
+        <DataTable ref="dt" :value="gridData" :paginator="true" :rowsPerPageOptions="[5, 10, 20, 50]"
+        tableStyle="min-width: 50rem" :rows="5" dataKey="id" :rowHover="true" v-model:filters="filters"
+        filterDisplay="menu" :filters="filters" :globalFilterFields="['nr_pub', 'nr_pub', 'id_param_v_pub']"
             paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-            currentPageReportTemplate="{first} a {last} de {totalRecords} registros"
-            scrollable
-            scrollHeight="415px"
-        >
+            currentPageReportTemplate="{first} a {last} de {totalRecords} registros" scrollable scrollHeight="415px">
             <template #header>
                 <div class="flex justify-content-end gap-3">
                     <Button icon="pi pi-external-link" label="Exportar" @click="exportCSV($event)" />
@@ -152,25 +133,37 @@ const novoRegistro = () => {
                     </span>
                 </div>
             </template>
-            <Column field="id_benef" header="Beneficiário" sortable>
+            <Column field="nr_pub" header="Nº da Publicação" sortable>
                 <template #body="{ data }">
-                    {{ data.id_benef }}
+                    {{ data.nr_pub }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Beneficiário" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter"
+                        placeholder="Localize por Nº da Publicação" />
                 </template>
             </Column>
-            <Column field="nr_beneficio" header="Nº Beneficio" sortable>
-                <template #body="{ data }">
-                    {{ data.nr_beneficio }}
+            <Column field="data_pub" header="Data da Publicação" sortable>
+            <template #body="{ data }">
+                {{ data.data_pub }}
                 </template>
                 <template #filter="{ filterModel }">
-                    <InputText v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Localize por Nº Beneficio" />
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter"
+                        placeholder="Localize por Data da Publicação" />
+                </template>
+            </Column>
+            <Column field="id_param_v_pub" header="Veículo da Publicação" sortable>
+                <template #body="{ data }">
+                    {{ data.id_param_v_pub }}
+                </template>
+                <template #filter="{ filterModel }">
+                    <InputText v-model="filterModel.value" type="text" class="p-column-filter"
+                        placeholder="Localize por Veículo da Publicação" />
                 </template>
             </Column>
             <Column headerStyle="width: 5rem; text-align: center" bodyStyle="text-align: center; overflow: visible">
                 <template #body="{ data }">
-                    <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" class="p-button-outlined" />
+                    <Button type="button" icon="pi pi-bars" rounded v-on:click="getItem(data)" @click="toggle"
+                        aria-haspopup="true" aria-controls="overlay_menu" class="p-button-outlined" />
                     <Menu ref="menu" id="overlay_menu" :model="itemsButtons" :popup="true" />
                 </template>
             </Column>

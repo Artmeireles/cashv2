@@ -3,8 +3,7 @@ import { inject, onBeforeMount, ref, watchEffect } from 'vue';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess, defaultWarn } from '@/toast';
-import { useRoute, useRouter } from 'vue-router';
-const route = useRoute();
+import { useRouter } from 'vue-router';
 const router = useRouter();
 // Cookies de usuário
 import { useUserStore } from '@/stores/user';
@@ -22,14 +21,12 @@ const accept = ref(false);
 const errorMessages = ref({});
 // Emit do template
 const emit = defineEmits(['changed']);
-// Campos de formulário mascarados
-const itemDataMasked = ref({});
 // Url base do form action
-const urlBase = ref(`${baseApiUrl}/ben-vinculos`);
+const urlBase = ref(`${baseApiUrl}/emp-ua`);
 // Carragamento de dados do form
 const loadData = async () => {
     if (itemData.value && itemData.value.id) {
-        const url = `${urlBase.value}/${route.params.id}/${itemData.value.id}`;
+        const url = `${urlBase.value}/${itemData.value.id}`;
         loading.value = true;
         await axios.get(url).then((res) => {
             const body = res.data;
@@ -44,14 +41,13 @@ const loadData = async () => {
             }
         });
     }
-    itemData.value.id_benef = route.params.id
 };
 // Salvar dados do formulário
 const saveData = async () => {
     if (formIsValid()) {
         const method = itemData.value.id ? 'put' : 'post';
         const id = itemData.value.id ? `/${itemData.value.id}` : '';
-        const url = `${urlBase.value}/${route.params.id}${id}`;
+        const url = `${urlBase.value}${id}`;
         axios[method](url, itemData.value)
             .then((res) => {
                 const body = res.data;
@@ -102,42 +98,62 @@ watchEffect(() => {
         <form @submit.prevent="saveData">
             <div class="col-12">
                 <div class="p-fluid formgrid grid">
-                    <!-- <div class="field col-12 md:col-4">
-                        <label for="id_benef">Beneficiário</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_benef" id="id_benef" type="text" maxlength="10" />
-                    </div> -->
-                    <div class="field col-12 md:col-4">
-                        <label for="nr_beneficio">Nº Benefício</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.nr_beneficio" id="nr_beneficio" type="text" maxlength="10" />
-                    </div>
-                    <div class="field col-12 md:col-4">
-                        <label for="dt_ini_benef">Data Benefício</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_ini_benef" id="dt_ini_benef" type="text" maxlength="10" />
-                    </div>
-                    <div class="field col-12 md:col-4">
-                        <label for="id_param_tp_benef">Tipo de Benefício</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_tp_benef" id="id_param_tp_benef" type="text" maxlength="255" />
-                    </div>
-                    <div class="field col-12 md:col-3">
-                        <label for="tp_plan_rp">Plano Segregação</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tp_plan_rp" id="tp_plan_rp" type="text" maxlength="255" />
-                    </div>
-                    <div class="field col-12 md:col-3">
-                        <label for="tp_pen_morte">Tipo Pensão</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tp_pen_morte" id="tp_pen_morte" type="text" maxlength="255" />
-                    </div>
-                    <div class="field col-12 md:col-4">
-                        <label for="id_serv_inst">CPF Instituidor</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_serv_inst" id="id_serv_inst" type="text" maxlength="11" />
+                    <div class="field col-12 md:col-2">
+                        <label for="id_emp">Empresa</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_emp" id="id_emp" type="text" maxlength="6"/>
                     </div>
                     <div class="field col-12 md:col-2">
-                        <label for="dt_inst">Data Óbito</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_inst" id="dt_inst" type="text" maxlength="11" />
+                        <label for="c_ua">Unidade Autonoma</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.c_ua" id="c_ua" type="text" maxlength="6"/>
                     </div>
-                        <!-- <label for="dt_inst">Data Óbito</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemDataMasked.dt_inst" id="cep" type="text" @input="validateDtNascto()" @blur="setUnMasked('dt_inst')" />
-                        <small id="text-error" v-if="errorMessages.dt_inst" class="p-error">{{ errorMessages.dt_inst || '&nbsp;' }}</small>
-                    </div> -->
+                    <div class="field col-12 md:col-2">
+                        <label for="cardug">Cardug</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cardug" id="cardug" type="text" maxlength="6"/>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="cnpj">CNPJ</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cnpj" id="cnpj" type="text" maxlength="6"/>
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="nome">Nome</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.nome" id="nome" type="text" maxlength="6" />
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="id_cidade">Cidade</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_cidade" id="id_cidade" type="text" maxlength="6" />
+                    </div>
+                    <div class="field col-12 md:col-2">
+                        <label for="cep">CEP</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cep" id="cep" type="text" maxlength="6" />
+                    </div> 
+                    <div class="field col-12 md:col-2">
+                        <label for="bairro">Bairro</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.bairro" id="bairro" type="text" maxlength="6" />
+                    </div> 
+                    <div class="field col-12 md:col-2">
+                        <label for="logradouro">Logradouro</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.logradouro" id="logradouro" type="text" maxlength="6" />
+                    </div>  
+                    <div class="field col-12 md:col-2">
+                        <label for="nr">Nº</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.nr" id="nr" type="text" maxlength="6" />
+                    </div>  
+                    <div class="field col-12 md:col-2">
+                        <label for="complemento">Complemento</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.complemento" id="complemento" type="text" maxlength="6" />
+                    </div>   
+                    <div class="field col-12 md:col-2">
+                        <label for="id_emp_resp">Órgão Responsável</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_emp_resp" id="id_emp_resp" type="text" maxlength="6" />
+                    </div> 
+                    <div class="field col-12 md:col-2">
+                        <label for="email">Email</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.email" id="email" type="text" maxlength="6" />
+                    </div> 
+                    <div class="field col-12 md:col-2">
+                        <label for="telefone">Telefone</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.telefone" id="telefone" type="text" maxlength="6" />
+                    </div> 
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">
                     <div v-if="mode != 'view' && isItemDataChanged()">Desejo registrar os dados inseridos.<br />Os dados serão transferidos para o eSocial ao salvar</div>
