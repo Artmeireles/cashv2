@@ -111,7 +111,7 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_inicio">Data Início</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_inicio" id="dt_inicio" type="text" maxlength="10" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_inicio" id="dt_inicio" type="text" maxlength="10" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="resp_remun">Remunerações</label>
@@ -119,7 +119,7 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_fim">Data Fim Cessão</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_fim" id="dt_fim" type="text" maxlength="10" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_fim" id="dt_fim" type="text" maxlength="10" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">

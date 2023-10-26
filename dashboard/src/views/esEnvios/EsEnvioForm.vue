@@ -124,7 +124,7 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-6">
                         <label for="exercicio">Exercício</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.exercicio" id="exercicio" type="text" maxlength="7" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.exercicio" id="exercicio" type="text" maxlength="6" />
                     </div>
                     <div class="field col-12 md:col-6">
                         <label for="tabela">Tabela</label>

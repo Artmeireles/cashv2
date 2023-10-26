@@ -108,11 +108,11 @@ watchEffect(() => {
                     </div> -->
                     <div class="field col-12 md:col-4">
                         <label for="nr_beneficio">Nº Benefício</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.nr_beneficio" id="nr_beneficio" type="text" maxlength="10" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.nr_beneficio" id="nr_beneficio" type="text" maxlength="30" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_ini_benef">Data Benefício</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_ini_benef" id="dt_ini_benef" type="text" maxlength="10" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_ini_benef" id="dt_ini_benef" type="text" maxlength="10" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="id_param_tp_benef">Tipo de Benefício</label>
@@ -120,11 +120,11 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-3">
                         <label for="tp_plan_rp">Plano Segregação</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tp_plan_rp" id="tp_plan_rp" type="text" maxlength="255" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tp_plan_rp" id="tp_plan_rp" type="text" maxlength="1" />
                     </div>
                     <div class="field col-12 md:col-3">
                         <label for="tp_pen_morte">Tipo Pensão</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tp_pen_morte" id="tp_pen_morte" type="text" maxlength="255" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.tp_pen_morte" id="tp_pen_morte" type="text" maxlength="1" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="id_serv_inst">CPF Instituidor</label>
@@ -132,12 +132,8 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="dt_inst">Data Óbito</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_inst" id="dt_inst" type="text" maxlength="11" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_inst" id="dt_inst" type="text" maxlength="10" />
                     </div>
-                        <!-- <label for="dt_inst">Data Óbito</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemDataMasked.dt_inst" id="cep" type="text" @input="validateDtNascto()" @blur="setUnMasked('dt_inst')" />
-                        <small id="text-error" v-if="errorMessages.dt_inst" class="p-error">{{ errorMessages.dt_inst || '&nbsp;' }}</small>
-                    </div> -->
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">
                     <div v-if="mode != 'view' && isItemDataChanged()">Desejo registrar os dados inseridos.<br />Os dados serão transferidos para o eSocial ao salvar</div>

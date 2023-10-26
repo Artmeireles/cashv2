@@ -104,7 +104,7 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="dt_inicio">Data Inicio</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_inicio" id="dt_inicio" type="text" maxlength="10" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_inicio" id="dt_inicio" type="text" maxlength="10" />
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="publicacao">Publicação</label>

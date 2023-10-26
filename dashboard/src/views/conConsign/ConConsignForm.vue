@@ -101,27 +101,27 @@ watchEffect(() => {
                 <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-2">
                         <label for="id_cad_bancos">Banco</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_cad_bancos" id="id_cad_bancos" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_cad_bancos" id="id_cad_bancos" type="text" maxlength="10"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="agencia">Agência</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.agencia" id="agencia" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.agencia" id="agencia" type="text" maxlength="255"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="qmar">Quitação mínima</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.qmar" id="qmar" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.qmar" id="qmar" type="text" maxlength="255"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="qmp">Quantidade máxima</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.qmp" id="qmp" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.qmp" id="qmp" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="averbar_online">Averbação online</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.averbar_online" id="averbar_online" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.averbar_online" id="averbar_online" type="text" maxlength="1" />
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="apenas_efetivos">Apenas efetivos</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.apenas_efetivos" id="apenas_efetivos" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.apenas_efetivos" id="apenas_efetivos" type="text" maxlength="1" />
                     </div> 
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">

@@ -100,19 +100,19 @@ watchEffect(() => {
                 <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-2">
                         <label for="id_serv">Servidor</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_serv" id="id_serv" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_serv" id="id_serv" type="text" maxlength="10"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="dt_inicio">Data Início</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_inicio" id="dt_inicio" type="text" maxlength="10"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_inicio" id="dt_inicio" type="text" maxlength="10"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="inc_fis_men">Incapacidade Física</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.inc_fis_men" id="inc_fis_men" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.inc_fis_men" id="inc_fis_men" type="text" maxlength="1"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="dt_inc_fis">Data da Incapacidade</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_inc_fis" id="dt_inc_fis" type="text" maxlength="10" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_inc_fis" id="dt_inc_fis" type="text" maxlength="10" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">

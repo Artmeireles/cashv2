@@ -139,11 +139,11 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_limite_prev">Data Limite Prev</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_limite_prev" id="dt_limite_prev" type="text" maxlength="255" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_limite_prev" id="dt_limite_prev" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_limite_irpf">Data Limite IRPF</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_limite_irpf" id="dt_limite_irpf" type="text" maxlength="255" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_limite_irpf" id="dt_limite_irpf" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="certidao">Certidão</label>
@@ -159,7 +159,7 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_cert">Data da Certidão</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_cert" id="dt_cert" type="text" maxlength="255" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_cert" id="dt_cert" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="cart_vacinacao">Cartão de Vacinação</label>

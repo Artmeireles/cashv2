@@ -100,11 +100,11 @@ watchEffect(() => {
                 <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-6">
                         <label for="nome">Nome</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.nome" id="nome" type="text" maxlength="8"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.nome" id="nome" type="text" maxlength="100"/>
                     </div>
                     <div class="field col-12 md:col-6">
                         <label for="cbo">CBO</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cbo" id="cbo" type="text" maxlength="8" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.cbo" id="cbo" type="text" maxlength="6" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">

@@ -131,7 +131,7 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="data_exercicio">Data Exercicio</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.data_exercicio" id="data_exercicio" type="text" maxlength="25" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.data_exercicio" id="data_exercicio" type="text" maxlength="25" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="tp_plan_rp">Plano Segregação da Massa</label>
@@ -147,11 +147,11 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="d_inicio_abono">Data Inicio Abono</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.d_inicio_abono" id="d_inicio_abono" type="text" maxlength="255" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.d_inicio_abono" id="d_inicio_abono" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="d_ing_cargo">Data de Ingressão no Cargo</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.d_ing_cargo" id="d_ing_cargo" type="text" maxlength="255" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.d_ing_cargo" id="d_ing_cargo" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="id_cargo">Cargo</label>
@@ -191,7 +191,7 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_pis">Data do PIS</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_pis" id="dt_pis" type="text" maxlength="255" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_pis" id="dt_pis" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="tempo_servico">Tempo de Serviço</label>
@@ -219,7 +219,7 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_nomeacao">Data Nomeação</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_nomeacao" id="dt_nomeacao" type="text" maxlength="255" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_nomeacao" id="dt_nomeacao" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="nom_edital">Nome Edital</label>

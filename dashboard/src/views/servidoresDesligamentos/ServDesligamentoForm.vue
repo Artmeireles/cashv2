@@ -111,7 +111,7 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_deslig">Data Desligamento</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_deslig" id="dt_deslig" type="text" maxlength="10" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_deslig" id="dt_deslig" type="text" maxlength="10" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="ind_pagto_ap">Pagamento Aviso Prévio</label>

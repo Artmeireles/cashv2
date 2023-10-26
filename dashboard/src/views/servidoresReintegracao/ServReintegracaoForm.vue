@@ -119,11 +119,11 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_efet_retorno">Data Efetivo Retorno</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_efet_retorno" id="dt_efet_retorno" type="text" maxlength="10" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_efet_retorno" id="dt_efet_retorno" type="text" maxlength="10" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="dt_i_efeito">Data Início Efeitos</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.dt_i_efeito" id="dt_i_efeito" type="text" maxlength="10" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.dt_i_efeito" id="dt_i_efeito" type="text" maxlength="10" />
                     </div>
                     <div class="field col-12 md:col-4">
                         <label for="obs">Observação</label>

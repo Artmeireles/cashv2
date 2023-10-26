@@ -141,7 +141,7 @@ watchEffect(() => {
                     </div>   
                     <div class="field col-12 md:col-2">
                         <label for="d_nascimento">Data de Nascimento</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.d_nascimento" id="d_nascimento" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.d_nascimento" id="d_nascimento" type="text" maxlength="6" />
                     </div> 
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">

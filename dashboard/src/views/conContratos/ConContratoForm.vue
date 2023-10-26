@@ -101,27 +101,27 @@ watchEffect(() => {
                 <div class="p-fluid formgrid grid">
                     <div class="field col-12 md:col-2">
                         <label for="token">Token</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.token" id="token" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.token" id="token" type="text" maxlength="255"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="id_user">User</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_user" id="id_user" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_user" id="id_user" type="text" maxlength="11"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="id_consign">Consignado</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_consign" id="id_consign" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_consign" id="id_consign" type="text" maxlength="10"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="id_serv">Servidor</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_serv" id="id_serv" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_serv" id="id_serv" type="text" maxlength="10"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="contrato">Contrato</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.contrato" id="contrato" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.contrato" id="contrato" type="text" maxlength="255"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="primeiro_vencimento">Primeiro Vencimento</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.primeiro_vencimento" id="primeiro_vencimento" type="text" maxlength="6"/>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.primeiro_vencimento" id="primeiro_vencimento" type="text" maxlength="255"/>
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="valor_parcela">Valor Parcela</label>
@@ -129,11 +129,11 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="parcela">Parcela</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.parcela" id="parcela" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.parcela" id="parcela" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="parcelas">Parcelas</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.parcelas" id="parcelas" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.parcelas" id="parcelas" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="valor_total">Valor Total</label>
@@ -145,19 +145,19 @@ watchEffect(() => {
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="qmar">Quitação Mínima</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.qmar" id="qmar" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.qmar" id="qmar" type="text" maxlength="255" />
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="averbado_online">Averbado Online</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.averbado_online" id="averbado_online" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.averbado_online" id="averbado_online" type="text" maxlength="1" />
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="data_averbacao">Data Averbação</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.data_averbacao" id="data_averbacao" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.data_averbacao" id="data_averbacao" type="text" maxlength="10" />
                     </div>
                     <div class="field col-12 md:col-2">
                         <label for="data_liquidacao">Data Liquidação</label>
-                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.data_liquidacao" id="data_liquidacao" type="text" maxlength="6" />
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-maska data-maska="##/##/####" v-model="itemData.data_liquidacao" id="data_liquidacao" type="text" maxlength="10" />
                     </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">
