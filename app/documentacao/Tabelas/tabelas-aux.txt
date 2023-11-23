@@ -1,0 +1,67 @@
+aux-pccs
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+			"pccs": "1",
+			"nivel": "01",
+			"siap_data_criacao": "23/11/2023",
+			"siap_data_ato": "22/11/2023",
+			"siap_ato": "100",
+			"id_param_v_pub": "132"
+}
+
+aux-classes
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+			"pccs": "1",
+			"nivel": "01",
+			"siap_data_criacao": "23/11/2023",
+			"siap_data_ato": "22/11/2023",
+			"siap_ato": "100",
+			"id_param_v_pub": "132"
+}
+
+aux-centros
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+			"centro": "1",
+			"c_ua": "01",
+			"cnpj_ua": "12227971000158",
+			"siap_data_criacao": "23/11/2023",
+			"siap_data_ato": "22/11/2023",
+			"siap_ato": "100",
+			"id_param_v_pub": "132"
+}
+
+aux-departamentos
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+			"nome": "Departamento",
+			"id_siope": "01"
+}
+
+aux-locacoes
+{  
+			"status": 10,
+            "evento": 1538,
+            "created_at": "0",
+            "updated_at": "0",
+			"locacao": "Locacao",
+			"cod_orgao": "01",
+			"sigla": "LC",
+			"siap_data_criacao": "23/11/2023",
+			"siap_data_ato": "22/11/2023",
+			"siap_ato": "100",
+			"id_param_v_pub": "132"
+}
