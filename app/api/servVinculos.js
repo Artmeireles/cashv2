@@ -113,6 +113,11 @@ module.exports = (app) => {
           "grauExp",
           bodyRaw.id_param_grau_exp
         );
+      if (bodyRaw.id_param_v_pub)
+        body.id_param_v_pub = await getIdParam(
+          "veiPub",
+          bodyRaw.id_param_v_pub
+        );
       body.id_vinc_principal = bodyRaw.id_vinc_principal || body.matricula;
       body.sit_func = bodyRaw.sit_func;
       body.pis = bodyRaw.pis;
@@ -126,7 +131,10 @@ module.exports = (app) => {
       body.dt_nomeacao = bodyRaw.dt_nomeacao;
       body.nom_edital = bodyRaw.nom_edital;
       body.nom_nr_inscr = bodyRaw.nom_nr_inscr;
-      if (bodyRaw.id_siap_pub) body.id_siap_pub = bodyRaw.id_siap_pub;
+      body.siap_dada_criacao = bodyRaw.siap_dada_criacao;
+      body.siap_data_ato = bodyRaw.siap_data_ato;
+      body.siap_ato = bodyRaw.siap_ato;
+      //if (bodyRaw.id_siap_pub) body.id_siap_pub = bodyRaw.id_siap_pub;
     }
     try {
       existsOrError(
@@ -202,6 +210,11 @@ module.exports = (app) => {
         existsOrError(
           await isParamOrError("grauExp", body.id_param_grau_exp),
           "Grau de Exposição selecionado não existe"
+        );
+      if (body.id_param_v_pub)
+        existsOrError(
+          await isParamOrError("veiPub", body.id_param_v_pub),
+          "Veículo de Publicação selecionado não existe"
         );
     } catch (error) {
       console.log(error);

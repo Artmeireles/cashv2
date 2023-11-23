@@ -237,6 +237,22 @@ watchEffect(() => {
                         <label for="id_param_grau_exp">Grau de Exposição</label>
                         <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_grau_exp" id="id_param_grau_exp" type="text" maxlength="255" />
                     </div>
+                    <div class="field col-12 md:col-4">
+                        <label for="siap_dada_criacao">Siap Data Criação</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.siap_dada_criacao" id="siap_dada_criacao" type="text" maxlength="255" />
+                    </div>
+                    <div class="field col-12 md:col-4">
+                        <label for="siap_data_ato">Siap Data Ato Criação</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.siap_data_ato" id="siap_data_ato" type="text" maxlength="255" />
+                    </div>
+                    <div class="field col-12 md:col-4">
+                        <label for="siap_ato">Siap Ato Criação</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.siap_ato" id="siap_ato" type="text" maxlength="255" />
+                    </div>
+                    <div class="field col-12 md:col-4">
+                        <label for="id_param_v_pub">Veículo de Publicação</label>
+                        <InputText autocomplete="no" :disabled="mode == 'view'" v-model="itemData.id_param_v_pub" id="id_param_v_pub" type="text" maxlength="255" />
+                    </div>
                 </div>
                 <div class="card flex justify-content-center flex-wrap gap-3">
                     <div v-if="mode != 'view' && isItemDataChanged()">Desejo registrar os dados inseridos.<br />Os dados serão transferidos para o eSocial ao salvar</div>

@@ -41,8 +41,12 @@ exports.up = function(knex) {
         table.specificType('dt_nomeacao', 'char(10)').comment("Data da Nomeação")
         table.string('nom_edital').comment("Nome do Edital")
         table.string('nom_nr_inscr').comment("Número Inscrição")
-        table.integer('id_siap_pub').unsigned().comment("Publicação")
         table.integer('id_param_grau_exp').unsigned().comment("Grau de Exposição")
+        table.specificType('siap_data_criacao', 'char(10)').comment("Data de criação")
+        table.specificType('siap_data_ato', 'char(10)').comment("Data do ato de criação")
+        table.string('siap_ato').comment("Número do ato de criação")
+        table.integer('id_param_v_pub').unsigned().comment("Veículo de Publicação do ato de criação")
+        //table.integer('id_siap_pub').unsigned().comment("Publicação")
 
         table.unique(['ini_valid', 'id_serv', 'matricula'])
         table.foreign('id_serv').references('id').inTable('servidores').onUpdate('CASCADE').onDelete('NO ACTION')
@@ -51,8 +55,9 @@ exports.up = function(knex) {
         table.foreign('id_param_cod_categ').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_tp_jor').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_tmp_parc').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
-        table.foreign('id_siap_pub').references('id').inTable('siap_publicacoes').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_grau_exp').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_param_v_pub').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
+        //table.foreign('id_siap_pub').references('id').inTable('siap_publicacoes').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 
