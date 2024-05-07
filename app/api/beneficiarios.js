@@ -45,27 +45,14 @@ module.exports = app => {
                 return res.status(400).send(error)
             }
             body = {}
-            const tpl = await app.db(tabelaDomain).where({ 'cpf_benef': cpfBenef }).first()
+            const tpl = await app.db(tabelaDomain).where({ 'id_serv': cpfBenef }).first()
             if (tpl && tpl.id) {
                 body.id = tpl.id
             }
-            body.id_emp = bodyRaw.id_emp
-            body.cpf_benef = bodyRaw.cpfBenef_10
-            body.nome = bodyRaw.nmBenefic_11
-            body.dt_nascto = bodyRaw.dtNascto_12
-            body.dt_inicio = bodyRaw.dtInicio_13
-            body.id_param_sexo = await getIdParam('sexo', bodyRaw.sexo_14)
-            body.id_param_raca_cor = await getIdParam('racaCor', bodyRaw.racaCor_15)
-            body.id_param_est_civ = await getIdParam('estCiv', bodyRaw.estCiv_16)
-            body.inc_fis_men = bodyRaw.incFisMen_17
-            //body.dt_inc_fis = bodyRaw.incFisMen_17
-            body.id_param_tplograd = await getIdParam('tpLograd', bodyRaw.tpLograd_19)
-            body.id_cidade = await getIdCidade(bodyRaw.codMunic_25)
-            body.cep = bodyRaw.cep_24
-            body.logradouro = bodyRaw.dscLograd_20
-            body.bairro = bodyRaw.bairro_23
-            body.nr = bodyRaw.nrLograd_21
-            body.complemento = bodyRaw.complemento_22
+            body.id_serv = bodyRaw.id_serv
+            body.dt_inicio = bodyRaw.cpfBenef_10
+            body.inc_fis_men = bodyRaw.nmBenefic_11
+            body.dt_inc_fis = bodyRaw.dtNascto_12
         }
         //body.id_emp = req.params.id_emp
 
@@ -174,49 +161,33 @@ module.exports = app => {
     const limit = 20 // usado para paginação
     const get = async (req, res) => {
         let user = req.user
-        const key = req.query.key ? req.query.key.trim() : ''
-        let keyCpf = req.query.keyCpf ? req.query.keyCpf : ''
-        let keyMat = req.query.keyMat ? req.query.keyMat : ''
-        if (req.query.key) {
-            keyCpf = key.replace(/([^\d])+/gim, "").length <= 11 ? key.replace(/([^\d])+/gim, "") : ''
-            keyMat = key.replace(/([^\d])+/gim, "").length <= 8 ? key.replace(/([^\d])+/gim, "").padStart(8, '0') : ''
-        }
-        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
+        const key = req.query.key ? req.query.key : ''
+        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
         try {
             // Alçada para exibição
-            isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de financeiros"`)
+            isMatchOrError(uParams && uParams.financeiro >= 1, `${noAccessMsg} "Exibição de empresa"`)
         } catch (error) {
             return res.status(401).send(error)
         }
         const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`
-        const tabelaVinculosDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.serv_vinculos`
 
         const page = req.query.page || 1
 
-        // let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
-        //     .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-        //     .where({ 'tbl1.status': STATUS_ACTIVE })
-        //     .where(function () {
-        //         this.where({ 'sv.matricula': keyMat })
-        //             .orWhere(app.db.raw(`tbl1.cpf_benef like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
-        //             .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
-        //     })
-
-        // sql = await app.db.raw(sql.toString())
-        // const count = sql[0][0].count
-
+        let sql = app.db({ tbl1: tabelaDomain }).count('tbl1.id', { as: 'count' })
+        .where({ status: STATUS_ACTIVE })
+        .where(function () {
+            this.where(app.db.raw(`tbl1.id_serv regexp('${key.toString().replace(' ', '.+')}')`))
+        })
+        sql = await app.db.raw(sql.toString())
+        const count = sql[0][0].count
         const ret = app.db({ tbl1: tabelaDomain })
-            .select('tbl1.*', 'sv.matricula')
-            .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-            .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: uParams.id_emp })
+            .where({ status: STATUS_ACTIVE })
             .where(function () {
-                this.where({ 'sv.matricula': keyMat })
-                    .orWhere(app.db.raw(`tbl1.cpf_benef like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))
-                    .orWhere(app.db.raw(`tbl1.nome regexp('${key.toString().replace(' ', '.+')}')`))
+                this.where(app.db.raw(`tbl1.id_serv regexp('${key.toString().replace(' ', '.+')}')`))
             })
-        ret.orderBy('nome').limit(limit).offset(page * limit - limit)
+        ret.orderBy('id_serv').limit(limit).offset(page * limit - limit)
         ret.then(body => {
-            return res.json({ data: body, limit })
+            return res.json({ data: body, count, limit })
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
@@ -225,7 +196,6 @@ module.exports = app => {
                 return res.status(500).send(error)
             })
     }
-
     const getById = async (req, res) => {
         let user = req.user
         const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;

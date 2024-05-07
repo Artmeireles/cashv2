@@ -32,7 +32,8 @@ module.exports = app => {
         catch (error) {
             return res.status(400).send(error)
         }
-
+        delete body.hash
+        
         if (body.id) {
             // Variáveis da edição de um registro
             // registrar o evento na tabela de eventos

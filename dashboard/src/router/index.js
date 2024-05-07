@@ -23,15 +23,107 @@ const routes = [
                 component: () => import('@/views/servidores/ServidorPanel.vue')
             },
             {
+                path: '/:client/:domain/serv-vinculos/:id_serv_vinc',
+                name: 'serv-vinculos',
+                component: () => import('@/views/servidoresVinculos/ServVinculosGrid.vue')
+            },
+            {
+                path: '/:client/:domain/serv-afastamentos/:id_serv_vinc',
+                name: 'serv-afastamentos',
+                component: () => import('@/views/servidoresAfastamentos/ServAfastamentosGrid.vue')
+            },
+            {
+                path: '/:client/:domain/empresa',
+                name: 'empresa',
+                component: () => import('@/views/empresa/EmpresaForm.vue')
+            },
+            {
+                path: '/:client/:domain/empresas',
+                name: 'empresas',
+                component: () => import('@/views/empresa/EmpresasGrid.vue')
+            },
+            {
+                path: '/:client/:domain/aux-cargos',
+                name: 'aux-cargos',
+                component: () => import('@/views/auxCargos/AuxCargosGrid.vue')
+            },
+            {
+                path: '/:client/:domain/fin-rubricas/:id_emp',
+                name: 'fin-rubricas',
+                component: () => import('@/views/finRubricas/FinRubricasGrid.vue')
+            },
+            {
+                path: '/:client/:domain/cad-bancos',
+                name: 'cad-bancos',
+                component: () => import('@/views/cadBancos/CadBancosGrid.vue')
+            },
+            //remuneração            
+            {
                 path: '/:client/:domain/remun-params',
                 name: 'remun-params',
                 component: () => import('@/views/remuneracaoParams/ParametrosGrid.vue')
             },
             {
-                path: '/:client/:domain/empresa',
-                name: 'empresa',
-                component: () => import('@/views/remuneracaoParams/ParametrosGrid.vue')
-            }
+                path: '/:client/:domain/remuneracao/:id_serv_vinc',
+                name: 'remuneracao',
+                component: () => import('@/views/remuneracao/RemuneracoesGrid.vue')
+            },
+            {
+                path: '/:client/:domain/remun-adfg',
+                name: 'remun-adfg',
+                component: () => import('@/views/remunADFG/RemunADFGGrid.vue')
+            },
+            //e-social
+            {
+                path: '/:client/:domain/es-params/:id_emp',
+                name: 'es-params',
+                component: () => import('@/views/esParams/EsParamsGrid.vue')
+            },
+            {
+                path: '/:client/:domain/es-envios',
+                name: 'es-envios',
+                component: () => import('@/views/esEnvios/EsEnviosGrid.vue')
+            },
+            {
+                path: '/:client/:domain/es-rejeicoes',
+                name: 'es-rejeicoes',
+                component: () => import('@/views/esRejeicoes/EsRejeicoesGrid.vue')
+            },
+            {
+                path: '/:client/:domain/tabelas-cc',
+                name: 'tabelas-cc',
+                component: () => import('@/views/tabelasCC/TabelasCCGrid.vue')
+            },
+            {
+                path: '/:client/:domain/tabelas/:id_emp',
+                name: 'tabelas',
+                component: () => import('@/views/tabelas/TabelasGrid.vue')
+            },
+            {
+                path: '/:client/:domain/beneficiarios',
+                name: 'beneficiarios',
+                component: () => import('@/views/beneficiarios/BeneficiariosGrid.vue')
+            },    
+            {
+                path: '/:client/:domain/ben-vinculos',
+                name: 'ben-vinculos',
+                component: () => import('@/views/beneficiariosVinculos/BenVinculosGrid.vue')
+            },   
+            {
+                path: '/:client/:domain/con-consign',
+                name: 'con-consign',
+                component: () => import('@/views/conConsign/ConConsignsGrid.vue')
+            },  
+            {
+                path: '/:client/:domain/emp-resp',
+                name: 'emp-resp',
+                component: () => import('@/views/empresasResp/EmpRespForm.vue')
+            },
+            {
+                path: '/:client/:domain/siap-publicacoes',
+                name: 'siap-publicacoes',
+                component: () => import('@/views/siapPublicacoes/SiapPubsGrid.vue')
+            },
         ]
     },
     {

@@ -4,9 +4,8 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { baseApiUrl } from '@/env';
 import axios from '@/axios-interceptor';
 import { defaultSuccess, defaultWarn } from '@/toast';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-
 const store = useUserStore();
 
 const router = useRouter();
@@ -87,7 +86,7 @@ const toggle = (event) => {
     menu.value.toggle(event);
 };
 const getItem = (data) => {
-    itemData.value = data;
+    itemData.value = { ...data };
 };
 const loadData = () => {
     axios.get(`${urlBase.value}`).then((axiosRes) => {

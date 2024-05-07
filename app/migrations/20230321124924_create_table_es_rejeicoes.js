@@ -8,11 +8,13 @@ exports.up = function(knex) {
         table.integer('evento').notNull()
         table.string('created_at').notNull()
         table.string('updated_at')
+        table.integer('id_emp').notNull().unsigned().comment("Empresa")
         table.integer('id_es_envio').notNull().unsigned().comment("eSocial Envios")
         table.integer('rejeicao_id').notNull().comment("ID da Rejeição de acordo com erro")
         table.integer('codigo').notNull().comment("Código da Rejeição")
         table.string('ocorrencia', 255).comment("Ocorrência da Rejeição, descrição do erro")
 
+        table.foreign('id_emp').references('id').inTable('wwmgca_app.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_es_envio').references('id').inTable('es_envios').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };

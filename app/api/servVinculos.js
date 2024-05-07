@@ -21,33 +21,52 @@ module.exports = (app) => {
 
   const save = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
+    const uParams = await app
+      .db({ u: "users" })
+      .join({ e: "empresa" }, "u.id_emp", "=", "e.id")
+      .select("u.*", "e.cliente", "e.dominio")
+      .where({ "u.id": user.id })
+      .first();
     let body = { ...req.body };
     if (req.params.id) body.id = req.params.id;
     const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
     const tabelaServidoresDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.servidores`;
     try {
       // Alçada para edição
-      if (body.id) isMatchOrError(uParams && uParams.cad_servidores >= 3, `${noAccessMsg} "Edição de ${tabela}"`);
+      if (body.id)
+        isMatchOrError(
+          uParams && uParams.cad_servidores >= 3,
+          `${noAccessMsg} "Edição de ${tabela}"`
+        );
       // Alçada para inclusão
-      else isMatchOrError(uParams && uParams.cad_servidores >= 1, `${noAccessMsg} "Inclusão de ${tabela}"`);
-    } catch (error) { return res.status(401).send(error); }
+      else
+        isMatchOrError(
+          uParams && uParams.cad_servidores >= 1,
+          `${noAccessMsg} "Inclusão de ${tabela}"`
+        );
+    } catch (error) {
+      return res.status(401).send(error);
+    }
 
-    body.id_serv = req.params.id_serv
+    body.id_serv = req.params.id_serv;
 
     const contentType = req.headers["content-type"];
     if (contentType == "text/plain") {
       const bodyRaw = convertESocialTextToJson(req.body);
       // return res.send(bodyRaw)
       body = {};
-      const id_serv = await app.db(tabelaServidoresDomain).select('id').where({ cpf_trab: bodyRaw.cpfTrab_13 }).first();
+      const id_serv = await app
+        .db(tabelaServidoresDomain)
+        .select("id")
+        .where({ cpf_trab: bodyRaw.cpfTrab_13 })
+        .first();
       try {
-        existsOrError(id_serv, `Servidor não encontrado`)
+        existsOrError(id_serv, `Servidor não encontrado`);
       } catch (error) {
         console.log(error);
         return res.status(400).send(error);
       }
-      body.id_serv = id_serv.id
+      body.id_serv = id_serv.id;
       body.ini_valid = bodyRaw.ini_valid;
       body.matricula = bodyRaw.matricula_108;
       body.tp_reg_trab = bodyRaw.tpRegTrab_109;
@@ -59,13 +78,20 @@ module.exports = (app) => {
       body.abono_perm = bodyRaw.indAbonoPerm_223 || "N";
       body.d_inicio_abono = bodyRaw.dtIniAbono_224;
       body.d_ing_cargo = bodyRaw.dtIngrCargo_227;
-      const id_cargo = await getIdCargos(bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228, { cliente: uParams.cliente, dominio: uParams.dominio });
+      const id_cargo = await getIdCargos(
+        bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228,
+        { cliente: uParams.cliente, dominio: uParams.dominio }
+      );
       if (id_cargo) body.id_cargo = id_cargo;
       else {
-        const cargo = await app.db(`${dbPrefix}_${uParams.cliente}_${uParams.dominio}.aux_cargos`).insert({
-          evento: 1, created_at: new Date(), nome: bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228,
-          cbo: bodyRaw.CBOCargo_226 || bodyRaw.CBOFuncao_229
-        });
+        const cargo = await app
+          .db(`${dbPrefix}_${uParams.cliente}_${uParams.dominio}.aux_cargos`)
+          .insert({
+            evento: 1,
+            created_at: new Date(),
+            nome: bodyRaw.nmCargo_225 || bodyRaw.nmFuncao_228,
+            cbo: bodyRaw.CBOCargo_226 || bodyRaw.CBOFuncao_229,
+          });
         body.id_cargo = cargo[0];
       }
       body.acum_cargo = bodyRaw.acumCargo_230 || bodyRaw.acumCargo_230;
@@ -82,7 +108,16 @@ module.exports = (app) => {
       body.hr_noturno = bodyRaw.horNoturno_241;
       body.desc_jornd = bodyRaw.dscJorn_242;
       // Os dados a seguir deverão ser capturados no banco de dados e enviados pelo PonteCasV2
-      if (bodyRaw.id_param_grau_exp) body.id_param_grau_exp = await getIdParam("grauExp", bodyRaw.id_param_grau_exp);
+      if (bodyRaw.id_param_grau_exp)
+        body.id_param_grau_exp = await getIdParam(
+          "grauExp",
+          bodyRaw.id_param_grau_exp
+        );
+      if (bodyRaw.id_param_v_pub)
+        body.id_param_v_pub = await getIdParam(
+          "veiPub",
+          bodyRaw.id_param_v_pub
+        );
       body.id_vinc_principal = bodyRaw.id_vinc_principal || body.matricula;
       body.sit_func = bodyRaw.sit_func;
       body.pis = bodyRaw.pis;
@@ -96,7 +131,10 @@ module.exports = (app) => {
       body.dt_nomeacao = bodyRaw.dt_nomeacao;
       body.nom_edital = bodyRaw.nom_edital;
       body.nom_nr_inscr = bodyRaw.nom_nr_inscr;
-      if (bodyRaw.id_siap_pub) body.id_siap_pub = bodyRaw.id_siap_pub;
+      body.siap_dada_criacao = bodyRaw.siap_dada_criacao;
+      body.siap_data_ato = bodyRaw.siap_data_ato;
+      body.siap_ato = bodyRaw.siap_ato;
+      //if (bodyRaw.id_siap_pub) body.id_siap_pub = bodyRaw.id_siap_pub;
     }
     try {
       existsOrError(body.ini_valid, "Validade inicial do registro não informado");
@@ -114,14 +152,14 @@ module.exports = (app) => {
       existsOrError(body.tp_plan_rp, "Plano Segregação em Massa não informado");
       existsOrError(body.teto_rgps, "Teto RGPS não informado");
       existsOrError(body.abono_perm, "Abono Permanência não informado");
-      if (body.abono_perm == 'S')
+      if (body.abono_perm == "S")
         existsOrError(
           body.d_inicio_abono,
           "Data Início do Abono não informado"
         );
       if (body.tp_reg_trab == "2" && body.id_param_tp_prov == "2") {
         existsOrError(body.id_cargo, "Cargo não informado");
-        if (!(['1', '4'].includes.body.tp_reg_trab))
+        if (!["1", "4"].includes.body.tp_reg_trab)
           existsOrError(
             body.d_ing_cargo,
             "Data de Ingresso do Cargo não informado"
@@ -170,6 +208,11 @@ module.exports = (app) => {
           await isParamOrError("grauExp", body.id_param_grau_exp),
           "Grau de Exposição selecionado não existe"
         );
+      if (body.id_param_v_pub)
+        existsOrError(
+          await isParamOrError("veiPub", body.id_param_v_pub),
+          "Veículo de Publicação selecionado não existe"
+        );
     } catch (error) {
       console.log(error);
       return res.status(400).send(error);
@@ -181,9 +224,16 @@ module.exports = (app) => {
     body = JSON.parse(JSON.stringify(body), removeAccentsObj);
     body = JSON.parse(JSON.stringify(body), changeUpperCase);
 
-    const tpl = await app.db(tabelaDomain).where({ 'id_serv': body.id_serv, 'ini_valid': body.ini_valid, 'matricula': body.matricula }).first()
+    const tpl = await app
+      .db(tabelaDomain)
+      .where({
+        id_serv: body.id_serv,
+        ini_valid: body.ini_valid,
+        matricula: body.matricula,
+      })
+      .first();
     if (tpl && tpl.id) {
-      body.id = tpl.id
+      body.id = tpl.id;
     }
 
     if (body.id) {
@@ -213,8 +263,12 @@ module.exports = (app) => {
           else res.status(201).send("Vinculo não encontrado");
         })
         .catch((error) => {
-
-          app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+          app.api.logger.logError({
+            log: {
+              line: `Error in file: ${__filename}.${__function} ${error}`,
+              sConsole: true,
+            },
+          });
           return res.status(500).send(error);
         });
     } else {
@@ -248,18 +302,27 @@ module.exports = (app) => {
           return res.json(body);
         })
         .catch((error) => {
-          app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+          app.api.logger.logError({
+            log: {
+              line: `Error in file: ${__filename}.${__function} ${error}`,
+              sConsole: true,
+            },
+          });
           return res.status(500).send(error);
         });
     }
   };
 
-  const limit = 5; // usado para paginação
   const get = async (req, res) => {
     let user = req.user;
     const id_serv = req.params.id_serv;
     const key = req.query.key ? req.query.key : "";
-    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
+    const uParams = await app
+      .db({ u: "users" })
+      .join({ e: "empresa" }, "u.id_emp", "=", "e.id")
+      .select("u.*", "e.cliente", "e.dominio")
+      .where({ "u.id": user.id })
+      .first();
     try {
       // Alçada para exibição
       isMatchOrError(
@@ -271,21 +334,6 @@ module.exports = (app) => {
     }
     const tabelaDomain = `${dbPrefix}_${uParams.cliente}_${uParams.dominio}.${tabela}`;
 
-    const page = req.query.page || 1;
-
-    let sql = app
-      .db({ tbl1: tabelaDomain })
-      .count("tbl1.id", { as: "count" })
-      .where({ status: STATUS_ACTIVE, id_serv: req.params.id_serv })
-      .where(function () {
-        this.where(
-          app.db.raw(
-            `tbl1.matricula regexp('${key.toString().replace(" ", ".+")}')`
-          )
-        );
-      });
-    sql = await app.db.raw(sql.toString());
-    const count = sql[0][0].count;
     const ret = app
       .db({ tbl1: tabelaDomain })
       .where({ status: STATUS_ACTIVE, id_serv: req.params.id_serv })
@@ -295,14 +343,10 @@ module.exports = (app) => {
             `tbl1.matricula regexp('${key.toString().replace(" ", ".+")}')`
           )
         );
-      });
-    ret
+      })
       .orderBy("matricula")
-      .limit(limit)
-      .offset(page * limit - limit);
-    ret
       .then((body) => {
-        return res.json({ data: body, count, limit });
+        return res.json({ data: body });
       })
       .catch((error) => {
         app.api.logger.logError({
@@ -312,14 +356,24 @@ module.exports = (app) => {
           },
         });
 
-        app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+        app.api.logger.logError({
+          log: {
+            line: `Error in file: ${__filename}.${__function} ${error}`,
+            sConsole: true,
+          },
+        });
         return res.status(500).send(error);
       });
   };
 
   const getById = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
+    const uParams = await app
+      .db({ u: "users" })
+      .join({ e: "empresa" }, "u.id_emp", "=", "e.id")
+      .select("u.*", "e.cliente", "e.dominio")
+      .where({ "u.id": user.id })
+      .first();
     try {
       // Alçada para exibição
       isMatchOrError(
@@ -353,14 +407,24 @@ module.exports = (app) => {
           },
         });
 
-        app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+        app.api.logger.logError({
+          log: {
+            line: `Error in file: ${__filename}.${__function} ${error}`,
+            sConsole: true,
+          },
+        });
         return res.status(500).send(error);
       });
   };
 
   const remove = async (req, res) => {
     let user = req.user;
-    const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
+    const uParams = await app
+      .db({ u: "users" })
+      .join({ e: "empresa" }, "u.id_emp", "=", "e.id")
+      .select("u.*", "e.cliente", "e.dominio")
+      .where({ "u.id": user.id })
+      .first();
     try {
       // Alçada para exibição
       isMatchOrError(
