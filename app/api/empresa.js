@@ -14,7 +14,12 @@ module.exports = app => {
 
     const save = async (req, res) => {
         let user = req.user
-        const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
+        let uParams = app.db({ u: 'users' })
+        const contentType = req.headers['content-type']
+        if (contentType == "text/plain")
+            uParams = await uParams.where({ 'u.id': user.id }).first();
+        else
+            uParams = await uParams.join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();
         let body = { ...req.body }
 
         if (req.params.id) body.id = req.params.id
@@ -27,8 +32,7 @@ module.exports = app => {
         } catch (error) {
             return res.status(401).send(error)
         }
-        
-        const contentType = req.headers['content-type']
+
         if (contentType == "text/plain") {
             const bodyRaw = convertESocialTextToJson(req.body)
             body = {}
@@ -88,7 +92,8 @@ module.exports = app => {
                     .where({ nr_insc: body.nr_insc })
                     .andWhere(app.db.raw(body.id ? (`id != '${body.id}'`) : '1=1'))
                     .first()
-                notExistsOrError(dataFromDB, 'Combinação de CNPJ/ CPF já cadastrado')
+                if (contentType == "text/plain") body.id = dataFromDB.id
+                else notExistsOrError(dataFromDB, 'CNPJ já cadastrado')
             }
         }
         catch (error) {
@@ -199,9 +204,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -224,9 +229,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 

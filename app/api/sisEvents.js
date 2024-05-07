@@ -33,9 +33,8 @@ module.exports = app => {
             evento.id_registro = last.id
             evento.created_at = new Date()
             if (request.user && request.user.id) {
-                const user = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('cliente', 'dominio').where({ 'u.id': request.user.id }).first()
-                evento.cliente = user.cliente
-                evento.dominio = user.dominio
+                const user = await app.db({ u: 'users' }).select('id_emp').where({ 'u.id': request.user.id }).first()
+                evento.id_emp = user.id_emp
             }
 
             try {
@@ -72,9 +71,8 @@ module.exports = app => {
             evento.id_registro = next.id
             evento.created_at = new Date()
             if (request.user && request.user.id) {
-                const user = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('cliente', 'dominio').where({ 'u.id': request.user.id }).first()
-                evento.cliente = user.cliente
-                evento.dominio = user.dominio
+                const user = await app.db({ u: 'users' }).select('id_emp').where({ 'u.id': request.user.id }).first()
+                evento.id_emp = user.id_emp
             }
 
             try {
@@ -109,9 +107,8 @@ module.exports = app => {
             evento.id_registro = last.id
             evento.created_at = new Date()
             if (request.user && request.user.id) {
-                const user = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('cliente', 'dominio').where({ 'u.id': request.user.id }).first()
-                evento.cliente = user.cliente
-                evento.dominio = user.dominio
+                const user = await app.db({ u: 'users' }).select('id_emp').where({ 'u.id': request.user.id }).first()
+                evento.id_emp = user.id_emp
             }
 
             try {
@@ -132,9 +129,8 @@ module.exports = app => {
         evento.geo_ln = request.headers['x-geo-ln']
         evento.created_at = new Date()
         if (request.user && request.user.id) {
-            const user = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('cliente', 'dominio').where({ 'u.id': request.user.id }).first()
-            evento.cliente = user.cliente
-            evento.dominio = user.dominio
+            const user = await app.db({ u: 'users' }).select('id_emp').where({ 'u.id': request.user.id }).first()
+            evento.id_emp = user.id_emp
         }
         try {
             const dba = await app.db(tabelaSisEvents).insert(evento)

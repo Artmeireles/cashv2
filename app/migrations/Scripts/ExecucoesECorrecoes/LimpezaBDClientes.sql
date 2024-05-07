@@ -10,7 +10,7 @@ TRUNCATE TABLE `wwmgca_cliente_aTIVOS`.`cON_COnsign`;
 TRUNCATE TABLE `wwmgca_cliente_ativos`.`con_contratos`; 
 TRUNCATE TABLE `wwmgca_cliente_ativos`.`con_parcelas`; 
 TRUNCATE TABLE `WWMGCA_cLIENTe_ativos`.`emp_resp`; 
-TRUNCATE TABLE `wwmgca_cliente_ativos`.`EMP_RESp_CONTato`; 
+TRUNCATE TABLE `wwmgca_cliente_ativos`.`emp_resp_contatos`; 
 TRUNCATE TABLE `wwmgca_cliente_ativos`.`emp_ua`; 
 TRUNCATE TABLE `WWMgca_cliente_ativos`.`es_envios`; 
 TRUNCATE TABLE `wwmgca_clientE_ATIVOS`.`ES_params`; 

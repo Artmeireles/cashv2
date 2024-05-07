@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { baseApiAuthUrl } from '@/env';
 import { userKey, glKey } from '@/global';
-import axios from '@/axios-interceptor';
-import ipify from 'ipify2';
+import interceptor from '@/axios-interceptor';
+import axios from 'axios';
 
 export const useUserStore = defineStore('users', {
     state: () => ({
@@ -34,31 +34,28 @@ export const useUserStore = defineStore('users', {
     actions: {
         async registerUser(email, password) {
             const url = `${baseApiAuthUrl}/signin`;
-            if (!this.ipify) {
-                this.ipify = await ipify.ipv4();
-                if (this.ipify) {
-                    axios.interceptors.request.use((config) => {
-                        if (this.ipify) {
-                            config.headers['x-ip-address'] = this.ipify;
-                        }
-                        return config;
-                    });
-                }
-            }
-            await axios
+            const urlIp = `https://api.vivazul.com.br/getIp`;
+            let ip = await axios.get(urlIp);
+            ip = ip.data.ip.split(',')[0];
+            interceptor.interceptors.request.use((config) => {
+                config.headers['x-ip-address'] = ip;
+                return config;
+            });
+            await interceptor
                 .post(url, { email, password })
                 .then((res) => {
                     this.user = res.data;
                     if (this.user.id && this.user.isMatch) {
                         this.user.timeLogged = Math.floor(Date.now() / 1000);
-                        axios.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`;
-                        localStorage.setItem(userKey, JSON.stringify({ ...res.data, ip: this.ipify }));
+                        this.user.ip = ip;
+                        interceptor.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`;
+                        localStorage.setItem(userKey, JSON.stringify({ ...res.data, ip: ip }));
                         location.reload();
                     } else {
-                        delete axios.defaults.headers.common['Authorization'];
-                        delete axios.defaults.headers.common['x-ip-address'];
-                        delete axios.defaults.headers.common['x-geo-lt'];
-                        delete axios.defaults.headers.common['x-geo-ln'];
+                        delete interceptor.defaults.headers.common['Authorization'];
+                        delete interceptor.defaults.headers.common['x-ip-address'];
+                        delete interceptor.defaults.headers.common['x-geo-lt'];
+                        delete interceptor.defaults.headers.common['x-geo-ln'];
                         localStorage.removeItem(userKey);
                     }
                     return this.user;
@@ -69,7 +66,7 @@ export const useUserStore = defineStore('users', {
         },
         async findUser(cpf) {
             const url = `${baseApiAuthUrl}/signin`;
-            await axios
+            await interceptor
                 .post(url, { cpf })
                 .then((res) => {
                     this.user = res.data;
@@ -80,17 +77,14 @@ export const useUserStore = defineStore('users', {
         },
         async validateToken(userData) {
             const url = `${baseApiAuthUrl}/validateToken`;
-            // Pra validar movimentação/troca de IP
-            if (userData && userData.ip) userData.ipSignin = userData.ip; // comentar esta linha e descomentar as duas seguintes
-            // let ipify = await axios.get("https://api.ipify.org?format=json")
-            // userData.ipSignin = ipify.data.ip || undefined
-            return await axios
+            if (userData && userData.ip) userData.ipSignin = userData.ip;
+            return await interceptor
                 .post(url, userData)
                 .then((res) => {
                     this.isTokenValid = res.data;
                     if (this.isTokenValid) {
                         this.user = userData;
-                        axios.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`;
+                        interceptor.defaults.headers.common['Authorization'] = `bearer ${this.user.token}`;
                         this.getLocation();
                         this.timeToLogOut = 600;
                     } else {
@@ -103,10 +97,10 @@ export const useUserStore = defineStore('users', {
         },
         logout() {
             this.user = {};
-            delete axios.defaults.headers.common['Authorization'];
-            delete axios.defaults.headers.common['x-ip-address'];
-            delete axios.defaults.headers.common['x-geo-lt'];
-            delete axios.defaults.headers.common['x-geo-ln'];
+            delete interceptor.defaults.headers.common['Authorization'];
+            delete interceptor.defaults.headers.common['x-ip-address'];
+            delete interceptor.defaults.headers.common['x-geo-lt'];
+            delete interceptor.defaults.headers.common['x-geo-ln'];
             localStorage.removeItem(userKey);
         },
         getLocation() {
@@ -121,8 +115,8 @@ export const useUserStore = defineStore('users', {
             this.geolocation.longitude = position.coords.longitude;
             this.errorMessage = null;
             localStorage.setItem(glKey, JSON.stringify({ geolocation: this.geolocation }));
-            axios.defaults.headers.common['x-geo-lt'] = this.geolocation.latitude;
-            axios.defaults.headers.common['x-geo-ln'] = this.geolocation.longitude;
+            interceptor.defaults.headers.common['x-geo-lt'] = this.geolocation.latitude;
+            interceptor.defaults.headers.common['x-geo-ln'] = this.geolocation.longitude;
         },
         showError(error) {
             switch (error.code) {

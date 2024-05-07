@@ -44,7 +44,7 @@ exports.up = function(knex) {
         table.integer('id_siap_pub').unsigned().comment("Publicação")
         table.integer('id_param_grau_exp').unsigned().comment("Grau de Exposição")
 
-        table.unique(['ini_valid', 'id_serv', 'matricula'])
+        table.unique(['ini_valid', 'id_serv', 'matricula'], 'serv_vinculos_unique')
         table.foreign('id_serv').references('id').inTable('servidores').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_tp_prov').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_cargo').references('id').inTable('aux_cargos').onUpdate('CASCADE').onDelete('NO ACTION')

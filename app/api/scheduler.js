@@ -57,6 +57,7 @@ module.exports = app => {
             }
         })
     }
+    // Regra de agendamento para executar a tarefa no primeiro segundo do primeiro dia de cada mês
     const ruleOneByMonth = '0 0 6 1 * *'
 
     // Agendamento da tarefa para executar no primeiro segundo do primeiro dia de cada mês

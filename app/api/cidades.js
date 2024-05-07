@@ -1,11 +1,11 @@
 
 module.exports = app => {
-    const tabela = 'cidades'
+    const tabela = 'cad_cidades'
 
     const getListaCidades = async (req, res) => {
         const uf = req.query.uf
         if (uf && uf.length == 2) {
-            let sql = app.db({ c: 'cad_cidades' })
+            let sql = app.db({ c: tabela })
                 .select('id', 'uf_abrev', 'uf_nome', 'municipio_id', 'municipio_nome')
                 .where({ uf_abrev: uf }).orderBy('municipio_nome')
                 .then(body => {
@@ -20,7 +20,7 @@ module.exports = app => {
     const getUFByCidade = async (req, res) => {
         const cidade = req.query.cidade
         if (cidade && cidade.length > 0) {
-            let sql = app.db({ c: 'cad_cidades' })
+            let sql = app.db({ c: tabela })
                 .select('uf_abrev', 'uf_nome')
                 .where({ id: cidade }).first()
                 .then(body => {

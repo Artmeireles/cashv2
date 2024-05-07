@@ -81,10 +81,9 @@ module.exports = app => {
             body.naturalidade = bodyRaw.naturalidade || 'Naturalidade não informada'
         }
 
-        if(!body.id_emp) body.id_emp = req.params.id_emp
         delete body.uf
+
         try {
-            existsOrError(body.id_emp, 'Órgão não informado')
             existsOrError(body.cpf_trab, 'CPF do Trabalhador não informado')
             body.cpf_trab = body.cpf_trab.replace(/([^\d])+/gim, "")
             cpfOrError(body.cpf_trab, 'CPF inválido')
@@ -218,7 +217,7 @@ module.exports = app => {
         const ret = app.db({ tbl1: tabelaDomain })
             .select('tbl1.id', 'tbl1.cpf_trab', 'tbl1.nome', 'sv.matricula')
             .leftJoin({ sv: `${tabelaVinculosDomain}` }, 'tbl1.id', '=', 'sv.id_serv')
-            .where({ 'tbl1.status': STATUS_ACTIVE, id_emp: uParams.id_emp })
+            .where({ 'tbl1.status': STATUS_ACTIVE })
             .where(function () {
                 this.where({ 'sv.matricula': keyMat })
                     .orWhere(app.db.raw(`tbl1.cpf_trab like '%${keyCpf.replace(/([^\d])+/gim, "")}%'`))

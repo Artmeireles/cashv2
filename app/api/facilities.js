@@ -91,8 +91,6 @@ module.exports = app => {
 
     const getIdParam = async (meta, value) => {
         const tabelaDomain = `${dbPrefix}_app.params`
-        // console.log(meta, value);
-        // console.log(app.db(tabelaDomain).select('id').where({ 'meta': meta, 'value': value }).first().toString());
         let body = { id: 0 }
         const param = await app.db(tabelaDomain).select('id').where({ 'meta': meta, 'value': value }).first()
         if (param) return param.id

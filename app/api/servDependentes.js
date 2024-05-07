@@ -176,7 +176,6 @@ module.exports = (app) => {
     const id_serv = await app.db(tabelaServidoresDomain).select('id').where({ cpf_trab: bodyRaw.cpfTrab_13 }).first();
     let ocorrencias = countOccurrences(JSON.stringify(bodyRaw), 'INCLUIRDEPENDENTE_91');
     if (Array.isArray(bodyRaw.INCLUIRDEPENDENTE_91)) ocorrencias = bodyRaw.INCLUIRDEPENDENTE_91.length;
-    // console.log(ocorrencias);
     if (id_serv && id_serv.id && ocorrencias > 0) {
       for (let index = 0; index < ocorrencias; index++) {
         if ((bodyRaw.cpfDep_95 || (ocorrencias > 1 && bodyRaw.cpfDep_95[index]))) {
@@ -200,7 +199,6 @@ module.exports = (app) => {
             cart_vacinacao: ocorrencias > 1 ? bodyRaw.cart_vacinacao[index] : bodyRaw.cart_vacinacao,
             declaracao_escolar: ocorrencias > 1 ? bodyRaw.declaracao_escolar[index] : bodyRaw.declaracao_escolar,
           });
-          // console.log(body[index]);
         }
       }
 

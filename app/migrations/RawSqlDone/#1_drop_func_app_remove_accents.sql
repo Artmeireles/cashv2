@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS `wwmgca_app`.`remove_accents`;

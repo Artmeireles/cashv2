@@ -22,28 +22,51 @@ function executeSqlFile(sqlFolderPath, sqlDoneFolderPath) {
             console.error('Erro ao ler a pasta:', err);
             return;
         }
-    
-        files.forEach((file) => {
-            console.log(file);
+
+        files.forEach(async (file) => {
             const sqlFilePath = path.join(sqlFolderPath, file);
             const sql = fs.readFileSync(sqlFilePath).toString();
-    
-            knex.raw(sql)
-                .then(() => {
-                    fs.mkdirSync(sqlDoneFolderPath, { recursive: true });
-                    fs.rename(sqlFilePath, path.join(sqlDoneFolderPath, file), (err) => {
-                        if (err) {
-                            console.error(err);
-                        } 
-                    });
-                    console.log(`Arquivo ${file} executado com sucesso e renomeado para ${sqlDoneFolderPath}`);
-                })
-                .catch((error) => {
-                    console.error(`Erro ao executar o arquivo ${file}:`, error);
+            const sqlStatements = sql.split(';').filter(statement => statement.trim() !== '');
+            let success = true;
+
+            sqlStatements.forEach(async (statement) => {
+                // Executar com transaction
+                await knex.transaction((trx) => {
+                    trx.raw(statement)
+                        .then(() => {
+                            console.log(`Instrução executada com sucesso do arquivo ${file}: ${statement}`);
+                        })
+                        .catch((error) => {
+                            console.error(`Erro ao executar uma instrução do arquivo ${file}: ${statement}`, error);
+                            success = false;
+                        });
                 });
+            })
+                .then(async () => {
+                    await knex.raw('SET FOREIGN_KEY_CHECKS = 1')
+                        .then(() => {
+                            console.log(`Instrução executada com sucesso do arquivo ${file}: SET FOREIGN_KEY_CHECKS = 1`);
+                        })
+                        .catch((error) => {
+                            console.error(`Erro ao executar uma instrução do arquivo ${file}: SET FOREIGN_KEY_CHECKS = 1`, error);
+                            success = false;
+                        });
+                });
+            if (!success) {
+                return;
+            }
+            fs.mkdirSync(sqlDoneFolderPath, { recursive: true });
+            fs.rename(sqlFilePath, path.join(sqlDoneFolderPath, file), (err) => {
+                if (err) {
+                    console.error(`Erro ao renomear o arquivo ${file}:`, err);
+                } else {
+                    console.log(`Arquivo ${file} movido para ${sqlDoneFolderPath}`);
+                }
+            });
         });
     });
 }
+
 
 /**
  * Função responsável por executar os arquivos JSON e lançar no banco de dados
@@ -56,19 +79,18 @@ function executeJsontoSql(jsonFolderPath, jsonDoneFolderPath) {
             console.error('Erro ao ler a pasta:', err);
             return;
         }
-    
+
         files.forEach((file) => {
-            console.log(file);
             const jsonFilePath = path.join(jsonFolderPath, file);
             const json = fs.readFileSync(jsonFilePath).toString();
-    
+
             knex.raw(convertToBatchInsertSQL(json))
                 .then(() => {
                     fs.mkdirSync(jsonDoneFolderPath, { recursive: true });
                     fs.rename(sqlFilePath, path.join(jsonDoneFolderPath, file), (err) => {
                         if (err) {
                             console.error(err);
-                        } 
+                        }
                     });
                     console.log(`Arquivo ${file} executado com sucesso e renomeado para ${jsonDoneFolderPath}`);
                 })

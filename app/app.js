@@ -65,28 +65,28 @@ app.listen(port, async() => {
         });
         app.api.logger.logInfo({ log: { line: `Directory logs created successfully!`, sConsole: true } })
     }
-    const clientes = await app.db('params')
-        .select('value')
-        .where({ meta: 'clientName', dominio: 'root' })
-        .andWhereNot({ value: 'root' }).then()
-    clientes.forEach(async elementClient => {
-        const dominios = await app.db('params')
-            .select('value')
-            .where({ meta: 'domainName', dominio: elementClient.value }).then()
-        dominios.forEach(elementDomain => {
-            const photosDir = `./assets/images/${elementClient.value}/${elementDomain.value}`
-                // const photosDir = `../frontend/src/assets/images/${elementClient.value}/${elementDomain.value}`
-            if (!fs.existsSync(photosDir)) {
-                fs.mkdirSync(path.join(__dirname, photosDir), { recursive: true }, (err) => {
-                    if (err) {
-                        app.api.logger.logInfo({ log: { line: `Directory photos create error! Error: ${err}`, sConsole: false } })
-                        return console.error(err);
-                    }
-                });
-                app.api.logger.logInfo({ log: { line: `Directory photos created successfully!`, sConsole: true } })
-            }
-        })
-    })
+    // const clientes = await app.db('params')
+    //     .select('value')
+    //     .where({ meta: 'clientName', dominio: 'root' })
+    //     .andWhereNot({ value: 'root' }).then()
+    // clientes.forEach(async elementClient => {
+    //     const dominios = await app.db('params')
+    //         .select('value')
+    //         .where({ meta: 'domainName', dominio: elementClient.value }).then()
+    //     dominios.forEach(elementDomain => {
+    //         const photosDir = `./assets/images/${elementClient.value}/${elementDomain.value}`
+    //             // const photosDir = `../frontend/src/assets/images/${elementClient.value}/${elementDomain.value}`
+    //         if (!fs.existsSync(photosDir)) {
+    //             fs.mkdirSync(path.join(__dirname, photosDir), { recursive: true }, (err) => {
+    //                 if (err) {
+    //                     app.api.logger.logInfo({ log: { line: `Directory photos create error! Error: ${err}`, sConsole: false } })
+    //                     return console.error(err);
+    //                 }
+    //             });
+    //             app.api.logger.logInfo({ log: { line: `Directory photos created successfully!`, sConsole: true } })
+    //         }
+    //     })
+    // })
     moment().toString()     
     app.api.logger.logInfo({ log: { line: `Backend executando na porta ${port}`, sConsole: true } }) 
 })

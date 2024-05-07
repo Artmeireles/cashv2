@@ -20,8 +20,8 @@ exports.up = function(knex) {
         table.string('nr', 255).notNull().comment("Número")
         table.string('complemento', 255).notNull().comment("Complemento")
         table.integer('id_emp_resp').notNull().unsigned().comment("Orgão Responsável")        
-        table.string('email', 255).comment("E-mail")
-        table.string('telefone', 255).comment("Telefone")  
+        table.string('email', 255).notNull().comment("E-mail")
+        table.string('telefone', 255).notNull().comment("Telefone")  
 
         table.foreign('id_emp').references('id').inTable('wwmgca_app.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_cidade').references('id').inTable('wwmgca_app.cad_cidades').onUpdate('CASCADE').onDelete('NO ACTION')

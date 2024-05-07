@@ -68,7 +68,7 @@ module.exports = app => {
             body.complemento = bodyRaw.complemento_22
         }
         //body.id_emp = req.params.id_emp
-        
+
 
         try {
             existsOrError(body.id_emp, 'Órgão não informado')
@@ -98,10 +98,8 @@ module.exports = app => {
                     .andWhere(app.db.raw(body.id ? (`id != '${body.id}'`) : '1=1'))
                     .first()
                 notExistsOrError(dataFromDB, 'Combinação de CPF já cadastrado')
-        }
-    } catch (error) {
-        
-        console.log(body.id_emp);
+            }
+        } catch (error) {
             return res.status(400).send(error)
         }
 
@@ -222,9 +220,9 @@ module.exports = app => {
         })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename} (${__function}:${__line}). Error: ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 
@@ -247,9 +245,9 @@ module.exports = app => {
             })
             .catch(error => {
                 app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                
-                    app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
-                    return res.status(500).send(error)
+
+                app.api.logger.logError({ log: { line: `Error in file: ${__filename}.${__function} ${error}`, sConsole: true } })
+                return res.status(500).send(error)
             })
     }
 

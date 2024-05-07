@@ -8,7 +8,6 @@ exports.up = function(knex) {
         table.integer('evento').notNull()
         table.string('created_at').notNull()
         table.string('updated_at')
-        table.integer('id_emp').notNull().unsigned().comment("Órgão")
         table.string('cpf_trab', 14).notNull().comment("CPF")
         table.string('nome', 70).notNull().comment("Nome do Trabalhador")
         table.string('nome_social', 70).comment("Nome Social")
@@ -39,7 +38,6 @@ exports.up = function(knex) {
         table.string('pai', 70).comment("Nome do Pai")
         table.string('naturalidade', 60).comment("Naturalidade")
 
-        table.foreign('id_emp').references('id').inTable('wwmgca_app.empresa').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_sexo').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_raca_cor').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')
         table.foreign('id_param_est_civ').references('id').inTable('wwmgca_app.params').onUpdate('CASCADE').onDelete('NO ACTION')

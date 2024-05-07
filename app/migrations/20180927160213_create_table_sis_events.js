@@ -5,6 +5,7 @@ exports.up = function(knex) {
         table.collate('utf8mb4_general_ci')
         table.increments('id').primary()
         table.integer('id_user').unsigned().notNullable()
+        table.integer('id_emp').unsigned().notNullable()
         table.string('created_at').notNull()
         table.text('evento')
         table.string('classevento')

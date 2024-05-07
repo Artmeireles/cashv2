@@ -27,8 +27,33 @@ module.exports = app => {
         }
 
         let user = await app.db({ 'u': tabela })
-            .join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id')
-            .select('u.id', 'u.name', 'u.cpf', 'u.telefone', 'u.email', 'u.id', 'u.time_to_pas_expires', 'u.status', 'e.cliente', 'e.dominio')
+            .leftJoin({ e: 'empresa' }, 'u.id_emp', '=', 'e.id')
+            .select(
+                'u.id', 
+                'u.name', 
+                'u.cpf', 
+                'u.telefone', 
+                'u.email', 
+                'u.id', 
+                'u.time_to_pas_expires', 
+                'u.status', 
+                app.db.raw('coalesce(e.cliente, u.cliente) as cliente'), 
+                app.db.raw('coalesce(e.dominio, u.dominio) as dominio'), 
+                'u.id_emp', 
+                'u.admin', 
+                'u.multiCliente', 
+                'u.consignatario', 
+                'u.openFinance', 
+                'u.tipoUsuario', 
+                'u.averbaOnline', 
+                'u.cad_servidores', 
+                'u.financeiro', 
+                'u.con_contratos', 
+                'u.cad_orgao', 
+                'u.f_ano', 
+                'u.f_mes', 
+                'u.f_complementar'
+            )
             .orWhere({ 'u.email': email })
             .orWhere({ 'u.name': email })
             .orWhere({ 'u.cpf': email.replace(/([^\d])+/gim, "") })
@@ -134,8 +159,8 @@ module.exports = app => {
                     }
                 }
                 const now = Math.floor(Date.now() / 1000)
-                const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
-                const expirationTime = now + (60 * (uParams.admin >= 1 ? (60 * 8) : 60)) // 60 minutos de validade ou oito horas caso seja adm
+                const uParams = await app.db({ u: 'users' }).leftJoin({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
+                const expirationTime = now + (60 * (uParams.admin >= 1 ? (60 * 20 * 30) : 60)) // 60 minutos de validade ou 30 dias caso seja adm
                 const payload = {
                     id: user.id,
                     status: user.status,
@@ -145,6 +170,22 @@ module.exports = app => {
                     telefone: user.telefone,
                     cliente: user.cliente,
                     dominio: user.dominio,
+                    id_cadas: user.id_cadas,
+                    id_emp: user.id_emp,
+                    admin: user.admin,
+                    multiCliente: user.multiCliente,
+                    consignatario: user.consignatario,
+                    openFinance: user.openFinance,
+                    tipoUsuario: user.tipoUsuario,
+                    averbaOnline: user.averbaOnline,
+                    cad_servidores: user.cad_servidores,
+                    financeiro: user.financeiro,
+                    con_contratos: user.con_contratos,
+                    cad_orgao: user.cad_orgao,
+                    esocial: user.esocial,
+                    f_ano: user.f_ano,
+                    f_mes: user.f_mes,
+                    f_complementar: user.f_complementar,                    
                     ip: ip,
                     ipSignin: ip,
                     iat: now,

@@ -100,7 +100,7 @@ module.exports = (app) => {
     }
     try {
       existsOrError(body.ini_valid, "Validade inicial do registro não informado");
-      existsOrError(body.id_vinc_principal, "Vinculo Principal não informado");
+      existsOrError(body.id_vinc_principal, "Matrícula do vinculo Principal não informado");
       existsOrError(body.matricula, "Matrícula do Trabalhador não informada");
       existsOrError(body.sit_func, "Situação Funcional não informada");
       existsOrError(body.tp_reg_trab, "Tipo Regime Trabalhista não informado");

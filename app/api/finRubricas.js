@@ -92,8 +92,6 @@ module.exports = app => {
                 return res.status(400).send(error)
         }
 
-        // return console.log(body);
-
         if (body.id) {
             // Variáveis da edição de um registro
             // registrar o evento na tabela de eventos

@@ -201,6 +201,9 @@ module.exports = app => {
         .get(app.api.servidores.getById)
         .delete(app.api.servidores.remove)
 
+    app.route('/serv-dependentes')
+        .all(app.config.passport.authenticate())
+        .post(app.api.servDependentes.save)
     app.route('/serv-dependentes/:id_serv')
         .all(app.config.passport.authenticate())
         .post(app.api.servDependentes.save)
@@ -211,6 +214,9 @@ module.exports = app => {
         .get(app.api.servDependentes.getById)
         .delete(app.api.servDependentes.remove)
 
+    app.route('/serv-vinculos')
+        .all(app.config.passport.authenticate())
+        .post(app.api.servVinculos.save)
     app.route('/serv-vinculos/:id_serv')
         .all(app.config.passport.authenticate())
         .post(app.api.servVinculos.save)
