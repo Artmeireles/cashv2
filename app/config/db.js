@@ -8,6 +8,8 @@ const sqlDoneFolderPath = './migrations/RawSqlDone'; // Caminho da pasta com os 
 const jsonFolderPath = './migrations/Json'; // Caminho da pasta com os arquivos Json
 const jsonDoneFolderPath = './migrations/JsonDone'; // Caminho da pasta com os arquivos JsonDone
 
+knex.migrate.latest([config])
+
 executeSqlFile(sqlFolderPath, sqlDoneFolderPath);
 executeJsontoSql(jsonFolderPath, jsonDoneFolderPath);
 
@@ -128,6 +130,4 @@ function convertToBatchInsertSQL(data) {
 
     return `${insertSQL}${rows};`;
 }
-
-knex.migrate.latest([config])
 module.exports = knex
