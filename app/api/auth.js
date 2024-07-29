@@ -21,7 +21,8 @@ module.exports = app => {
         const ip = req.body.ip
 
         try {
-            existsOrError(email, 'E-mail, nome ou CPF precisam ser informados')
+            const clientIp = req.ip || req.connection.remoteAddress;
+            existsOrError(email, 'E-mail, nome ou CPF precisam ser informados. IP: ' + clientIp)
         } catch (error) {
             return res.status(400).send(error)
         }
@@ -29,29 +30,29 @@ module.exports = app => {
         let user = await app.db({ 'u': tabela })
             .leftJoin({ e: 'empresa' }, 'u.id_emp', '=', 'e.id')
             .select(
-                'u.id', 
-                'u.name', 
-                'u.cpf', 
-                'u.telefone', 
-                'u.email', 
-                'u.id', 
-                'u.time_to_pas_expires', 
-                'u.status', 
-                app.db.raw('coalesce(e.cliente, u.cliente) as cliente'), 
-                app.db.raw('coalesce(e.dominio, u.dominio) as dominio'), 
-                'u.id_emp', 
-                'u.admin', 
-                'u.multiCliente', 
-                'u.consignatario', 
-                'u.openFinance', 
-                'u.tipoUsuario', 
-                'u.averbaOnline', 
-                'u.cad_servidores', 
-                'u.financeiro', 
-                'u.con_contratos', 
-                'u.cad_orgao', 
-                'u.f_ano', 
-                'u.f_mes', 
+                'u.id',
+                'u.name',
+                'u.cpf',
+                'u.telefone',
+                'u.email',
+                'u.id',
+                'u.time_to_pas_expires',
+                'u.status',
+                app.db.raw('coalesce(e.cliente, u.cliente) as cliente'),
+                app.db.raw('coalesce(e.dominio, u.dominio) as dominio'),
+                'u.id_emp',
+                'u.admin',
+                'u.multiCliente',
+                'u.consignatario',
+                'u.openFinance',
+                'u.tipoUsuario',
+                'u.averbaOnline',
+                'u.cad_servidores',
+                'u.financeiro',
+                'u.con_contratos',
+                'u.cad_orgao',
+                'u.f_ano',
+                'u.f_mes',
                 'u.f_complementar'
             )
             .orWhere({ 'u.email': email })
@@ -185,7 +186,7 @@ module.exports = app => {
                     esocial: user.esocial,
                     f_ano: user.f_ano,
                     f_mes: user.f_mes,
-                    f_complementar: user.f_complementar,                    
+                    f_complementar: user.f_complementar,
                     ip: ip,
                     ipSignin: ip,
                     iat: now,
