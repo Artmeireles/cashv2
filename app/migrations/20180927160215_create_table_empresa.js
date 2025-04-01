@@ -1,5 +1,7 @@
-exports.up = function(knex) {
-    return knex.schema.createTable('wwmgca_app.empresa', table => {
+const { db } = require('../.env')
+
+exports.up = function (knex, Promise) {
+    return knex.schema.createTable(db.database+ '.empresa', table => {
         table.engine('InnoDB')
         table.charset('utf8mb4')
         table.collate('utf8mb4_general_ci')

@@ -1,5 +1,7 @@
+const { migrationClientSchema } = require('../.env')
+
 exports.up = function(knex) {
-    return knex.schema.createTable('wwmgca_cliente_ativos.con_parcelas', table => {
+    return knex.schema.createTable(migrationClientSchema + '.con_parcelas', table => {
         table.engine('InnoDB')
         table.charset('utf8mb4')
         table.collate('utf8mb4_general_ci')
@@ -21,5 +23,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-    return knex.schema.dropTable('wwmgca_cliente_ativos.con_parcelas')
+    return knex.schema.dropTable(migrationClientSchema + '.con_parcelas')
 };

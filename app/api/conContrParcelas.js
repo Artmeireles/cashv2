@@ -1,5 +1,4 @@
 const moment = require('moment')
-const client = require("basic-ftp")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
@@ -10,9 +9,7 @@ module.exports = app => {
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
     const fs = require('fs');
-    const ftpClient = new client.Client()
-    ftpClient.ftp.verbose = true
-
+    
     const save = async (req, res) => {
         let user = req.user
         const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;

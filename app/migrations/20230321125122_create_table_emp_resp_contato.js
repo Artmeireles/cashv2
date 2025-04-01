@@ -1,5 +1,7 @@
+const { migrationClientSchema } = require('../.env')
+
 exports.up = function(knex) {
-    return knex.schema.createTable('wwmgca_cliente_ativos.emp_resp_contatos', table => {
+    return knex.schema.createTable(migrationClientSchema + '.emp_resp_contatos', table => {
         table.engine('InnoDB')
         table.charset('utf8mb4')
         table.collate('utf8mb4_general_ci')
@@ -17,5 +19,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-    return knex.schema.dropTable('wwmgca_cliente_ativos.emp_resp_contatos')
+    return knex.schema.dropTable(migrationClientSchema + '.emp_resp_contatos')
 };

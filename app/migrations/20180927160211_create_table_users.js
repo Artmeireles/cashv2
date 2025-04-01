@@ -1,5 +1,7 @@
-exports.up = function(knex) {
-    return knex.schema.createTable('users', function(table) {
+const { db } = require('../.env')
+
+exports.up = function (knex, Promise) {
+    return knex.schema.createTable(db.database+ '.users', function(table) {
       table.increments('id').unsigned().primary();
       table.integer('evento').notNullable();
       table.string('created_at').notNullable();

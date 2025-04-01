@@ -1,8 +1,7 @@
+const { migrationClientSchema } = require('../.env')
+
 exports.up = function(knex) {
-    /**
-     * Tabela 2400 do eSocial
-     */
-    return knex.schema.createTable('wwmgca_cliente_ativos.beneficiarios', table => {
+    return knex.schema.createTable(migrationClientSchema + '.beneficiarios', table => {
         table.engine('InnoDB')
         table.charset('utf8mb4')
         table.collate('utf8mb4_general_ci')
@@ -19,5 +18,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-    return knex.schema.dropTable('wwmgca_cliente_ativos.beneficiarios')
+    return knex.schema.dropTable(migrationClientSchema + '.beneficiarios')
 };

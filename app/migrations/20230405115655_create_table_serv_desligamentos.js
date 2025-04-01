@@ -1,5 +1,7 @@
-exports.up = function (knex) {
-    return knex.schema.createTable('wwmgca_cliente_ativos.serv_desligamentos', table => {
+const { migrationClientSchema } = require('../.env')
+
+exports.up = function(knex) {
+    return knex.schema.createTable(migrationClientSchema + '.serv_desligamentos', table => {
         table.engine('InnoDB')
         table.charset('utf8mb4')
         table.collate('utf8mb4_general_ci')
@@ -20,5 +22,5 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-    return knex.schema.dropTable('wwmgca_cliente_ativos.serv_desligamentos')
+    return knex.schema.dropTable(migrationClientSchema + '.serv_desligamentos')
 };

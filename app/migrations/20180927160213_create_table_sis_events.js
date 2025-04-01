@@ -1,5 +1,7 @@
-exports.up = function(knex) {
-    return knex.schema.createTable('sis_events', table => {
+const { db } = require('../.env')
+
+exports.up = function (knex, Promise) {
+    return knex.schema.createTable(db.database+ '.sis_events', table => {
         table.charset('utf8mb4')
         table.engine('InnoDB')
         table.collate('utf8mb4_general_ci')

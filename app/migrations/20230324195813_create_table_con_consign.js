@@ -1,5 +1,7 @@
+const { migrationClientSchema } = require('../.env')
+
 exports.up = function(knex) {
-    return knex.schema.createTable('wwmgca_cliente_ativos.con_consign', table => {
+    return knex.schema.createTable(migrationClientSchema + '.con_consign', table => {
         table.engine('InnoDB')
         table.charset('utf8mb4')
         table.collate('utf8mb4_general_ci')
@@ -15,10 +17,10 @@ exports.up = function(knex) {
         table.boolean('averbar_online').notNull().default(false).comment('Aceitar averbação online')
         table.boolean('apenas_efetivos').notNull().default(true).comment('Apenas efetivos podem contratar')
 
-        table.foreign('id_cad_bancos').references('id').inTable('wwmgca_cliente_ativos.cad_bancos').onUpdate('CASCADE').onDelete('NO ACTION')
+        table.foreign('id_cad_bancos').references('id').inTable(migrationClientSchema + '.cad_bancos').onUpdate('CASCADE').onDelete('NO ACTION')
     })
 };
 
 exports.down = function(knex) {
-    return knex.schema.dropTable('wwmgca_cliente_ativos.con_consign')
+    return knex.schema.dropTable(migrationClientSchema + '.con_consign')
 };
