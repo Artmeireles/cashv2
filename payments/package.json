@@ -1,0 +1,37 @@
+{
+    "name": "sakai-vue",
+    "version": "4.3.0",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "lint": "eslint --fix . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    },
+    "dependencies": {
+        "@primeuix/themes": "^1.0.0",
+        "chart.js": "3.3.2",
+        "primeicons": "^7.0.0",
+        "primevue": "^4.3.1",
+        "tailwindcss-primeui": "^0.5.0",
+        "vue": "^3.4.34",
+        "vue-router": "^4.4.0"
+    },
+    "devDependencies": {
+        "@primevue/auto-import-resolver": "^4.3.1",
+        "@rushstack/eslint-patch": "^1.8.0",
+        "autoprefixer": "^10.4.19",
+        "postcss": "^8.4.40",
+        "sass": "^1.55.0",
+        "tailwindcss": "^3.4.6",
+        "unplugin-vue-components": "^0.27.3",
+        "@eslint/js": "^9.22.0",
+        "@vitejs/plugin-vue": "^5.2.3",
+        "@vue/eslint-config-prettier": "^10.2.0",
+        "eslint": "^9.22.0",
+        "eslint-plugin-vue": "~10.0.0",
+        "globals": "^16.0.0",
+        "prettier": "3.5.3",
+        "vite": "^6.2.4",
+        "vite-plugin-vue-devtools": "^7.7.2"
+    }
+}
