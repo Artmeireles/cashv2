@@ -28,6 +28,10 @@ const dropdownItem = ref(null);
                         <label for="age1">Age</label>
                         <InputText id="age1" type="text" />
                     </div>
+                    <div class="flex flex-col gap-2">
+                        <label for="age1">Age</label>
+                        <Calendar id="calendar" />
+                    </div>
                 </div>
 
                 <div class="card flex flex-col gap-4">

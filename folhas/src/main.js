@@ -17,7 +17,8 @@ app.use(PrimeVue, {
         preset: Aura,
         options: {
             darkModeSelector: '.app-dark'
-        }
+        },
+        ripple: true,
     }
 });
 app.use(ToastService);
