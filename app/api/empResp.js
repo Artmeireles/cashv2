@@ -1,11 +1,8 @@
-const moment = require('moment')
-const randomstring = require("randomstring")
 const { dbPrefix } = require("../.env")
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, isValidEmail, isMatchOrError, noAccessMsg,
+    const { existsOrError, notExistsOrError, isMatchOrError, noAccessMsg,
     cpfOrError, cnpjOrError } = app.api.validation
-    const { mailyCliSender } = app.api.mailerCli
     const tabela = 'emp_resp'
     const STATUS_ACTIVE = 10
     const STATUS_DELETE = 99
@@ -159,6 +156,7 @@ module.exports = app => {
                     return res.status(500).send(error)
             })
     }
+    
     const getById = async (req, res) => {
         let user = req.user
         const uParams = await app.db({ u: 'users' }).join({ e: 'empresa' }, 'u.id_emp', '=', 'e.id').select('u.*', 'e.cliente', 'e.dominio').where({ 'u.id': user.id }).first();;
